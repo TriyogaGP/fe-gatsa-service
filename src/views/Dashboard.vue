@@ -4,7 +4,7 @@
     <v-card class="pa-1 rounded" variant="outlined" elevation="4">
       <v-container fluid>
         <v-row>
-          <v-col :cols="cols" v-if="roleID === '1' || roleID === '2'">
+          <v-col :cols="cols" v-if="roleID === '1'">
             <v-card color="white">
               <v-sheet color="green" class="sheetData" elevation="2">
                 <v-icon icon="mdi mdi-account-group" size="large" />
@@ -211,9 +211,9 @@
       width="500px"
     >
       <PopUpNotifikasiVue
-        :notifikasi-kode.sync="notifikasiKode"
-        :notifikasi-text.sync="notifikasiText"
-        :notifikasi-button.sync="notifikasiButton"
+        :notifikasi-kode="notifikasiKode"
+        :notifikasi-text="notifikasiText"
+        :notifikasi-button="notifikasiButton"
         @cancel="dialogNotifikasi = false"
       />
     </v-dialog>

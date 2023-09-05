@@ -2053,8 +2053,8 @@
         </v-toolbar>
         <v-card-text class="pt-4" style="font-size: 13px;">
           <PdfCetakan
-            :dialog-pdf.sync="dialogPDF"
-            :url-sk.sync="urlSk"
+            :dialog-pdf="dialogPDF"
+            :url-sk="urlSk"
           />
         </v-card-text>
       </v-card>
@@ -2108,9 +2108,9 @@
       width="500px"
     >
       <PopUpNotifikasiVue
-        :notifikasi-kode.sync="notifikasiKode"
-        :notifikasi-text.sync="notifikasiText"
-        :notifikasi-button.sync="notifikasiButton"
+        :notifikasi-kode="notifikasiKode"
+        :notifikasi-text="notifikasiText"
+        :notifikasi-button="notifikasiButton"
         @proses="goToProses"
         @cancel="dialogNotifikasi = false"
       />

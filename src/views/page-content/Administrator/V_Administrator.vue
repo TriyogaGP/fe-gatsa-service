@@ -437,9 +437,9 @@
       width="500px"
     >
       <PopUpNotifikasi
-        :notifikasi-kode.sync="notifikasiKode"
-        :notifikasi-text.sync="notifikasiText"
-        :notifikasi-button.sync="notifikasiButton"
+        :notifikasi-kode="notifikasiKode"
+        :notifikasi-text="notifikasiText"
+        :notifikasi-button="notifikasiButton"
         @cancel="dialogNotifikasi = false"
       />
     </v-dialog>

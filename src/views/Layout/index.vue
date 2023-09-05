@@ -3,11 +3,10 @@
     <Navbar
       :nama-sekolah="namaSekolah"
       :logo-sekolah="logoSekolah"
-      :total-notif="roleID === '1' || roleID === '2' ? this.dataNotifikasi.allNotif : 0"
+      :total-notif="roleID === '1' ? this.dataNotifikasi.allNotif : 0"
       :total-broadcast="this.dataNotifikasi.broadcast"
     />
     <v-main class="ma-4">
-      {{ dataNotifikasi.length }}
       <router-view style="margin-bottom: 20px;" />
       <div v-if="roleID === '3' || roleID === '4'" class="floating" @click="sendMessageAdmin()">
         <span class="tulisan"><v-icon size="small" icon="mdi mdi-chat" />&nbsp;Chat Administrator</span>
@@ -69,8 +68,6 @@ export default {
     },
     musik: '',
     DialogPengaduan: false,
-    // dialogPopup: false,
-    // fotoProfil: '',
 	}),
   setup() {
     const roleID = localStorage.getItem('roleID')
@@ -98,13 +95,10 @@ export default {
           report: value.length ? value[2].count : 0,
           broadcast: value.length ? value[3].count : 0,
         }
-        // `${this.API_URL}bahan/media-notifikasi/notif.mp3`
-        var data = { soundurl : require('../../../public/media-notifikasi/notif.mp3')}
-        this.musik = new Audio(data.soundurl);
-        if((this.roleID === '1' || this.roleID === '2') && this.dataNotifikasi.allNotif > 0) {
+        if((this.roleID === '1') && this.dataNotifikasi.allNotif > 0) {
           this.audio()
         }
-        if((this.roleID === '3' || this.roleID === '4') && this.dataNotifikasi.broadcast > 0) {
+        if((this.roleID === '2' || this.roleID === '3' || this.roleID === '4') && this.dataNotifikasi.broadcast > 0) {
           this.audio()
         }
       }
@@ -113,8 +107,6 @@ export default {
 	mounted(){
     this.fotoProfil = localStorage.getItem('popup')
     this.getCMSSettings()
-    var data = { soundurl : require('../../../public/media-notifikasi/notif.mp3')}
-    this.musik = new Audio(data.soundurl);
     // this.dialogPopup = true
 	},
 	methods: {
@@ -125,12 +117,10 @@ export default {
       this.DialogPengaduan = true
     },
     audio(){
-      this.musik.autoplay = true;
-      this.musik.play();
-      setInterval(() => {
-        this.musik.pause();
-        this.musik.currentTime = 0;
-      }, 1000);
+      var sound = new Howl({
+        src: `${this.API_URL}bahan/media-notifikasi/notif-2.wav`
+      });
+      sound.play();
     },
 	}
 };
