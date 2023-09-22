@@ -8,8 +8,8 @@ RUN npm install --force
 
 COPY . .
 
-RUN npm run-script build
+RUN npm run-script stg-build
 
 EXPOSE 4002
 
-CMD ["npm", "run", "stg"]
+CMD ["npm", "run", "stg-serve"]

@@ -4,10 +4,12 @@
   "private": true,
   "scripts": {
     "start": "node server.js",
-    "build": "vue-cli-service build --skip-plugins @vue/cli-plugin-eslint --mode production",
+    "build": "vue-cli-service build --skip-plugins @vue/cli-plugin-eslint",
+    "build-prod": "vue-cli-service build --skip-plugins @vue/cli-plugin-eslint --mode production",
     "lint": "vue-cli-service lint",
     "dev": "vue-cli-service serve --skip-plugins @vue/cli-plugin-eslint --mode development",
-    "stg": "vue-cli-service serve --skip-plugins @vue/cli-plugin-eslint --mode staging"
+    "stg-build": "vue-cli-service build --skip-plugins @vue/cli-plugin-eslint --mode staging",
+    "stg-serve": "vue-cli-service serve --skip-plugins @vue/cli-plugin-eslint --mode staging"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.4.2",
@@ -20,6 +22,7 @@
     "@tanstack/vue-query": "^4.32.6",
     "@vue/composition-api": "^1.7.2",
     "@vuepic/vue-datepicker": "^6.0.0",
+    "axios": "^0.27.2",
     "chart.js": "^4.3.3",
     "core-js": "^3.6.5",
     "dayjs": "^1.11.9",
