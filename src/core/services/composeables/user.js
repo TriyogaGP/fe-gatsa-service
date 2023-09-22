@@ -9,6 +9,13 @@ const user = {
 			select: (response) => response.data.result
 		})
 	},
+	jadwalexamByGet: (id_jadwal_exam) => {
+		return useQuery({
+			queryKey: ["jadwal-exam-by"],
+			queryFn: () => ApiService.get(`user/jadwal-exam-id/${id_jadwal_exam}`, localStorage.getItem('user_token')),
+			select: (response) => response.data.result
+		})
+	},
 }
 
 export default user;

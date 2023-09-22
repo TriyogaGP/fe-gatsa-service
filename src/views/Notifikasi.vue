@@ -253,7 +253,7 @@ export default {
   }),
   setup() {
     useMeta({
-      title: "Notifikasi - MTsS. SIROJUL ATHFAL",
+      title: "Notifikasi",
       htmlAttrs: {
         lang: "id",
         amp: true,

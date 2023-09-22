@@ -168,7 +168,7 @@ export default {
   }),
   setup() {
     useMeta({
-      title: "Percakapan - MTsS. SIROJUL ATHFAL",
+      title: "Percakapan",
       htmlAttrs: {
         lang: "id",
         amp: true,
@@ -192,6 +192,7 @@ export default {
 		this.scrollToEnd()
 	},
   mounted() {
+    if(!localStorage.getItem('user_token')) return this.$router.push({name: 'LogIn'});
     this.roleID = localStorage.getItem("roleID")
     this.idLogin = localStorage.getItem("idLogin")
     this.nama = localStorage.getItem("nama")

@@ -13,7 +13,7 @@
         </v-col>
         <v-col cols="12" md="6">
           <v-row no-gutters>
-            <v-col cols="12" md="4">
+            <v-col cols="12" md="4" class="pr-2">
               <Autocomplete
                 v-model="pencarian"
                 :data-a="pencarianOptions"
@@ -25,7 +25,7 @@
                 @ubah="() => { page = 1; searchData = null; }"
               />
             </v-col>
-            <v-col cols="12" md="6" class="pl-2">
+            <v-col cols="12" md="6" class="pr-2">
               <Autocomplete
                 v-model="searchData"
                 :data-a="pencarian === 'Mata Pelajaran' ? optionsMengajar : pencarian === 'Kelas' ? optionsKelas : questionOptions"
@@ -36,7 +36,7 @@
                 @ubah="(e) => { page = 1; getQuestionExam({page: 1, limit: limit, keyword: e}); }"
               />
             </v-col>
-            <v-col cols="12" md="2" class="pl-2 d-flex justify-end align-center">
+            <v-col cols="12" md="2" class="d-flex justify-end align-center">
               <Autocomplete
                 v-model="page"
                 :data-a="pageOptions"
@@ -56,7 +56,7 @@
           :loading="loadingtable"
           :items="DataQuestionExam"
           :expand-on-click="DetailPilihan === false ? true : false"
-          show-expand
+          v-model:expanded="expanded"
           item-value="kode"
           density="comfortable"
           hide-default-footer
@@ -64,6 +64,7 @@
           class="elavation-3 rounded"
           :items-per-page="itemsPerPage"
           @page-count="pageCount = $event"
+          @click:row="clickrow"
         >
           <!-- header -->
           <template #headers="{ columns }">
@@ -89,16 +90,26 @@
           </template>
           <template #[`item.pilihan`]="{ item }">
             <Button
-              v-if="item.raw.jenis === 'pilihan ganda'"
+              v-if="item.raw.jenis === 'pilihan ganda' || item.raw.jenis === 'benar salah'"
               color-button="#04f7f7"
               icon-button="mdi mdi-information"
               nama-button="Detail"
               @proses="openDetail(item.raw.pilihan)"
             />
+            <span v-else-if="item.raw.jenis === 'menjodohkan'">
+              <span v-if="item.raw.pilihan.jenis === 'text'" v-html="item.raw.pilihan.text" /> 
+              <div v-else>
+                <img :src="item.raw.pilihan.file" width="80">
+                  <v-tooltip
+                    activator="parent"
+                    location="top"
+                  ><img :src="item.raw.pilihan.file" width="300"></v-tooltip>
+              </div>
+            </span>
             <span v-else>-</span>
           </template>
           <template #[`item.kunci`]="{ item }">
-            <span v-html="item.raw.jenis === 'pilihan ganda' ? item.raw.kunci : '-'" /> 
+            <span v-html="item.raw.jenis === 'pilihan ganda' || item.raw.jenis === 'menjodohkan' || item.raw.jenis === 'benar salah' ? item.raw.kunci : '-'" /> 
           </template>
           <template #[`item.statusAktif`]="{ item }">
             <v-icon size="small" v-if="item.raw.statusAktif == true" color="green" icon="mdi mdi-check" />
@@ -136,10 +147,10 @@
           <template #bottom>
             <v-divider :thickness="2" class="border-opacity-100" color="white" />
             <v-row no-gutters>
-              <v-col cols="10" class="pa-2 d-flex justify-start align-center">
+              <v-col cols="12" lg="10" class="pa-2 d-flex justify-start align-center">
                 <span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
               </v-col>
-              <v-col cols="2" class="pa-2 text-right">
+              <v-col cols="12" lg="2" class="pa-2 text-right">
                 <div class="d-flex justify-start align-center">
                   <Autocomplete
                     v-model="limit"
@@ -271,7 +282,7 @@
               md="4"
               class="pt-2 d-flex align-center font-weight-bold"
             >
-              Pertanyaan
+              Pertanyaan / Pernyataan
             </v-col>
             <v-col
               cols="12"
@@ -280,7 +291,7 @@
             >
               <TextArea
                 v-model="inputDataQuestionExam.pertanyaan"
-                label-ta="Pertanyaan"
+                label-ta="Pertanyaan / Pernyataan"
                 rows="4"
                 :clearable-ta="true"
               />
@@ -303,10 +314,10 @@
                 <v-icon v-if="filePertanyaan !== ''" color="red" icon="mdi mdi-delete" style="cursor: pointer;" @click="() => { filePertanyaan = ''; filename = ''; }" />
                 <v-img :src="`${BASE_URL}berkas/${filePertanyaan}`" />
               </div>
-              <div v-else>gambar pertanyaan tidak ada</div>
+              <!-- <div v-else>gambar pertanyaan tidak ada</div> -->
             </v-col>
           </v-row>
-          <v-row no-gutters v-if="inputDataQuestionExam.jenis === 'pilihan ganda'">
+          <v-row no-gutters v-if="inputDataQuestionExam.jenis === 'pilihan ganda' || inputDataQuestionExam.jenis === 'benar salah'">
             <v-col
               cols="12"
               md="4"
@@ -321,7 +332,7 @@
             >
               <Autocomplete
                 v-model="inputDataQuestionExam.kunci"
-                :data-a="ValuePilihan"
+                :data-a="inputDataQuestionExam.jenis === 'pilihan ganda' ? ValuePilihan : ValuePilihan2"
                 label-a="Pilih Kunci Jawaban"
                 item-title="value"
                 item-value="value"
@@ -329,7 +340,7 @@
               />
             </v-col>
           </v-row>
-          <v-row no-gutters v-if="inputDataQuestionExam.jenis === 'pilihan ganda'">
+          <v-row no-gutters v-if="inputDataQuestionExam.jenis === 'pilihan ganda' || inputDataQuestionExam.jenis === 'menjodohkan' || inputDataQuestionExam.jenis === 'benar salah'">
             <v-col
               cols="12"
               md="4"
@@ -345,12 +356,13 @@
               <TextField
                 v-model="jumlahPilihan"
                 label-tf="Jumlah Pilihan"
+                :disabled-tf="inputDataQuestionExam.jenis === 'pilihan ganda' ? false : true"
                 @keypress="onlyNumber($event, 1, jumlahPilihan)"
                 @input="dataChange(jumlahPilihan, 5)"
               />
             </v-col>
           </v-row>
-          <v-row no-gutters v-if="inputDataQuestionExam.jenis === 'pilihan ganda'">
+          <v-row no-gutters v-if="inputDataQuestionExam.jenis === 'pilihan ganda' || inputDataQuestionExam.jenis === 'menjodohkan'">
             <v-col
               cols="12"
               md="4"
@@ -392,6 +404,7 @@
                 :label-ta="`Pilihan ${k}`"
                 rows="4"
                 class="mt-2"
+                :disabled-ta="inputDataQuestionExam.jenis === 'benar salah' ? true : false"
                 :clearable-ta="true"
               />
               <Button 
@@ -497,6 +510,7 @@ export default {
     PopUpNotifikasiVue
   },
   data: () => ({
+		expanded: [],
 		DataQuestionExam: [],
 		searchData: null,
     page: 1,
@@ -516,7 +530,7 @@ export default {
       { title: "#", key: "data-table-expand", sortable: false, width: "3%" },
       { title: "JENIS SOAL / KODE SOAL", key: "jeniskode", sortable: false, width: "10%" },
       { title: "MATA PELAJARAN / KELAS", key: "mapelkelas", sortable: false, width: "10%" },
-      { title: "PERTANYAAN", key: "pertanyaan", sortable: false, width: "20%" },
+      { title: "PERTANYAAN / PERNYATAAN", key: "pertanyaan", sortable: false, width: "20%" },
       { title: "PILIHAN", key: "pilihan", sortable: false, width: "3%" },
       { title: "KUNCI", key: "kunci", sortable: false, width: "3%" },
       { title: "CREATE BY", key: "createBy", sortable: false, width: "10%" },
@@ -538,9 +552,10 @@ export default {
     },
     JenisPilihan: 'text',
     ValuePilihan: ["A", "B", "C", "D", "E"],
+    ValuePilihan2: ["B", "S"],
     TextPilihan: [],
     FilePilihan: [],
-    questionOptions: ["pilihan ganda", "essay"],
+    questionOptions: ["pilihan ganda", "essay", "menjodohkan", "benar salah"],
     jenisPilihanOptions: ["text", "gambar"],
     editedIndex: 0,
     kondisiTombol: true,
@@ -564,7 +579,7 @@ export default {
   }),
   setup() {
     useMeta({
-      title: "Question Exam - MTsS. SIROJUL ATHFAL",
+      title: "Question Exam",
       htmlAttrs: {
         lang: "id",
         amp: true,
@@ -639,10 +654,10 @@ export default {
         this.pageOptions = []
         this.DataQuestionExam = value.records
 				this.pageSummary = {
-					page: this.DataQuestionExam.length ? value.pageSummary.page : 0,
-					limit: this.DataQuestionExam.length ? value.pageSummary.limit : 0,
-					total: this.DataQuestionExam.length ? value.pageSummary.total : 0,
-					totalPages: this.DataQuestionExam.length ? value.pageSummary.totalPages : 0
+					page: this.DataQuestionExam.length ? value?.pageSummary?.page : 0,
+					limit: this.DataQuestionExam.length ? value?.pageSummary?.limit : 0,
+					total: this.DataQuestionExam.length ? value?.pageSummary?.total : 0,
+					totalPages: this.DataQuestionExam.length ? value?.pageSummary?.totalPages : 0
 				}
         for (let index = 1; index <= this.pageSummary.totalPages; index++) {
           this.pageOptions.push(index)
@@ -656,6 +671,16 @@ export default {
           this.kondisiTombol = false
         }else{
           this.kondisiTombol = true
+        }
+
+        if(value.jenis === 'menjodohkan' && this.editedIndex === 0){
+          this.jumlahPilihan = 1
+          this.TextPilihan = []
+        }else if(value.jenis === 'benar salah'){
+          this.jumlahPilihan = 2
+          this.TextPilihan = ["Benar", "Salah"]
+        }else if(value.jenis === 'menjodohkan' && this.editedIndex === 1){
+          this.jumlahPilihan = 1
         }
       }
     },
@@ -674,6 +699,7 @@ export default {
 		},
   },
   mounted() {
+    if(!localStorage.getItem('user_token')) return this.$router.push({name: 'LogIn'});
     this.roleID = localStorage.getItem('roleID')
     this.idLog = localStorage.getItem('idLogin')
 		this.getQuestionExam({page: this.page, limit: this.limit, keyword: this.searchData});
@@ -688,11 +714,12 @@ export default {
       getKelas: 'setting/getKelas',
     }),
     postRecord(jenis) {
-      let inputPilihan = []
+      let dataInputPilihan = []
+      let valueKunci = this.makeRandom(5)
       for (let index = 0; index < this.jumlahPilihan; index++) {
-        inputPilihan.push({
+        dataInputPilihan.push({
           jenis: this.JenisPilihan,
-          value: this.ValuePilihan[index],
+          value: this.inputDataQuestionExam.jenis === 'pilihan ganda' ? this.ValuePilihan[index] : this.inputDataQuestionExam.jenis === 'benar salah' ? this.ValuePilihan2[index] : valueKunci,
           text: this.JenisPilihan === 'text' ? this.TextPilihan[index] ? this.TextPilihan[index] : null : null,
           file: this.JenisPilihan === 'gambar' ? this.FilePilihan[index] ? this.FilePilihan[index] : null : null,
         })
@@ -707,10 +734,9 @@ export default {
           text: this.inputDataQuestionExam.pertanyaan ? this.inputDataQuestionExam.pertanyaan : null,
           file: this.filePertanyaan ? this.filePertanyaan : null,
         },
-        pilihan: this.inputDataQuestionExam.jenis === 'essay' ? null : inputPilihan,
-        kunci: this.inputDataQuestionExam.jenis === 'essay' ? null : this.inputDataQuestionExam.kunci,
+        pilihan: this.inputDataQuestionExam.jenis === 'essay' ? null : dataInputPilihan,
+        kunci: this.inputDataQuestionExam.jenis === 'essay' ? null : this.inputDataQuestionExam.jenis === 'menjodohkan' ? valueKunci : this.inputDataQuestionExam.kunci,
       }
-      return console.log(bodyData);
       this.$store.dispatch('user/postQuestionExam', bodyData)
       .then((res) => {
         this.DialogQuestionExam = false
@@ -724,7 +750,7 @@ export default {
     postRecordTwo(jenis, item = null, statusAktif) {
       let bodyData = {
         proses: jenis,
-        kode: item.kode ? item.kode : null,
+        kode: item?.kode ? item?.kode : null,
         kondisi: statusAktif,
       }
       this.$store.dispatch('user/postQuestionExam', bodyData)
@@ -743,27 +769,39 @@ export default {
         this.clearData()
       }else{
         this.inputDataQuestionExam = {
-          kode: item.kode,
-          mapel: item.kodemapel,
-          kelas: item.kelas,
-          jenis: item.jenis,
-          pertanyaan: item.pertanyaan.text,
-          kunci: item.kunci,
+          kode: item?.kode,
+          mapel: item?.kodemapel,
+          kelas: item?.kelas,
+          jenis: item?.jenis,
+          pertanyaan: item?.pertanyaan?.text,
+          kunci: item?.kunci,
         }
-        this.filePertanyaan = item.pertanyaan.file ? item.pertanyaan.file.split('/')[4] : ''
-        this.filename = item.pertanyaan.file ? item.pertanyaan.file.split('/')[4].split('.')[0] : ''
-        this.jumlahPilihan = item.pilihan.length
-        this.JenisPilihan = item.pilihan.length ? item.pilihan[0].jenis : ''
-        item.pilihan.map(val => {
-          if(val.jenis === 'text'){
+        this.filePertanyaan = item?.pertanyaan?.file ? item?.pertanyaan?.file.split('/')[4] : ''
+        this.filename = item?.pertanyaan?.file ? item?.pertanyaan?.file.split('/')[4].split('.')[0] : ''
+        if(item?.jenis === 'pilihan ganda' || item?.jenis === 'benar salah'){
+          this.jumlahPilihan = item?.pilihan?.length
+          this.JenisPilihan = item?.pilihan?.length ? item?.pilihan[0].jenis : ''
+          item?.pilihan.map(val => {
+            if(val.jenis === 'text'){
+              this.FilePilihan = []
+              this.TextPilihan.push(val.text)
+            }else{
+              let fileAkhir = val.file.split('/')
+              this.FilePilihan.push(fileAkhir[fileAkhir.length - 1])
+              this.TextPilihan = []
+            }
+          })
+        }else if(item?.jenis === 'menjodohkan'){
+          this.JenisPilihan = item?.pilihan?.jenis
+          if(item?.pilihan?.jenis === 'text'){
             this.FilePilihan = []
-            this.TextPilihan.push(val.text)
+            this.TextPilihan.push(item?.pilihan?.text)
           }else{
-            let fileAkhir = val.file.split('/')
+            let fileAkhir = item?.pilihan?.file.split('/')
             this.FilePilihan.push(fileAkhir[fileAkhir.length - 1])
             this.TextPilihan = []
           }
-        })
+        }
       }
       this.DialogQuestionExam = true
     },
@@ -835,6 +873,12 @@ export default {
 		},
     dataChange(e, max){
       if(Number(e) > max) this.jumlahPilihan = max
+    },
+    clickrow(event, data) {
+      const index = this.$data.expanded.find(i => i === data?.item?.raw?.kode);
+      if(typeof index === 'undefined') return this.$data.expanded = [];
+      this.$data.expanded.splice(0, 1)
+      this.$data.expanded.push(data?.item?.raw?.kode);
     },
     notifikasi(kode, text, proses){
       this.dialogNotifikasi = true

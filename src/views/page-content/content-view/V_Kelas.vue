@@ -13,7 +13,7 @@
         </v-col>
         <v-col cols="12" md="6">
           <v-row no-gutters>
-            <v-col cols="12" md="9">
+            <v-col cols="12" md="9" class="pr-2">
               <TextField
                 v-model="searchData"
                 icon-prepend-tf="mdi mdi-magnify"
@@ -29,7 +29,7 @@
                 }"
               />
             </v-col>
-            <v-col cols="12" md="3" class="pl-2 d-flex justify-end align-center">
+            <v-col cols="12" md="3" class="d-flex justify-end align-center">
               <Autocomplete
                 v-model="page"
                 :data-a="pageOptions"
@@ -49,7 +49,7 @@
           :loading="loadingtable"
           :items="DataKelas"
           expand-on-click
-          show-expand
+          v-model:expanded="expanded"
           item-value="idKelas"
           density="comfortable"
           hide-default-footer
@@ -57,6 +57,7 @@
           class="elavation-3 rounded"
           :items-per-page="itemsPerPage"
           @page-count="pageCount = $event"
+          @click:row="clickrow"
         >
           <!-- header -->
           <template #headers="{ columns }">
@@ -106,10 +107,10 @@
           <template #bottom>
             <v-divider :thickness="2" class="border-opacity-100" color="white" />
             <v-row no-gutters>
-              <v-col cols="10" class="pa-2 d-flex justify-start align-center">
+              <v-col cols="12" lg="10" class="pa-2 d-flex justify-start align-center">
                 <span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
               </v-col>
-              <v-col cols="2" class="pa-2 text-right">
+              <v-col cols="12" lg="2" class="pa-2 text-right">
                 <div class="d-flex justify-start align-center">
                   <Autocomplete
                     v-model="limit"
@@ -243,6 +244,7 @@ export default {
     PopUpNotifikasiVue
   },
   data: () => ({
+		expanded: [],
 		DataKelas: [],
 		searchData: '',
     page: 1,
@@ -283,7 +285,7 @@ export default {
   }),
   setup() {
     useMeta({
-      title: "Data Kelas - MTsS. SIROJUL ATHFAL",
+      title: "Data Kelas",
       htmlAttrs: {
         lang: "id",
         amp: true,
@@ -340,6 +342,7 @@ export default {
 		},
   },
   mounted() {
+    if(!localStorage.getItem('user_token')) return this.$router.push({name: 'LogIn'});
     this.roleID = localStorage.getItem('roleID')
     this.idLog = localStorage.getItem('idLogin')
 		this.getKelas({page: this.page, limit: this.limit, keyword: this.searchData});
@@ -388,6 +391,12 @@ export default {
         id_kelas: '',
         kelas: '',
       }
+    },
+    clickrow(event, data) {
+      const index = this.$data.expanded.find(i => i === data?.item?.raw?.idKelas);
+      if(typeof index === 'undefined') return this.$data.expanded = [];
+      this.$data.expanded.splice(0, 1)
+      this.$data.expanded.push(data?.item?.raw?.idKelas);
     },
     notifikasi(kode, text, proses){
       this.dialogNotifikasi = true

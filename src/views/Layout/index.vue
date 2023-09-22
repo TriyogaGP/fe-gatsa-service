@@ -42,10 +42,6 @@
         <v-card-actions />
       </v-card>
     </v-dialog>
-    <!-- <v-overlay :value="dialogPopup">
-      <v-icon style="cursor: pointer;" @click="dialogPopup = false">clear</v-icon>
-      <v-img :src="fotoProfil" width="300"/>
-    </v-overlay> -->
   </v-app>
 </template>
 
@@ -105,9 +101,7 @@ export default {
     }
   },
 	mounted(){
-    this.fotoProfil = localStorage.getItem('popup')
     this.getCMSSettings()
-    // this.dialogPopup = true
 	},
 	methods: {
 		...mapActions({
@@ -190,6 +184,7 @@ export default {
 }
 .v-data-table__tr {
   font-size: 13px;
+  height: 50px;
 }
 .sheetData {
   height: 50px;
@@ -204,7 +199,30 @@ export default {
   width: 15px;
   height: 15px;
 }
-
+.gambarLogo {
+  margin-right: 5px;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  line-height: normal;
+  position: relative;
+  text-align: center;
+  vertical-align: middle;
+  float:left;
+  overflow: hidden;
+  width: 35px;
+  height: 35px;
+}
+.textNamaSekolah {
+	color: #FFF;
+	font-weight: bold;
+	font-size: 10pt;
+  align-items: center;
+  display: flex;
+  line-height: normal;
+  margin-right: 10px;
+  height: 35px;
+}
 .v-dialog--custom {
   width: 800px !important;
   height: 100% !important;
@@ -220,7 +238,7 @@ export default {
   width: 16px;
 }
 .v-dialog--custom::-webkit-scrollbar-thumb {
-  background-color: #4CAF50;
+  background-color: #272727;
   border: 5px solid #e1e1f0;
   border-radius: 10rem;
 }
@@ -244,7 +262,7 @@ export default {
   width: 16px;
 }
 .ScrollFullscreen::-webkit-scrollbar-thumb {
-  background-color: #4CAF50;
+  background-color: #272727;
   border: 5px solid #e1e1f0;
   border-radius: 10rem;
 }
@@ -253,6 +271,28 @@ export default {
   right: -3rem;
   top: -50rem;
   background: transparent;
+}
+
+.cross {
+  position: relative;
+  display: inline-block;
+}
+.cross::before, .cross::after {
+  content: '';
+  width: 100%;
+  position: absolute;
+  right: 0;
+  top: 35%;
+}
+.cross::before {
+  border-bottom: 3px solid red;
+  -webkit-transform: skewY(-45deg);
+  transform: skewY(-45deg);
+}
+.cross::after {
+  border-bottom: 3px solid red;
+  -webkit-transform: skewY(45deg);
+  transform: skewY(45deg);
 }
 
 @media screen and (min-width: 1920px) {

@@ -23,7 +23,11 @@ export const GET_LIST_SISWASISWI = "listSiswaSiswi";
 export const GET_QUESTION_EXAM = "getQuestionExam";
 export const POST_QUESTION_EXAM = "postQuestionExam";
 export const GET_JADWAL_EXAM = "getJadwalExam";
+export const GET_JADWAL_EXAM_BY = "getJadwalExambyID";
+export const GET_RANDOM_QUESTION = "getRandomQuestion";
 export const POST_JADWAL_EXAM = "postJadwalExam";
+export const POST_KOREKSI_EXAM = "postKoreksiExam";
+export const POST_JAWABAN_EXAM = "postJawabanExam";
 
 // mutation types
 export const SET_LOADINGTABLE = "SET_LOADINGTABLE";
@@ -40,6 +44,9 @@ export const SET_JADWAL_MENGAJAR = "SET_JADWAL_MENGAJAR";
 export const SET_LIST_SISWASISWI = "SET_LIST_SISWASISWI";
 export const SET_QUESTION_EXAM = "SET_QUESTION_EXAM";
 export const SET_JADWAL_EXAM = "SET_JADWAL_EXAM";
+export const SET_JADWAL_EXAM_BY = "SET_JADWAL_EXAM_BY";
+export const SET_RANDOM_QUESTION = "SET_RANDOM_QUESTION";
+export const SET_KOREKSI_EXAM = "SET_KOREKSI_EXAM";
 
 const state = {
   loadingtable: false,
@@ -56,6 +63,9 @@ const state = {
   listSiswaSiswi: [],
   dataQuestionExam: [],
   dataJadwalExam: [],
+  dataJadwalExamBy: null,
+  dataRandomQuestion: null,
+  dataKoreksiExam: null,
 }
 
 const mutations = {
@@ -101,6 +111,15 @@ const mutations = {
   [SET_JADWAL_EXAM](state, data) {
     state.dataJadwalExam = data
   },
+  [SET_JADWAL_EXAM_BY](state, data) {
+    state.dataJadwalExamBy = data
+  },
+  [SET_RANDOM_QUESTION](state, data) {
+    state.dataRandomQuestion = data
+  },
+  [SET_KOREKSI_EXAM](state, data) {
+    state.dataKoreksiExam = data
+  },
 }
 
 const getters = {
@@ -139,6 +158,9 @@ const getters = {
   },
   jadwalExam(state) {
     return state.dataJadwalExam;
+  },
+  jadwalExamBy(state) {
+    return state.dataJadwalExamBy;
   },
 }
 
@@ -234,7 +256,7 @@ const actions = {
   [GET_SISWASISWI](context, data) {
     return new Promise((resolve, reject) => {
       context.commit('SET_LOADINGTABLE', true)
-      ApiService.get(`user/siswasiswi?page=${data.page}&limit=${data.limit}${data.keyword ? `&keyword=${data.keyword}` : ''}${typeof data.kelas !== 'object' || data.kelas ? `&kelas=${data.kelas}` : ''}`, token)
+      ApiService.get(`user/siswasiswi?page=${data.page}&limit=${data.limit}${data.keyword ? `&keyword=${data.keyword}` : ''}${typeof data.kelas !== 'undefined' || data.kelas ? `&kelas=${data.kelas}` : ''}`, token)
       .then((response) => {
         context.commit('SET_LOADINGTABLE', false)
         context.commit('SET_SISWASISWI', response.data.result)
@@ -400,10 +422,57 @@ const actions = {
       })
     });
   },
+  [GET_JADWAL_EXAM_BY](context, id_jadwal_exam) {
+    return new Promise((resolve, reject) => {
+      ApiService.get(`user/jadwal-exam-id/${id_jadwal_exam}`, token)
+      .then((response) => {
+        context.commit('SET_JADWAL_EXAM_BY', response.data.result)
+        resolve(response);
+      })
+      .catch((error) => {
+        reject(error);
+      })
+    });
+  },
+  [GET_RANDOM_QUESTION](context, data) {
+    return new Promise((resolve, reject) => {
+      ApiService.get(`user/kode-soal-random?mapel=${data.mapel}&kelas=${data.kelas}&limitSoal=${data.limitSoal}`, token)
+      .then((response) => {
+        context.commit('SET_RANDOM_QUESTION', response.data.result)
+        resolve(response);
+      })
+      .catch((error) => {
+        reject(error);
+      })
+    });
+  },
   [POST_JADWAL_EXAM](context, bodyData) {
     return new Promise((resolve, reject) => {
       ApiService.post(`user/jadwal-exam`, token, bodyData)
       .then((response) => {
+        resolve(response);
+      })
+      .catch((error) => {
+        reject(error);
+      })
+    });
+  },
+  [POST_JAWABAN_EXAM](context, bodyData) {
+    return new Promise((resolve, reject) => {
+      ApiService.post(`user/simpan-jwaban-exam`, token, bodyData)
+      .then((response) => {
+        resolve(response);
+      })
+      .catch((error) => {
+        reject(error);
+      })
+    });
+  },
+  [POST_KOREKSI_EXAM](context, bodyData) {
+    return new Promise((resolve, reject) => {
+      ApiService.post(`user/koreksi-exam`, token, bodyData)
+      .then((response) => {
+        context.commit('SET_KOREKSI_EXAM', response.data.result)
         resolve(response);
       })
       .catch((error) => {

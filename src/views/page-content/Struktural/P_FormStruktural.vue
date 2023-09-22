@@ -131,7 +131,7 @@ export default {
   }),
   setup() {
     useMeta({
-      title: "Formulir Struktural - MTsS. SIROJUL ATHFAL",
+      title: "Formulir Struktural",
       htmlAttrs: {
         lang: "id",
         amp: true,

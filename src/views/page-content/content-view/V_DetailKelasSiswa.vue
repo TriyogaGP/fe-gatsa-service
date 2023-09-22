@@ -6,6 +6,13 @@
       <v-icon size="small" class="iconstyle" icon="mdi mdi-menu-right" />
       <span>Data Siswa Siswi Kelas {{ kelas }}</span>
     </div>
+    <div v-if="kondisi === 'koreksi'" class="text-right wadah">
+      <span @click="gotolist('koreksi')" class="link">Data Koreksi Exam</span>
+      <v-icon size="small" class="iconstyle" icon="mdi mdi-menu-right" />
+      <span @click="gotolist2(mapel)" class="link">Data Koreksi Exam ({{ mapel }})</span>
+      <v-icon size="small" class="iconstyle" icon="mdi mdi-menu-right" />
+      <span>Data Siswa Siswi Kelas {{ kelas }}</span>
+    </div>
     <div v-if="kondisi === 'penilaian'" class="text-right wadah">
       <span v-if="roleID === '1' || roleID === '2'" @click="gotolist('penilaian')" class="link">Data Akademis</span>
       <v-icon v-if="roleID === '1' || roleID === '2'" size="small" class="iconstyle" icon="mdi mdi-menu-right" />
@@ -38,7 +45,7 @@
         </v-col>
         <v-col cols="12" md="6">
           <v-row no-gutters>
-            <v-col cols="12" md="9">
+            <v-col cols="12" md="9" class="pr-2">
               <TextField
                 v-model="searchData"
                 icon-prepend-tf="mdi mdi-magnify"
@@ -54,7 +61,7 @@
                 }"
               />
             </v-col>
-            <v-col cols="12" md="3" class="pl-2 d-flex justify-end align-center">
+            <v-col cols="12" md="3" class="d-flex justify-end align-center">
               <Autocomplete
                 v-model="page"
                 :data-a="pageOptions"
@@ -74,7 +81,7 @@
           :loading="loadingtable"
           :items="DataSiswaSiswi"
           expand-on-click
-          show-expand
+          v-model:expanded="expanded"
           item-value="idUser"
           density="comfortable"
           hide-default-footer
@@ -82,6 +89,7 @@
           class="elavation-3 rounded"
           :items-per-page="itemsPerPage"
           @page-count="pageCount = $event"
+          @click:row="clickrow"
         >
           <!-- header -->
           <template #headers="{  }">
@@ -99,6 +107,20 @@
                 <Button v-if="DataSiswaSiswi.length" variant="plain" size-button="small" model-button="comfortable" color-button="#ffffff" icon-button="mdi mdi-pencil" :disabled-button="Number(jumlahTugasTemp) <= 0" @proses="taskDialog()"/>
               </td>
               <td class="tableHeader">NILAI HURUF</td>
+            </tr>
+            <tr v-if="kondisi === 'koreksi'">
+              <td rowspan="2" class="tableHeader">No</td>
+              <td rowspan="2" class="tableHeader">#</td>
+              <td rowspan="2" class="tableHeader">NOMOR INDUK</td>
+              <td rowspan="2" class="tableHeader">NAMA</td>
+              <td colspan="5" class="tableHeader" style="text-align: center;">KOREKSI NILAI</td>
+            </tr>
+            <tr v-if="kondisi === 'koreksi'">
+              <td class="tableHeader">PILIHAN GANDA</td>
+              <td class="tableHeader">MENJODOHKAN</td>
+              <td class="tableHeader">BENAR SALAH</td>
+              <td class="tableHeader">ESSAY</td>
+              <td class="tableHeader">TOTAL NILAI</td>
             </tr>
             <tr v-if="kondisi === 'view'">
               <td class="tableHeader">No</td>
@@ -130,6 +152,25 @@
           <template #[`item.kehadiran`]="{ item }">
             <strong>S</strong>:&nbsp;{{ item.raw.dataKehadiran.sakit }}, <strong>A</strong>:&nbsp;{{ item.raw.dataKehadiran.alfa }}, <strong>I</strong>:&nbsp;{{ item.raw.dataKehadiran.ijin }}
           </template>
+          <template #[`item.pilihanganda`]="{ item }">
+            <span class="tulisan-td" v-html="item.raw.dataKoreksi.pilihanganda" />
+            <!-- <Button variant="plain" size-button="small" model-button="comfortable" color-button="#ffffff" icon-button="mdi mdi-pencil"/> -->
+          </template>
+          <template #[`item.menjodohkan`]="{ item }">
+            <span class="tulisan-td" v-html="item.raw.dataKoreksi.menjodohkan" />
+            <!-- <Button variant="plain" size-button="small" model-button="comfortable" color-button="#ffffff" icon-button="mdi mdi-pencil"/> -->
+          </template>
+          <template #[`item.benarsalah`]="{ item }">
+            <span class="tulisan-td" v-html="item.raw.dataKoreksi.benarsalah" />
+            <!-- <Button variant="plain" size-button="small" model-button="comfortable" color-button="#ffffff" icon-button="mdi mdi-pencil"/> -->
+          </template>
+          <template #[`item.essay`]="{ item }">
+            <span class="tulisan-td" v-html="item.raw.dataKoreksi.essay" />
+            <!-- <Button variant="plain" size-button="small" model-button="comfortable" color-button="#ffffff" icon-button="mdi mdi-pencil"/> -->
+          </template>
+          <template #[`item.total`]="{ item }">
+            <span class="tulisan-td" v-html="item.raw.totalNilai" />
+          </template>
           <template #[`item.statusAktif`]="{ item }">
             <v-icon size="small" v-if="item.raw.statusAktif == true" color="green" icon="mdi mdi-check" />
             <v-icon size="small" v-else-if="item.raw.statusAktif == false" color="red" icon="mdi mdi-close" />
@@ -138,9 +179,17 @@
             <tr>
               <td :colspan="columns.length">
                 <Button
+                  v-if="kondisi === 'view'"
                   color-button="#04f7f7"
                   icon-button="mdi mdi-pencil"
                   nama-button="Detail"
+                  @proses="openDialog(item.raw)"
+                />
+                <Button
+                  v-if="kondisi === 'koreksi'"
+                  color-button="#04f7f7"
+                  icon-button="mdi mdi-pencil"
+                  nama-button="Koreksi Nilai"
                   @proses="openDialog(item.raw)"
                 />
                 <Button
@@ -156,10 +205,10 @@
           <template #bottom>
             <v-divider :thickness="2" class="border-opacity-100" color="white" />
             <v-row no-gutters>
-              <v-col cols="10" class="pa-2 d-flex justify-start align-center">
+              <v-col cols="12" lg="10" class="pa-2 d-flex justify-start align-center">
                 <span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
               </v-col>
-              <v-col cols="2" class="pa-2 text-right">
+              <v-col cols="12" lg="2" class="pa-2 text-right">
                 <div class="d-flex justify-start align-center">
                   <v-select
                     v-model="limit"
@@ -197,113 +246,6 @@
         </v-data-table>
       </div>
     </v-card>
-    <v-dialog
-      v-model="DialogKehadiran"
-      scrollable
-      max-width="800px"
-      persistent
-      transition="dialog-bottom-transition"
-    >
-      <v-card color="background-dialog-card">
-        <v-toolbar color="surface">
-          <v-toolbar-title>Data Ubah Kehadiran</v-toolbar-title>
-          <v-spacer />
-          <v-toolbar-items>
-            <Button
-              variant="plain"
-              color-button="#ffffff"
-              icon-button="mdi mdi-close"
-              model-button="comfortable"
-              size-button="large"
-              @proses="() => { DialogKehadiran = false; }"
-            />
-          </v-toolbar-items>
-        </v-toolbar>
-        <v-card-text class="pt-4" style="font-size: 13px;">
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Sakit
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              <TextField
-                v-model="inputKehadiran.sakit"
-                label-tf="Sakit"
-                :clearable-tf="true"
-                @keypress="onlyNumber($event, 3, inputKehadiran.sakit)"                     
-              />
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Tanpa Keterangan (Alfa)
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              <TextField
-                v-model="inputKehadiran.alfa"
-                label-tf="Tanpa Keterangan (Alfa)"
-                :clearable-tf="true"
-                @keypress="onlyNumber($event, 3, inputKehadiran.alfa)"                          
-              />
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Ijin
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              <TextField
-                v-model="inputKehadiran.ijin"
-                label-tf="Ijin"
-                :clearable-tf="true"
-                @keypress="onlyNumber($event, 3, inputKehadiran.ijin)"                          
-              />
-            </v-col>
-          </v-row>
-        </v-card-text>
-        <v-divider />
-        <v-card-actions>
-          <v-row 
-            no-gutters
-            class="mr-3"
-          >
-            <v-col
-              class="text-end"
-              cols="12"
-            >
-              <Button 
-                color-button="black"
-                nama-button="Ubah Kehadiran"
-                @proses="simpanKehadiran()"
-              />
-            </v-col>
-          </v-row>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
     <v-dialog
       v-model="DialogSiswaSiswi"
       scrollable
@@ -1325,6 +1267,113 @@
       </v-card>
     </v-dialog>
     <v-dialog
+      v-model="DialogKehadiran"
+      scrollable
+      max-width="800px"
+      persistent
+      transition="dialog-bottom-transition"
+    >
+      <v-card color="background-dialog-card">
+        <v-toolbar color="surface">
+          <v-toolbar-title>Data Ubah Kehadiran</v-toolbar-title>
+          <v-spacer />
+          <v-toolbar-items>
+            <Button
+              variant="plain"
+              color-button="#ffffff"
+              icon-button="mdi mdi-close"
+              model-button="comfortable"
+              size-button="large"
+              @proses="() => { DialogKehadiran = false; }"
+            />
+          </v-toolbar-items>
+        </v-toolbar>
+        <v-card-text class="pt-4" style="font-size: 13px;">
+          <v-row no-gutters>
+            <v-col
+              cols="12"
+              md="4"
+              class="pt-2 d-flex align-center font-weight-bold"
+            >
+              Sakit
+            </v-col>
+            <v-col
+              cols="12"
+              md="8"
+              class="pt-3"
+            >
+              <TextField
+                v-model="inputKehadiran.sakit"
+                label-tf="Sakit"
+                :clearable-tf="true"
+                @keypress="onlyNumber($event, 3, inputKehadiran.sakit)"                     
+              />
+            </v-col>
+          </v-row>
+          <v-row no-gutters>
+            <v-col
+              cols="12"
+              md="4"
+              class="pt-2 d-flex align-center font-weight-bold"
+            >
+              Tanpa Keterangan (Alfa)
+            </v-col>
+            <v-col
+              cols="12"
+              md="8"
+              class="pt-3"
+            >
+              <TextField
+                v-model="inputKehadiran.alfa"
+                label-tf="Tanpa Keterangan (Alfa)"
+                :clearable-tf="true"
+                @keypress="onlyNumber($event, 3, inputKehadiran.alfa)"                          
+              />
+            </v-col>
+          </v-row>
+          <v-row no-gutters>
+            <v-col
+              cols="12"
+              md="4"
+              class="pt-2 d-flex align-center font-weight-bold"
+            >
+              Ijin
+            </v-col>
+            <v-col
+              cols="12"
+              md="8"
+              class="pt-3"
+            >
+              <TextField
+                v-model="inputKehadiran.ijin"
+                label-tf="Ijin"
+                :clearable-tf="true"
+                @keypress="onlyNumber($event, 3, inputKehadiran.ijin)"                          
+              />
+            </v-col>
+          </v-row>
+        </v-card-text>
+        <v-divider />
+        <v-card-actions>
+          <v-row 
+            no-gutters
+            class="mr-3"
+          >
+            <v-col
+              class="text-end"
+              cols="12"
+            >
+              <Button 
+                color-button="black"
+                nama-button="Ubah Kehadiran"
+                @proses="simpanKehadiran()"
+              />
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog
       v-model="DialogTask"
       fullscreen
       scrollable
@@ -1347,61 +1396,59 @@
           </v-toolbar-items>
         </v-toolbar>
         <v-card-text class="pt-4 ScrollFullscreen">
-          <div class="mt-4">
-            <v-data-table
-              loading-text="Sedang memuat... Harap tunggu"
-              no-data-text="Tidak ada data yang tersedia"
-              no-results-text="Tidak ada catatan yang cocok ditemukan"
-              :loading="loadingtable"
-              :items="DataSiswaSiswi"
-              item-key="idUser"
-              hide-default-header
-              hide-default-footer
-              class="elavation-3 rounded"
-            >
-              <!-- header -->
-              <template #headers="{  }">
-                <tr>
-                  <td rowspan="2" class="tableHeader">NOMOR INDUK</td>
-                  <td rowspan="2" class="tableHeader">NAMA</td>
-                  <td :colspan="(2 + Number(jumlahTugasTemp))" class="tableHeader" style="text-align: center;">PENILAIAN</td>
-                </tr>
-                <tr>
-                  <td v-for="index in (2 + Number(jumlahTugasTemp))" :key="index" class="tableHeader">
-                    {{ conditionNilai[index-1].name }}<br>
-                    <Button v-if="conditionNilai[index-1].statusCondition" variant="plain" size-button="small" model-button="comfortable" color-button="#ffffff" icon-button="mdi mdi-close" @proses="formNilai(DataSiswaSiswi, false, conditionNilai[index-1].trigger);"/>
-                    <Button v-if="conditionNilai[index-1].statusCondition" variant="plain" size-button="small" model-button="comfortable" color-button="#ffffff" icon-button="mdi mdi-check" @proses="() => {
-                      simpanPerubahan(inputTempAll, DataSiswaSiswi, mapel, conditionNilai[index-1].trigger, 'all')
-                      formNilai(this.DataSiswaSiswi, false, conditionNilai[index-1].trigger);
-                    }"/>
-                    <Button v-if="!conditionNilai[index-1].statusCondition" variant="plain" size-button="small" model-button="comfortable" color-button="#ffffff" icon-button="mdi mdi-pencil" @proses="formNilai(DataSiswaSiswi, true, conditionNilai[index-1].trigger)"/>
-                  </td>
-                </tr>
-              </template>
-              <template #item="{ item }">
-                <tr>
-                  <td>{{ item.raw.nomorInduk }}</td>
-                  <td>{{ uppercaseLetterFirst2(item.raw.nama) }}</td>
-                  <td v-for="index in (2 + Number(jumlahTugasTemp))" :key="index">
-                    <TextField
-                      v-if="conditionNilai[index-1].statusCondition"
-                      v-model="inputTemp[item.raw.idUser]"
-                      variant="outlined"
-                      class="textfieldnilai"
-                      @keypress="onlyNumber($event, 3, inputTemp[item.raw.idUser])"
-                      @input="() => {
-                        if(Number(inputTemp[item.raw.idUser]) > 100) inputTemp[item.raw.idUser] = 100;
-                      }"
-                      @update:modelValue="updateNilai($event, item.raw.idUser)"
-                      @keyup.enter="simpanPerubahan(inputTemp[item.raw.idUser], item.raw, mapel, conditionNilai[index-1].trigger, 'single')"
-                    />
-                    <span v-else v-html="item.raw.dataNilai[conditionNilai[index-1].trigger]" />
-                  </td>
-                </tr>
-              </template>
-              <template #bottom />
-            </v-data-table>
-          </div>
+          <v-data-table
+            loading-text="Sedang memuat... Harap tunggu"
+            no-data-text="Tidak ada data yang tersedia"
+            no-results-text="Tidak ada catatan yang cocok ditemukan"
+            :loading="loadingtable"
+            :items="DataSiswaSiswi"
+            item-key="idUser"
+            hide-default-header
+            hide-default-footer
+            class="elavation-3 rounded"
+          >
+            <!-- header -->
+            <template #headers="{  }">
+              <tr>
+                <td rowspan="2" class="tableHeader">NOMOR INDUK</td>
+                <td rowspan="2" class="tableHeader">NAMA</td>
+                <td :colspan="(2 + Number(jumlahTugasTemp))" class="tableHeader" style="text-align: center;">PENILAIAN</td>
+              </tr>
+              <tr>
+                <td v-for="index in (2 + Number(jumlahTugasTemp))" :key="index" class="tableHeader">
+                  {{ conditionNilai[index-1].name }}<br>
+                  <Button v-if="conditionNilai[index-1].statusCondition" variant="plain" size-button="small" model-button="comfortable" color-button="#ffffff" icon-button="mdi mdi-close" @proses="formNilai(DataSiswaSiswi, false, conditionNilai[index-1].trigger);"/>
+                  <Button v-if="conditionNilai[index-1].statusCondition" variant="plain" size-button="small" model-button="comfortable" color-button="#ffffff" icon-button="mdi mdi-check" @proses="() => {
+                    simpanPerubahan(inputTempAll, DataSiswaSiswi, mapel, conditionNilai[index-1].trigger, 'all')
+                    formNilai(this.DataSiswaSiswi, false, conditionNilai[index-1].trigger);
+                  }"/>
+                  <Button v-if="!conditionNilai[index-1].statusCondition" variant="plain" size-button="small" model-button="comfortable" color-button="#ffffff" icon-button="mdi mdi-pencil" @proses="formNilai(DataSiswaSiswi, true, conditionNilai[index-1].trigger)"/>
+                </td>
+              </tr>
+            </template>
+            <template #item="{ item }">
+              <tr>
+                <td>{{ item.raw.nomorInduk }}</td>
+                <td>{{ uppercaseLetterFirst2(item.raw.nama) }}</td>
+                <td v-for="index in (2 + Number(jumlahTugasTemp))" :key="index">
+                  <TextField
+                    v-if="conditionNilai[index-1].statusCondition"
+                    v-model="inputTemp[item.raw.idUser]"
+                    variant="outlined"
+                    class="textfieldnilai"
+                    @keypress="onlyNumber($event, 3, inputTemp[item.raw.idUser])"
+                    @input="() => {
+                      if(Number(inputTemp[item.raw.idUser]) > 100) inputTemp[item.raw.idUser] = 100;
+                    }"
+                    @update:modelValue="updateNilai($event, item.raw.idUser)"
+                    @keyup.enter="simpanPerubahan(inputTemp[item.raw.idUser], item.raw, mapel, conditionNilai[index-1].trigger, 'single')"
+                  />
+                  <span v-else v-html="item.raw.dataNilai[conditionNilai[index-1].trigger]" />
+                </td>
+              </tr>
+            </template>
+            <template #bottom />
+          </v-data-table>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -1494,6 +1541,213 @@
       </v-card>
     </v-dialog>
     <v-dialog
+      v-model="DialogKoreksiNilai"
+      fullscreen
+      scrollable
+      hide-overlay
+      transition="dialog-bottom-transition"
+    >
+      <v-card color="background-dialog-card">
+        <v-toolbar color="surface">
+          <v-toolbar-title>
+            Data Koreksi Nilai ({{ koreksiNilai.nama }}) 
+            <v-icon size="small" color="white" icon="mdi mdi-information" />
+            <v-tooltip
+              activator="parent"
+              location="bottom"
+            >
+              <div color="surface">
+                <h2><v-icon size="small" color="white" icon="mdi mdi-information" /> Informasi</h2>
+                - lingkaran warna hitam dan icon kunci warna hijau adalah kunci jawaban<br>
+                - pada Soal Menjodohkan tanda silang adalah jawaban siswa
+              </div>
+            </v-tooltip>
+          </v-toolbar-title>
+          <v-spacer />
+          <v-toolbar-items>
+            <Button
+              variant="plain"
+              color-button="#ffffff"
+              icon-button="mdi mdi-close"
+              model-button="comfortable"
+              size-button="large"
+              @proses="() => { clearData(); DialogKoreksiNilai = false; }"
+            />
+          </v-toolbar-items>
+        </v-toolbar>
+        <v-card-text class="ScrollFullscreen">
+          <div v-if="koreksiNilai.jawabanPG.length">
+            <h2 style="text-decoration: overline underline;">Pilihan Ganda</h2>
+            <table class="kotaksoal" v-for="(pg, index) in koreksiNilai.jawabanPG" :key="pg.kode" border="0" width="100%" cellspacing="0" cellpadding="0">
+              <tr>
+                <td width="2%" class="font-style"><p :class="pg.kondisi ? '' : 'cross' ">{{ `${index+1}.` }}</p></td>
+                <td width="75%" style="font-weight: 500; text-align: justify; padding-right: 10px;">
+                  <div v-if="!pg.pertanyaan.file">
+                    <span v-html="pg.pertanyaan.text" />
+                  </div>
+                  <div v-else>
+                    <v-img :src="`${API_URL}berkas/${pg.pertanyaan.file}`" width="100" />
+                    <span v-html="pg.pertanyaan.text" />
+                  </div>
+                </td>
+                <td width="10%" rowspan="2" style="border-left: 2px solid #000">
+                  <div class="kunci-jawaban">
+                    <h5>{{ `kode soal: ${pg.kode}` }}</h5>
+                    <h4>Jawaban Siswa</h4>
+                    <p style="font-size: 35px; font-weight: bold;">{{ pg.jawaban ? pg.jawaban : '-' }}</p>
+                    <p :style="pg.kondisi ? 'font-size: 20px; font-weight: bold; color: #0F0;' : 'font-size: 20px; font-weight: bold; color: #F00;'">{{ pg.kondisi ? 'Benar' : 'Salah' }}</p>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td />
+                <td>
+                  <table border="0" width="100%" cellspacing="0" cellpadding="0">
+                    <tr v-for="(datapilihan) in pg.pilihan" :key="datapilihan.kode">
+                      <td width="2%" class="font-style">
+                        <div v-if="pg.kunciJawaban !== datapilihan.value" class="jawaban-lingkar-1">{{ `${datapilihan.value}.` }}</div>
+                        <v-icon v-else class="jawaban-lingkar-2" size="small" color="green" icon="mdi mdi-key" />
+                      </td>
+                      <td>
+                        <div v-if="!datapilihan.file">
+                          <span v-html="datapilihan.text" />
+                        </div>
+                        <div v-else>
+                          <v-img :src="`${API_URL}berkas/${datapilihan.file}`" width="100" style="margin-bottom: 2px;" />
+                          <span v-html="datapilihan.text" />
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div v-if="koreksiNilai.jawabanMenjodohkan.length">
+            <h2 style="text-decoration: overline underline;">Menjodohkan</h2>
+            <div class="kotaksoal">
+              <table class="tabelJodoh" border="1" width="100%" cellspacing="0" cellpadding="0">
+                <tr style="text-align: center; vertical-align: middle; font-weight: bold;">
+                  <td width="2%">No</td>
+                  <td>Pernyataan / Jawaban</td>
+                  <td width="10%" v-for="(jodoh, index) in koreksiNilai.jawabanMenjodohkan" :key="jodoh.kode">
+                    <div v-if="!jodoh.pilihan[index].file">
+                      <span v-html="jodoh.pilihan[index].text" />
+                    </div>
+                    <div v-else>
+                      <v-img :src="`${API_URL}berkas/${jodoh.pilihan[index].file}`" width="100" />
+                      <span v-html="jodoh.pilihan[index].text" />
+                    </div>
+                  </td>
+                </tr>
+                <tr v-for="(jodoh, index) in koreksiNilai.jawabanMenjodohkan" :key="jodoh.kode">
+                  <td width="2%" style="vertical-align: middle; text-align: center; font-weight: bold;"><p :class="jodoh.kondisi ? '' : 'cross' ">{{ `${index+1}.` }}</p></td>
+                  <td style="vertical-align: middle; font-weight: bold;">
+                    <div v-if="!jodoh.pertanyaan.file">
+                      <span v-html="jodoh.pertanyaan.text" />
+                    </div>
+                    <div v-else>
+                      <v-img :src="`${API_URL}berkas/${jodoh.pertanyaan.file}`" width="100" />
+                      <span v-html="jodoh.pertanyaan.text" />
+                    </div>
+                  </td>
+                  <td style="font-weight: 500; text-align: center" v-for="(datapilihan, k) in jodoh.pilihan" :key="k">
+                    <v-icon v-if="jodoh.kunciJawaban === datapilihan.value" class="jawaban-lingkar-2" size="small" color="green" icon="mdi mdi-key" />
+                    <div><v-icon v-if="jodoh.jawaban === datapilihan.value" size="small" color="black" icon="mdi mdi-close-thick" /></div>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+          <div v-if="koreksiNilai.jawabanBenarSalah.length">
+            <h2 style="text-decoration: overline underline;">Benar Salah</h2>
+            <table class="kotaksoal" v-for="(bs, index) in koreksiNilai.jawabanBenarSalah" :key="bs.kode" border="0" width="100%" cellspacing="0" cellpadding="0">
+              <tr>
+                <td width="2%" class="font-style"><p :class="bs.kondisi ? '' : 'cross' ">{{ `${index+1}.` }}</p></td>
+                <td width="75%" style="font-weight: 500; text-align: justify; padding-right: 10px;"><span v-html="bs.pertanyaan.text" /></td>
+                <td width="10%" rowspan="2" style="border-left: 2px solid #000">
+                  <div class="kunci-jawaban">
+                    <h5>{{ `kode soal: ${bs.kode}` }}</h5>
+                    <h4>Jawaban Siswa</h4>
+                    <p style="font-size: 35px; font-weight: bold;">{{ bs.jawaban ? bs.jawaban : '-' }}</p>
+                    <p :style="bs.kondisi ? 'font-size: 20px; font-weight: bold; color: #0F0;' : 'font-size: 20px; font-weight: bold; color: #F00;'">{{ bs.kondisi ? 'Benar' : 'Salah' }}</p>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td />
+                <td>
+                  <table border="0" width="100%" cellspacing="0" cellpadding="0">
+                    <tr v-for="(datapilihan) in bs.pilihan" :key="datapilihan.kode">
+                      <td width="2%" class="font-style">
+                        <div v-if="bs.kunciJawaban !== datapilihan.value" class="jawaban-lingkar-1">{{ `${datapilihan.value}.` }}</div>
+                        <v-icon v-else class="jawaban-lingkar-2" size="small" color="green" icon="mdi mdi-key" />
+                      </td>
+                      <td><span v-html="datapilihan.text" /></td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div v-if="koreksiNilai.jawabanEssay.length">
+            <h2 style="text-decoration: overline underline;">Essay</h2>
+            <table class="kotaksoal" v-for="(essay, index) in koreksiNilai.jawabanEssay" :key="essay.kode" border="0" width="100%" cellspacing="0" cellpadding="0">
+              <tr>
+                <td width="2%" class="font-style">{{ `${index+1}.` }}</td>
+                <td width="75%" style="font-weight: 500; text-align: justify; padding-right: 10px; vertical-align: top;">
+                  <div v-if="!essay.pertanyaan.file">
+                    <span v-html="essay.pertanyaan.text" />
+                  </div>
+                  <div v-else>
+                    <v-img :src="`${API_URL}berkas/${essay.pertanyaan.file}`" width="100" />
+                    <span v-html="essay.pertanyaan.text" />
+                  </div>
+                </td>
+                <td width="10%" rowspan="2" style="border-left: 2px solid #000">
+                  <div class="kunci-jawaban">
+                    <h5>{{ `kode soal: ${essay.kode}` }}</h5>
+                    <h4>Point</h4>
+                    <TextField
+                      v-model="koreksiNilai.jawabanEssay[index].point"
+                      class="ma-1"
+                      @keypress="onlyNumber($event, 2, koreksiNilai.jawabanEssay[index].point)"
+                      @input="() => {
+                        if(Number(koreksiNilai.jawabanEssay[index].point) > 25) koreksiNilai.jawabanEssay[index].point = 25;
+                      }"
+                      :clearable-tf="true"
+                    />
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td />
+                <td style="text-align: justify; padding-right: 10px; vertical-align: top;"><strong>Jawaban:</strong>&nbsp;{{ essay.jawaban ? essay.jawaban : '-' }}</td>
+              </tr>
+            </table>
+          </div>
+        </v-card-text>
+        <v-divider />
+        <v-card-actions>
+          <v-row 
+            no-gutters
+            class="mr-3"
+          >
+            <v-col
+              class="text-end"
+              cols="12"
+            >
+              <Button 
+                color-button="black"
+                nama-button="Lihat Point"
+                @proses="UpdatePoint()"
+              />
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog
       v-model="dialogNotifikasi"
       transition="dialog-bottom-transition"
       persistent
@@ -1521,9 +1775,11 @@ export default {
     PopUpNotifikasiVue
   },
   data: () => ({
+		API_URL: process.env.VUE_APP_BASE_URL_VIEW,
     kondisi: '',
     mapel: '',
     kelas: '',
+    expanded: [],
 		DataSiswaSiswi: [],
 		searchData: '',
     page: 1,
@@ -1543,6 +1799,22 @@ export default {
     totalItems: 0,
     roleID: '',
     idLog: '',
+    koreksiNilai: {
+      idAnswerExam: '',
+      idUser: '',
+      nama: '',
+      semester: '',
+      jawabanPG: '',
+      jawabanEssay: '',
+      jawabanMenjodohkan: '',
+      jawabanBenarSalah: '',
+    },
+    totalpoint: {
+      pointPG: 0,
+      pointEssay: 0,
+      pointMenjodohkan: 0,
+      pointBenarSalah: 0,
+    },
     previewData: {
       idUser: '',
       namaRole: '',
@@ -1609,6 +1881,7 @@ export default {
     DialogKehadiran: false,
     DialogTask: false,
     DialogJumlahTugas: false,
+    DialogKoreksiNilai: false,
     endecryptType: '',
     jumlahTugas: 0,
     jumlahTugasTemp: 0,
@@ -1634,7 +1907,7 @@ export default {
   }),
   setup() {
     useMeta({
-      title: "Data Kelas Siswa Siswi - MTsS. SIROJUL ATHFAL",
+      title: "Data Kelas Siswa Siswi",
       htmlAttrs: {
         lang: "id",
         amp: true,
@@ -1647,7 +1920,8 @@ export default {
   },
   computed: {
     ...mapState({
-      loadingtable: store => store.user.loadingtable
+      mengajar: store => store.setting.mengajarOptions,
+      loadingtable: store => store.user.loadingtable,
     }),
     ...mapGetters({
       siswasiswiAll: 'user/siswasiswiAll', 
@@ -1659,6 +1933,10 @@ export default {
     mapelText() {
       this.mapel = this.$route.query.mapel
       return this.mapel
+    },
+    mapelKode() {
+      let hasil = this.mengajar.filter(val => { return val.label === this.mapel })[0].kode
+      return String(hasil)
     },
   },
   watch: {
@@ -1682,14 +1960,27 @@ export default {
             let rataRataNilai = (Number(rataRataTugas) + Number(nilai.uts) + Number(nilai.uas)) / 3
             this.DataSiswaSiswi.push({
               ...str,
-              dataNilai: nilai,
               semester: semester,
+              dataNilai: nilai,
               dataKehadiran: kehadiran,
               totalNilaiTugas: rataRataTugas != 0 ? Math.ceil(rataRataTugas) : 0,
               rataRataNilai: rataRataNilai != 0 ? Math.ceil(rataRataNilai) : 0,
               hurufNilai: rataRataNilai <= 50 ? 'E' : rataRataNilai <= 65 ? 'D' : rataRataNilai <= 75 ? 'C' : rataRataNilai <= 85 ? 'B' : 'A',
             })
             // console.log(nilai);
+          }))
+        }else if(this.kondisi == 'koreksi'){
+          let kumpul = value.records
+          await Promise.all(kumpul.map(str => {
+            let koreksi = str.dataPenilaian.filter(k => k.mapel === this.mapel)[0].dataNK.koreksi
+            let totalNilai = Number(koreksi.pilihanganda) + Number(koreksi.essay) + Number(koreksi.menjodohkan) + Number(koreksi.benarsalah)
+            let semester = str.dataPenilaian.filter(k => k.mapel === this.mapel)[0].semester
+            this.DataSiswaSiswi.push({
+              ...str,
+              semester: semester,
+              dataKoreksi: koreksi,
+              totalNilai,
+            })
           }))
         }else if(this.kondisi == 'view'){
           this.DataSiswaSiswi = value.records
@@ -1722,6 +2013,7 @@ export default {
 		},
   },
   mounted() {
+    if(!localStorage.getItem('user_token')) return this.$router.push({name: 'LogIn'});
     this.roleID = localStorage.getItem('roleID')
     this.kelas = this.$route.params.kelas
     this.mapel = this.$route.query.mapel
@@ -1733,6 +2025,7 @@ export default {
 		...mapActions({
       fetchData: "fetchData", 
       getSiswaSiswi: "user/getSiswaSiswi", 
+      getMengajar: "setting/getMengajar",
     }),
     headerKondisi(kondisi) {
       this.headers = []
@@ -1744,6 +2037,18 @@ export default {
           { title: "Nama", key: "nama", sortable: false },
           { title: "Email", key: "email", sortable: false },
           { title: "Status", key: "statusAktif", sortable: false },
+        )
+      }else if(kondisi === 'koreksi'){
+        this.headers.push(
+          { title: "No", key: "number", sortable: false, width: "5%" },
+          { title: "#", key: "data-table-expand", sortable: false, width: "5%" },
+          { title: "Nomor Induk", key: "nomorInduk", sortable: false },
+          { title: "Nama", key: "nama", sortable: false },
+          { title: "Koreksi Pilihan Ganda", key: "pilihanganda", sortable: false },
+          { title: "Koreksi Menjodohkan", key: "menjodohkan", sortable: false },
+          { title: "Koreksi Benar Salah", key: "benarsalah", sortable: false },
+          { title: "Koreksi Essay", key: "essay", sortable: false },
+          { title: "Total Nilai", key: "total", sortable: false },
         )
       }else if(kondisi === 'penilaian'){
         this.headers.push(
@@ -1763,8 +2068,8 @@ export default {
     simpanPerubahan(nilai, item, mapel, task, kondisi) {
       let obj, bodyData;
       if(kondisi === 'single'){
-        let key = Object.keys(item.dataNilai)
-        let value = Object.values(item.dataNilai)
+        let key = Object.keys(item?.dataNilai)
+        let value = Object.values(item?.dataNilai)
         obj = {
           tugas1: key[0] == task ? Number(nilai) : value[0],
           tugas2: key[1] == task ? Number(nilai) : value[1],
@@ -1781,11 +2086,11 @@ export default {
         }
         bodyData = {
           jenis: 'nilai',
-          idUser: item.idUser,
+          idUser: item?.idUser,
           mapel: mapel,
-          semester: item.semester,
+          semester: item?.semester,
           dataNilai: {
-            semester: item.semester, 
+            semester: item?.semester, 
             nilai: obj
           }
         }
@@ -1854,69 +2159,139 @@ export default {
 			});
     },
     openDialog(item){
-      this.previewData = {
-        idUser: item.idUser,
-        namaRole: item.namaRole,
-        nama: this.uppercaseLetterFirst2(item.nama),
-        username: item.username,
-        email: item.email,
-        password: item.kataSandi,
-        nikSiswa: item.nikSiswa ? item.nikSiswa : '-',
-        nomorInduk: item.nomorInduk,
-        tempat: item.tempat,
-        tanggalLahir: item.tanggalLahir,
-        jenisKelamin: item.jenisKelamin,
-        agama: item.agama.label,
-        anakKe: item.anakKe ? item.anakKe : '-',
-        jumlahSaudara: item.jumlahSaudara ? item.jumlahSaudara : '-',
-        hobi: item.hobi ? item.hobi.label : '-',
-        citaCita: item.citaCita ? item.citaCita.label : '-',
-        kelas: item.kelas ? item.kelas : '-',
-        jenjang: item.dataSekolahSebelumnya.jenjang.label,
-        statusSekolah: item.dataSekolahSebelumnya.statusSekolah.label,
-        namaSekolah: item.dataSekolahSebelumnya.namaSekolah,
-        npsn: item.dataSekolahSebelumnya.npsn ? item.dataSekolahSebelumnya.npsn : '-',
-        alamatSekolah: this.uppercaseLetterFirst2(item.dataSekolahSebelumnya.alamatSekolah),
-        kabkotSekolah: this.uppercaseLetterFirst2(item.dataSekolahSebelumnya.kabkotSekolah.nama),
-        noPesertaUN: item.dataSekolahSebelumnya.noPesertaUN ? item.dataSekolahSebelumnya.noPesertaUN : '-',
-        noSKHUN: item.dataSekolahSebelumnya.noSKHUN ? item.dataSekolahSebelumnya.noSKHUN : '-',
-        noIjazah: item.dataSekolahSebelumnya.noIjazah ? item.dataSekolahSebelumnya.noSKHUN : '-',
-        nilaiUN: item.dataSekolahSebelumnya.nilaiUN ? item.dataSekolahSebelumnya.noSKHUN : '-',
-        noKK: item.noKK,
-        namaKK: this.uppercaseLetterFirst2(item.namaKK),
-        telp: item.dataAlamatOrangtua.telp,
-        alamat: this.uppercaseLetterFirst2(item.dataAlamatOrangtua.alamat),
-        provinsi: this.uppercaseLetterFirst2(item.dataAlamatOrangtua.provinsi.nama),
-        kabKota: this.uppercaseLetterFirst2(item.dataAlamatOrangtua.kabKota.nama),
-        kecamatan: this.uppercaseLetterFirst2(item.dataAlamatOrangtua.kecamatan.nama),
-        kelurahan: this.uppercaseLetterFirst2(item.dataAlamatOrangtua.kelurahan.nama),
-        kodePos: item.dataAlamatOrangtua.kodePos,
-        nikAyah: item.dataOrangtua.dataAyah.nikAyah,
-        namaAyah: this.uppercaseLetterFirst2(item.dataOrangtua.dataAyah.namaAyah),
-        tahunAyah: item.dataOrangtua.dataAyah.tahunAyah,
-        statusAyah: item.dataOrangtua.dataAyah.statusAyah.label,
-        pendidikanAyah: item.dataOrangtua.dataAyah.pendidikanAyah.label,
-        pekerjaanAyah: item.dataOrangtua.dataAyah.pekerjaanAyah.label,
-        telpAyah: item.dataOrangtua.dataAyah.telpAyah,
-        nikIbu: this.uppercaseLetterFirst2(item.dataOrangtua.dataIbu.nikIbu),
-        namaIbu: item.dataOrangtua.dataIbu.namaIbu,
-        tahunIbu: item.dataOrangtua.dataIbu.tahunIbu,
-        statusIbu: item.dataOrangtua.dataIbu.statusIbu.label,
-        pendidikanIbu: item.dataOrangtua.dataIbu.pendidikanIbu.label,
-        pekerjaanIbu: item.dataOrangtua.dataIbu.pekerjaanIbu.label,
-        telpIbu: item.dataOrangtua.dataIbu.telpIbu,
-        nikWali: item.dataOrangtua.dataWali.nikWali ? item.dataOrangtua.dataWali.nikWali : '-',
-        namaWali: item.dataOrangtua.dataWali.namaWali ? this.uppercaseLetterFirst2(item.dataOrangtua.dataWali.namaWali) : '-',
-        tahunWali: item.dataOrangtua.dataWali.tahunWali ? item.dataOrangtua.dataWali.tahunWali : '-',
-        pendidikanWali: item.dataOrangtua.dataWali.pendidikanWali ? item.dataOrangtua.dataWali.pendidikanWali.label : '-',
-        pekerjaanWali: item.dataOrangtua.dataWali.pekerjaanWali ? item.dataOrangtua.dataWali.pekerjaanWali.label : '-',
-        telpWali: item.dataOrangtua.dataWali.telpWali ? item.dataOrangtua.dataWali.telpWali : '-',
-        penghasilan: item.penghasilan ? item.penghasilan.label : '-',
-        statusTempatTinggal: item.dataLainnya.statusTempatTinggal ? item.dataLainnya.statusTempatTinggal.label : '-',
-        jarakRumah: item.dataLainnya.jarakRumah ? item.dataLainnya.jarakRumah.label : '-',
-        transportasi: item.dataLainnya.transportasi ? item.dataLainnya.transportasi.label : '-',
+      if(this.kondisi === 'koreksi'){
+    		this.getMengajar()
+        let bodyData = {
+          mapel: this.mapelKode,
+          kelas: this.kelas,
+          idUser: item?.idUser,
+        }
+        this.$store.dispatch('user/postKoreksiExam', bodyData)
+        .then((res) => {
+          if(res.status === 204) return this.notifikasi("warning", 'Data ini tidak ditemukan!', "1")
+          let data = res.data.result
+          this.koreksiNilai = {
+            idAnswerExam: data?.idAnswerExam,
+            idUser: data?.idUser,
+            nama: data?.nama,
+            semester: item?.semester,
+            jawabanPG: data?.jawabanPG,
+            jawabanEssay: data?.jawabanEssay,
+            jawabanMenjodohkan: data?.jawabanMenjodohkan,
+            jawabanBenarSalah: data?.jawabanBenarSalah,
+          }
+          this.DialogKoreksiNilai = true
+        })
+      }else if(this.kondisi === 'view'){
+        this.previewData = {
+          idUser: item?.idUser,
+          namaRole: item?.namaRole,
+          nama: this.uppercaseLetterFirst2(item?.nama),
+          username: item?.username,
+          email: item?.email,
+          password: item?.kataSandi,
+          nikSiswa: item?.nikSiswa ? item?.nikSiswa : '-',
+          nomorInduk: item?.nomorInduk,
+          tempat: item?.tempat,
+          tanggalLahir: item?.tanggalLahir,
+          jenisKelamin: item?.jenisKelamin,
+          agama: item?.agama?.label,
+          anakKe: item?.anakKe ? item?.anakKe : '-',
+          jumlahSaudara: item?.jumlahSaudara ? item?.jumlahSaudara : '-',
+          hobi: item?.hobi ? item?.hobi?.label : '-',
+          citaCita: item?.citaCita ? item?.citaCita?.label : '-',
+          kelas: item?.kelas ? item?.kelas : '-',
+          jenjang: item?.dataSekolahSebelumnya?.jenjang?.label,
+          statusSekolah: item?.dataSekolahSebelumnya?.statusSekolah?.label,
+          namaSekolah: item?.dataSekolahSebelumnya?.namaSekolah,
+          npsn: item?.dataSekolahSebelumnya?.npsn ? item?.dataSekolahSebelumnya?.npsn : '-',
+          alamatSekolah: this.uppercaseLetterFirst2(item?.dataSekolahSebelumnya?.alamatSekolah),
+          kabkotSekolah: this.uppercaseLetterFirst2(item?.dataSekolahSebelumnya?.kabkotSekolah?.nama),
+          noPesertaUN: item?.dataSekolahSebelumnya?.noPesertaUN ? item?.dataSekolahSebelumnya?.noPesertaUN : '-',
+          noSKHUN: item?.dataSekolahSebelumnya?.noSKHUN ? item?.dataSekolahSebelumnya?.noSKHUN : '-',
+          noIjazah: item?.dataSekolahSebelumnya?.noIjazah ? item?.dataSekolahSebelumnya?.noSKHUN : '-',
+          nilaiUN: item?.dataSekolahSebelumnya?.nilaiUN ? item?.dataSekolahSebelumnya?.noSKHUN : '-',
+          noKK: item?.noKK,
+          namaKK: this.uppercaseLetterFirst2(item?.namaKK),
+          telp: item?.dataAlamatOrangtua?.telp,
+          alamat: this.uppercaseLetterFirst2(item?.dataAlamatOrangtua?.alamat),
+          provinsi: this.uppercaseLetterFirst2(item?.dataAlamatOrangtua?.provinsi.nama),
+          kabKota: this.uppercaseLetterFirst2(item?.dataAlamatOrangtua?.kabKota.nama),
+          kecamatan: this.uppercaseLetterFirst2(item?.dataAlamatOrangtua?.kecamatan.nama),
+          kelurahan: this.uppercaseLetterFirst2(item?.dataAlamatOrangtua?.kelurahan.nama),
+          kodePos: item?.dataAlamatOrangtua?.kodePos,
+          nikAyah: item?.dataOrangtua?.dataAyah?.nikAyah,
+          namaAyah: this.uppercaseLetterFirst2(item?.dataOrangtua?.dataAyah?.namaAyah),
+          tahunAyah: item?.dataOrangtua?.dataAyah?.tahunAyah,
+          statusAyah: item?.dataOrangtua?.dataAyah?.statusAyah?.label,
+          pendidikanAyah: item?.dataOrangtua?.dataAyah?.pendidikanAyah?.label,
+          pekerjaanAyah: item?.dataOrangtua?.dataAyah?.pekerjaanAyah?.label,
+          telpAyah: item?.dataOrangtua?.dataAyah?.telpAyah,
+          nikIbu: this.uppercaseLetterFirst2(item?.dataOrangtua?.dataIbu?.nikIbu),
+          namaIbu: item?.dataOrangtua?.dataIbu?.namaIbu,
+          tahunIbu: item?.dataOrangtua?.dataIbu?.tahunIbu,
+          statusIbu: item?.dataOrangtua?.dataIbu?.statusIbu?.label,
+          pendidikanIbu: item?.dataOrangtua?.dataIbu?.pendidikanIbu?.label,
+          pekerjaanIbu: item?.dataOrangtua?.dataIbu?.pekerjaanIbu?.label,
+          telpIbu: item?.dataOrangtua?.dataIbu?.telpIbu,
+          nikWali: item?.dataOrangtua?.dataWali?.nikWali ? item?.dataOrangtua?.dataWali?.nikWali : '-',
+          namaWali: item?.dataOrangtua?.dataWali?.namaWali ? this.uppercaseLetterFirst2(item?.dataOrangtua?.dataWali?.namaWali) : '-',
+          tahunWali: item?.dataOrangtua?.dataWali?.tahunWali ? item?.dataOrangtua?.dataWali?.tahunWali : '-',
+          pendidikanWali: item?.dataOrangtua?.dataWali?.pendidikanWali ? item?.dataOrangtua?.dataWali?.pendidikanWali?.label : '-',
+          pekerjaanWali: item?.dataOrangtua?.dataWali?.pekerjaanWali ? item?.dataOrangtua?.dataWali?.pekerjaanWali?.label : '-',
+          telpWali: item?.dataOrangtua?.dataWali?.telpWali ? item?.dataOrangtua?.dataWali?.telpWali : '-',
+          penghasilan: item?.penghasilan ? item?.penghasilan?.label : '-',
+          statusTempatTinggal: item?.dataLainnya?.statusTempatTinggal ? item?.dataLainnya?.statusTempatTinggal?.label : '-',
+          jarakRumah: item?.dataLainnya?.jarakRumah ? item?.dataLainnya?.jarakRumah?.label : '-',
+          transportasi: item?.dataLainnya?.transportasi ? item?.dataLainnya?.transportasi?.label : '-',
+        }
+        this.DialogSiswaSiswi = true
       }
-      this.DialogSiswaSiswi = true
+    },
+    UpdatePoint(){
+      this.totalpoint = {
+        pointPG: 0,
+        pointEssay: 0,
+        pointMenjodohkan: 0,
+        pointBenarSalah: 0,
+      }
+      this.koreksiNilai.jawabanPG.map(pg => {
+        this.totalpoint.pointPG += pg.point
+      })
+      this.koreksiNilai.jawabanMenjodohkan.map(jodoh => {
+        this.totalpoint.pointMenjodohkan += jodoh.point
+      })
+      this.koreksiNilai.jawabanBenarSalah.map(bs => {
+        this.totalpoint.pointBenarSalah += bs.point
+      })
+      this.koreksiNilai.jawabanEssay.map(essay => {
+        this.totalpoint.pointEssay += Number(essay.point)
+      })
+      let bodyData = {
+        jenis: 'koreksi',
+        idUser: this.koreksiNilai.idUser,
+        mapel: this.mapel,
+        semester: this.koreksiNilai.semester,
+        dataKoreksiNilai: {
+          semester: this.koreksiNilai.semester,
+          koreksi: {
+            pilihanganda: this.totalpoint.pointPG,
+            menjodohkan: this.totalpoint.pointMenjodohkan,
+            benarsalah: this.totalpoint.pointBenarSalah,
+            essay: this.totalpoint.pointEssay,
+          }
+        }
+      }
+      // return console.log(bodyData);
+      this.$store.dispatch('user/postNilai', bodyData)
+      .then((res) => {
+        this.DialogKoreksiNilai = false
+        this.getSiswaSiswi({page: this.page, limit: this.limit, keyword: this.searchData, kelas: this.kelas})
+        this.notifikasi("success", res.data.message, "1")
+			})
+			.catch((err) => {
+        this.notifikasi("error", err.response.data.message, "1")
+			});
     },
     clearData(){
       this.previewData = {
@@ -1981,6 +2356,22 @@ export default {
         jarakRumah: '',
         transportasi: '',
       }
+      this.koreksiNilai = {
+        idAnswerExam: '',
+        idUser: '',
+        nama: '',
+        semester: '',
+        jawabanPG: '',
+        jawabanMenjodohkan: '',
+        jawabanBenarSalah: '',
+        jawabanEssay: '',
+      }
+      this.totalpoint = {
+        pointPG: 0,
+        pointEssay: 0,
+        pointMenjodohkan: 0,
+        pointBenarSalah: 0,
+      }
     },
     conditional(){
       this.conditionNilai = []
@@ -2017,12 +2408,12 @@ export default {
     },
     bukaDialog(item){
       this.inputKehadiran = {
-        idUser: item.idUser,
+        idUser: item?.idUser,
         mapel: this.mapel,
-        semester: item.semester,
-        sakit: String(item.dataKehadiran.sakit),
-        alfa: String(item.dataKehadiran.alfa),
-        ijin: String(item.dataKehadiran.ijin),
+        semester: item?.semester,
+        sakit: String(item?.dataKehadiran.sakit),
+        alfa: String(item?.dataKehadiran.alfa),
+        ijin: String(item?.dataKehadiran.ijin),
       }
       this.DialogKehadiran = true
     },
@@ -2055,11 +2446,11 @@ export default {
       if(kondisi === 'view'){
         this.$router.push({name: "DataKelasSiswa", params: { kelas: param }});
       }else{
-        this.$router.push({name: "DataAkademis"});
+        this.$router.push(this.kondisi === 'penilaian' ? {name: "DataAkademis"} : {name: "KoreksiExam"});
       }
     },
     gotolist2(mapel) {
-      this.$router.push({name: "DataDetailAkademis", params: { mapel: mapel.replace(' ', '-') }});
+      this.$router.push({name: "DataDetailAkademis", params: { mapel: mapel.replace(' ', '-'), jenis: this.kondisi === 'penilaian' ? 'mapel' : 'koreksi' }});
     },
     endecryptData(d) {
       this[d] = !this[d]
@@ -2085,6 +2476,12 @@ export default {
       let objIndex = this.inputTempAll.findIndex((obj => obj.idUser === idUser));
       this.inputTempAll[objIndex].nilai = e
     },
+    clickrow(event, data) {
+      const index = this.$data.expanded.find(i => i === data?.item?.raw?.idUser);
+      if(typeof index === 'undefined') return this.$data.expanded = [];
+      this.$data.expanded.splice(0, 1)
+      this.$data.expanded.push(data?.item?.raw?.idUser);
+    },
     notifikasi(kode, text, proses){
       this.dialogNotifikasi = true
       this.notifikasiKode = kode
@@ -2105,6 +2502,14 @@ export default {
 </style>
 
 <style scoped>
+.tabelJodoh,.tabelJodoh td,.tabelJodoh th {
+  border: 2px solid #000;
+  padding: 5px;
+}
+.tabelJodoh {
+  width: 100%;
+  border-collapse: collapse;
+}
 .wadah {
   font-size: 15px;
   font-weight: bold;
@@ -2129,5 +2534,46 @@ export default {
 }
 .titik2 {
   text-indent: 5em;
+}
+.kotaksoal {
+	width: 100%;
+	height: auto;
+	border: 2px dashed #000;
+	border-radius: 10px;
+	margin-bottom: 10px;
+	padding: 5px 10px;
+	font-size: 13px;
+	color: #000;
+}
+.font-style {
+  vertical-align: top;
+  font-weight: bold;
+}
+.jawaban-lingkar-1 {
+  width: 25px;
+  height: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0px 2px 2px 0px;
+}
+.jawaban-lingkar-2 {
+  border-radius: 50%;
+  border: 2px solid rgb(0, 0, 0);
+  width: 25px;
+  height: 25px;
+  justify-content: center;
+  align-items: center;
+  margin: 0px 2px 2px 0px;
+}
+.kunci-jawaban {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.stroke-icon {
+  stroke: black;
+  stroke-width: 30px;
 }
 </style>

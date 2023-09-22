@@ -19,7 +19,8 @@
             <v-col
               v-for="hasil in data.dataKelas"
               :key="hasil.kelas"
-              cols="3"
+              cols="12"
+              lg="3"
             >
               <v-card color="white" @click="hasil.jumlah > 0 ? openDialog(hasil.kelas) : warningNotif()">
                 <v-sheet color="green" class="sheetData" elevation="2">
@@ -467,7 +468,7 @@ export default {
   }),
   setup() {
     useMeta({
-      title: "Data Wali Kelas Siswa Siswi - MTsS. SIROJUL ATHFAL",
+      title: "Data Wali Kelas Siswa Siswi",
       htmlAttrs: {
         lang: "id",
         amp: true,
@@ -543,6 +544,7 @@ export default {
 		},
   },
   mounted() {
+    if(!localStorage.getItem('user_token')) return this.$router.push({name: 'LogIn'});
     this.BASEURL = process.env.VUE_APP_BASE_URL
     this.roleID = localStorage.getItem('roleID')
     if(this.roleID === '1' || this.roleID === '2') {

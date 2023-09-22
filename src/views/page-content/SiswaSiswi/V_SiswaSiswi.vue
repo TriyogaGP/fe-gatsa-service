@@ -70,7 +70,7 @@
         </v-col>
         <v-col cols="12" md="6">
           <v-row no-gutters>
-            <v-col cols="12" md="9">
+            <v-col cols="12" md="9" class="pr-2">
               <TextField
                 v-model="searchData"
                 icon-prepend-tf="mdi mdi-magnify"
@@ -86,7 +86,7 @@
                 }"
               />
             </v-col>
-            <v-col cols="12" md="3" class="pl-2 d-flex justify-end align-center">
+            <v-col cols="12" md="3" class="d-flex justify-end align-center">
               <Autocomplete
                 v-model="page"
                 :data-a="pageOptions"
@@ -106,7 +106,7 @@
           :loading="loadingtable"
           :items="DataSiswaSiswi"
           expand-on-click
-          show-expand
+          v-model:expanded="expanded"
           item-value="idUser"
           density="comfortable"
           hide-default-footer
@@ -114,6 +114,7 @@
           class="elavation-3 rounded"
           :items-per-page="itemsPerPage"
           @page-count="pageCount = $event"
+          @click:row="clickrow"
         >
           <!-- header -->
           <template #headers="{ columns }">
@@ -211,10 +212,10 @@
           <template #bottom>
             <v-divider :thickness="2" class="border-opacity-100" color="white" />
             <v-row no-gutters>
-              <v-col cols="10" class="pa-2 d-flex justify-start align-center">
+              <v-col cols="12" lg="10" class="pa-2 d-flex justify-start align-center">
                 <span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
               </v-col>
-              <v-col cols="2" class="pa-2 text-right">
+              <v-col cols="12" lg="2" class="pa-2 text-right">
                 <div class="d-flex justify-start align-center">
                   <Autocomplete
                     v-model="limit"
@@ -1740,11 +1741,6 @@ export default {
     PopUpNotifikasiVue
   },
   data: () => ({
-    cards: [
-      { title: 'Pre-fab homes', src: 'https://cdn.vuetifyjs.com/images/cards/house.jpg', flex: 3 },
-      { title: 'Favorite road trips', src: 'https://cdn.vuetifyjs.com/images/cards/road.jpg', flex: 3 },
-      { title: 'Best airlines', src: 'https://cdn.vuetifyjs.com/images/cards/plane.jpg', flex: 3 },
-    ],
     isLoadingbtnPDF: false,
     isLoadingbtnPDF1: false,
     isLoadingbtnPDF2: false,
@@ -1753,6 +1749,7 @@ export default {
     isLoadingbtnPDF5: false,
     isLoadingbtnPDF6: false,
     isLoadingExport: false,
+    expanded: [],
 		DataSiswaSiswi: [],
     DataKelas: [],
 		searchData: '',
@@ -1878,7 +1875,7 @@ export default {
   }),
   setup() {
     useMeta({
-      title: "Data Siswa Siswi - MTsS. SIROJUL ATHFAL",
+      title: "Data Siswa Siswi",
       htmlAttrs: {
         lang: "id",
         amp: true,
@@ -1996,6 +1993,7 @@ export default {
 		}
   },
   mounted() {
+    if(!localStorage.getItem('user_token')) return this.$router.push({name: 'LogIn'});
     this.BASEURL = process.env.VUE_APP_BASE_URL
     this.roleID = localStorage.getItem('roleID')
     this.mengajarKelas = localStorage.getItem('mengajar_kelas')
@@ -2194,7 +2192,13 @@ export default {
           : jenis === 'ktp' ? this.isLoadingbtnPDF4 = false
           : jenis === 'aktalahir' ? this.isLoadingbtnPDF5 = false
           : this.isLoadingbtnPDF6 = false
-          return this.notifikasi("warning", 'Gagal view berkas !', "1")
+          const nameJenis = jenis === 'ijazah' ? 'Ijazah'
+          : jenis === 'skhun' ? 'SKHUN'
+          : jenis === 'kk' ? 'Kartu Keluarga'
+          : jenis === 'ktp' ? 'KTP Orang Tua'
+          : jenis === 'aktalahir' ? 'Akta Lahir'
+          : 'Surat Keterangan Lulus'
+          return this.notifikasi("warning", `Data Berkas ${nameJenis} tidak ditemukan!`, "1")
         }
         this.urlSk = berkas
         setTimeout(() => {
@@ -2473,6 +2477,12 @@ export default {
 			.catch((err) => {
 				this.notifikasi("error", err.response.data.message, "1")
 			});
+    },
+    clickrow(event, data) {
+      const index = this.$data.expanded.find(i => i === data?.item?.raw?.idUser);
+      if(typeof index === 'undefined') return this.$data.expanded = [];
+      this.$data.expanded.splice(0, 1)
+      this.$data.expanded.push(data?.item?.raw?.idUser);
     },
     notifikasi(kode, text, proses){
       this.dialogNotifikasi = true

@@ -69,7 +69,10 @@
 
     <template v-slot:item="{ props, item }">
       <v-list v-if="slotA === 'first'" density="compact">
+        <v-list-subheader v-if="item.raw.type === 'subheader'">{{ item.raw.title }}</v-list-subheader>
+    		<v-divider v-if="item.raw.divider" :thickness="2" color="white" class="border-opacity-100" />
         <v-list-item
+          v-if="item.raw.type !== 'subheader' && !item.raw.divider"
           v-bind="props"
           :subtitle="item.raw.group"
         >

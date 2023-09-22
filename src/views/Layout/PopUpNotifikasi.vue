@@ -13,7 +13,7 @@
         <v-col v-else-if="kode == 'warning'" cols="12" class="d-flex flex-column justify-space-between align-center">
           <v-img class="ukuran" :src="`${API_URL}/bahan/media-notifikasi/Warning.png`" />
         </v-col>
-        <v-col v-else-if="kode == 'question' || kode == 'questionProses'" cols="12" class="d-flex flex-column justify-space-between align-center">
+        <v-col v-else-if="kode == 'question' || kode == 'question2' || kode == 'questionProses'" cols="12" class="d-flex flex-column justify-space-between align-center">
           <v-img class="ukuran" :src="`${API_URL}/bahan/media-notifikasi/tanda-tanya.png`" />
         </v-col>
       </v-row>
@@ -42,6 +42,20 @@
             class="elevation-0 tombol-question white--text"
             color-button="#3c00ff"
             nama-button="Keluar"
+            @proses="tombolProses(notifikasiButton)"
+          />
+          <Button 
+            v-if="kode == 'question2'"
+            class="elevation-0 tombol-question mr-4 white--text"
+            color-button="#9b1f15"
+            nama-button="Batal"
+            @proses="tombolProses(1)"
+          />
+          <Button 
+            v-if="kode == 'question2'"
+            class="elevation-0 tombol-question white--text"
+            color-button="#3c00ff"
+            nama-button="Yakin"
             @proses="tombolProses(notifikasiButton)"
           />
           <Button 
@@ -124,7 +138,7 @@ export default {
 
 <style>
 .textnotif {
-  font-size: 15px !important;
+  font-size: 13px !important;
   font-weight: 400 !important;
   color: #525252 !important;
   letter-spacing: normal!important;

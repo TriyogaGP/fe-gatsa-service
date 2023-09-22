@@ -38,6 +38,9 @@ export const GET_USER_BROADCAST = "getUserBroadcast";
 export const GET_COUNT_NOTIFIKASI = "getCountNotifikasi";
 export const GET_DATA_BERKAS = "getDataBerkas";
 export const POST_DATA_BERKAS = "postDataBerkas";
+export const GET_LIST_EXAM = "getListExam";
+export const GET_DATA_RFID = "getDataRFID";
+export const POST_DATA_RFID = "postDataRFID";
 
 // mutation types
 export const SET_LOADINGTABLE = "SET_LOADINGTABLE";
@@ -68,6 +71,8 @@ export const SET_KATEGORI_NOTIFIKASI = "SET_KATEGORI_NOTIFIKASI";
 export const SET_NOTIFIKASI = "SET_NOTIFIKASI";
 export const SET_USER_BROADCAST = "SET_USER_BROADCAST";
 export const SET_DATA_BERKAS = "SET_DATA_BERKAS";
+export const SET_DATA_RFID = "SET_DATA_RFID";
+export const SET_LIST_EXAM = "SET_LIST_EXAM";
 
 const state = {
   loadingtable: false,
@@ -93,6 +98,7 @@ const state = {
   KabKotaOnlyOptions: [],
   menuOptions: [],
   berkasOptions: [],
+  listOptions: [],
 
   dataRole: [],
   dataMenu: [],
@@ -102,6 +108,7 @@ const state = {
   dataNotifikasi: [],
   dataUserBroadcast: [],
   dataBerkas: [],
+  dataRFID: [],
 
   dataCountNotifikasi: null,
   dataUID: null,
@@ -174,6 +181,9 @@ const mutations = {
   [SET_BERKAS](state, data) {
     state.berkasOptions = data
   },
+  [SET_LIST_EXAM](state, data) {
+    state.listOptions = data
+  },
   
   [SET_UID](state, data) {
     state.dataUID = data
@@ -208,6 +218,9 @@ const mutations = {
   [SET_DATA_BERKAS](state, data) {
     state.dataBerkas = data
   },
+  [SET_DATA_RFID](state, data) {
+    state.dataRFID = data
+  },
 }
 
 const getters = {
@@ -240,6 +253,9 @@ const getters = {
   },
   berkasAll(state) {
     return state.dataBerkas;
+  },
+  rfidAll(state) {
+    return state.dataRFID;
   },
 }
 
@@ -429,6 +445,18 @@ const actions = {
       ApiService.get(`settings/optionsBerkas${data.kategori ? `?kategori=${data.kategori}` : ''}`, token)
       .then((response) => {
           context.commit('SET_BERKAS', response.data.result)
+          resolve(response);
+        })
+        .catch((error) => {
+          reject(error);
+        })
+    });
+  },
+  [GET_LIST_EXAM](context, data) {
+    return new Promise((resolve, reject) => {
+      ApiService.get(`settings/listExam${data.kelas ? `?kelas=${data.kelas}` : ''}`, token)
+      .then((response) => {
+          context.commit('SET_LIST_EXAM', response.data.result)
           resolve(response);
         })
         .catch((error) => {
@@ -669,6 +697,32 @@ const actions = {
   [POST_DATA_BERKAS](context, bodyData) {
     return new Promise((resolve, reject) => {
       ApiService.post(`settings/Berkas`, token, bodyData)
+      .then((response) => {
+          resolve(response);
+        })
+        .catch((error) => {
+          reject(error);
+        })
+    });
+  },
+  [GET_DATA_RFID](context, data) {
+    return new Promise((resolve, reject) => {
+      context.commit('SET_LOADINGTABLE', true)
+      ApiService.get(`settings/data-rfid?page=${data.page}&limit=${data.limit}${data.keyword ? `&keyword=${data.keyword}` : ''}`, token)
+      .then((response) => {
+          context.commit('SET_LOADINGTABLE', false)
+          context.commit('SET_DATA_RFID', response.data.result)
+          resolve(response);
+        })
+        .catch((error) => {
+          context.commit('SET_LOADINGTABLE', false)
+          reject(error);
+        })
+    });
+  },
+  [POST_DATA_RFID](context, bodyData) {
+    return new Promise((resolve, reject) => {
+      ApiService.post(`settings/data-rfid`, token, bodyData)
       .then((response) => {
           resolve(response);
         })

@@ -104,7 +104,7 @@ export default {
   }),
   setup() {
     useMeta({
-      title: "Formulir Administrator - MTsS. SIROJUL ATHFAL",
+      title: "Formulir Administrator",
       htmlAttrs: {
         lang: "id",
         amp: true,

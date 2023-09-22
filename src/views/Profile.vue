@@ -172,7 +172,6 @@
                           placeholder="Tanggal Lahir"
                           format="dd-MM-yyyy"
                           :enable-time-picker="false"
-                          :teleport="true"
                           auto-apply
                         />
                       </v-col>
@@ -549,7 +548,6 @@
                           placeholder="Tanggal Lahir"
                           format="dd-MM-yyyy"
                           :enable-time-picker="false"
-                          :teleport="true"
                           auto-apply
                         />
                       </v-col>
@@ -1875,88 +1873,19 @@
           <v-divider :thickness="2" class="border-opacity-100" />
           <div v-if="roleID === '4'" class="customScrollRight">
             <h4 class="white--text text-center ma-4">******&nbsp;Berkas - Berkas&nbsp;******</h4>
-            <v-row no-gutters class="mb-2">
-              <v-col cols="12" md="6" class="d-flex align-center text-left">
-                <span class="white--text">*FC Ijazah</span>
-              </v-col>
-              <v-col cols="12" md="6" class="text-right">
-                <Button
-                  :loading="isLoadingbtnPDF1"
-                  color-button="#0bd369"
-                  nama-button="Lihat Berkas"
-                  icon-button="mdi mdi-file-pdf-box"
-                  @proses="pdfCreate(previewData.fcIjazah, 'ijazah')"
-                />
-              </v-col>
-            </v-row>
-            <v-row no-gutters class="mb-2">
-              <v-col cols="12" md="6" class="d-flex align-center text-left">
-                <span class="white--text">*FC SKHUN</span>
-              </v-col>
-              <v-col cols="12" md="6" class="text-right">
-                <Button
-                  :loading="isLoadingbtnPDF2"
-                  color-button="#0bd369"
-                  nama-button="Lihat Berkas"
-                  icon-button="mdi mdi-file-pdf-box"
-                  @proses="pdfCreate(previewData.fcSKHUN, 'skhun')"
-                />
-              </v-col>
-            </v-row>
-            <v-row no-gutters class="mb-2">
-              <v-col cols="12" md="6" class="d-flex align-center text-left">
-                <span class="white--text">*FC SKHUN</span>
-              </v-col>
-              <v-col cols="12" md="6" class="text-right">
-                <Button
-                  :loading="isLoadingbtnPDF3"
-                  color-button="#0bd369"
-                  nama-button="Lihat Berkas"
-                  icon-button="mdi mdi-file-pdf-box"
-                  @proses="pdfCreate(previewData.fcKK, 'kk')"
-                />
-              </v-col>
-            </v-row>
-            <v-row no-gutters class="mb-2">
-              <v-col cols="12" md="6" class="d-flex align-center text-left">
-                <span class="white--text">*FC KTP Orangtua</span>
-              </v-col>
-              <v-col cols="12" md="6" class="text-right">
-                <Button
-                  :loading="isLoadingbtnPDF4"
-                  color-button="#0bd369"
-                  nama-button="Lihat Berkas"
-                  icon-button="mdi mdi-file-pdf-box"
-                  @proses="pdfCreate(previewData.fcKTPOrtu, 'ktp')"
-                />
-              </v-col>
-            </v-row>
-            <v-row no-gutters class="mb-2">
-              <v-col cols="12" md="6" class="d-flex align-center text-left">
-                <span class="white--text">*FC Akta Lahir</span>
-              </v-col>
-              <v-col cols="12" md="6" class="text-right">
-                <Button
-                  :loading="isLoadingbtnPDF5"
-                  color-button="#0bd369"
-                  nama-button="Lihat Berkas"
-                  icon-button="mdi mdi-file-pdf-box"
-                  @proses="pdfCreate(previewData.fcAktaLahir, 'aktalahir')"
-                />
-              </v-col>
-            </v-row>
-            <v-row no-gutters class="mb-2">
-              <v-col cols="12" md="6" class="d-flex align-center text-left">
-                <span class="white--text">*FC SKL</span>
-              </v-col>
-              <v-col cols="12" md="6" class="text-right">
-                <Button
-                  :loading="isLoadingbtnPDF6"
-                  color-button="#0bd369"
-                  nama-button="Lihat Berkas"
-                  icon-button="mdi mdi-file-pdf-box"
-                  @proses="pdfCreate(previewData.fcSKL, 'skl')"
-                />
+            <v-row no-gutters class="d-flex flex-row justify-center align-center">
+              <v-col
+                cols="5"
+                class="d-flex flex-column justify-center boxlist"
+                style="cursor: pointer;"
+                v-for="data in dataBerkas"
+                :key="data.kode"
+                :loading="true"
+                @click="pdfCreate(data.url, data.kode)">
+                <div>
+                  <v-progress-circular v-if="isLoadingPDF[data.kode]" indeterminate />
+                  <span v-else><v-icon icon="mdi mdi-file-pdf-box" /> {{ data.title }}</span>
+                </div>
               </v-col>
             </v-row>
             <!-- <h4 class="white--text text-center ma-4">******&nbsp;Raport Nilai&nbsp;******</h4> -->
@@ -1966,64 +1895,49 @@
             <v-row no-gutters class="mb-2">
               <v-col cols="12" md="12">
                 <div class="white--text text-left" style="font-weight: bold;">*Jabatan Struktural</div>
-                <div class="white--text text-left" style="font-size: 13px;">
-                  <v-list
-                    :lines="false"
-                    density="compact"
-                    nav
-                    class="listData"
-                  >
-                    <v-list-item v-for="jabatan in arrayData.jabatanGuru" :key="jabatan">
-                      <v-list-item-title>
-                        <v-icon icon="mdi mdi-square-small" />{{ jabatan }}
-                      </v-list-item-title>
-                    </v-list-item>
-                  </v-list>
+                <div class="white--text text-left">
+                  <v-row no-gutters class="d-flex flex-row justify-center align-center">
+                    <v-col cols="3" class="d-flex flex-column justify-center boxlist" v-for="jabatan in arrayData.jabatanGuru" :key="jabatan">
+                      {{ jabatan }}
+                    </v-col>
+                  </v-row>
                 </div>
               </v-col>
             </v-row>
             <v-row no-gutters class="mb-2">
               <v-col cols="12" md="12">
                 <div class="white--text text-left" style="font-weight: bold;">*Mangajar Bidang</div>
-                <div class="white--text text-left" style="font-size: 13px;">
-                  <v-list
-                    :lines="false"
-                    density="compact"
-                    nav
-                    class="listData"
-                  >
-                    <v-list-item v-for="bidang in arrayData.mengajarBidang" :key="bidang">
-                      <v-list-item-title>
-                        <v-icon icon="mdi mdi-square-small" />{{ bidang }}
-                      </v-list-item-title>
-                    </v-list-item>
-                  </v-list>
+                <div class="white--text text-left">
+                  <v-row no-gutters class="d-flex flex-row justify-center align-center">
+                    <v-col cols="3" class="d-flex flex-column justify-center boxlist" v-for="bidang in arrayData.mengajarBidang" :key="bidang">
+                      {{ bidang }}
+                    </v-col>
+                  </v-row>
                 </div>
               </v-col>
             </v-row>
             <v-row no-gutters class="mb-2">
               <v-col cols="12" md="12">
                 <div class="white--text text-left" style="font-weight: bold;">*Mangajar Kelas</div>
-                <div class="white--text text-left" style="font-size: 13px;">
-                  <v-list
-                    :lines="false"
-                    density="compact"
-                    nav
-                    class="listData"
-                  >
-                    <v-list-item v-for="kelas in arrayData.mengajarKelas" :key="kelas">
-                      <v-list-item-title>
-                        <v-icon icon="mdi mdi-square-small" />{{ kelas }}
-                      </v-list-item-title>
-                    </v-list-item>
-                  </v-list>
+                <div class="white--text text-left">
+                  <v-row no-gutters class="d-flex flex-row justify-center align-center">
+                    <v-col cols="3" class="d-flex flex-column justify-center boxlist" v-for="kelas in arrayData.mengajarKelas" :key="kelas">
+                      {{ kelas }}
+                    </v-col>
+                  </v-row>
                 </div>
               </v-col>
             </v-row>
             <v-row no-gutters class="mb-2">
               <v-col cols="12" md="12">
                 <div class="white--text text-left" style="font-weight: bold;">*Wali Kelas</div>
-                <div class="white--text text-left" style="font-size: 13px;">{{ previewData.waliKelas ? previewData.waliKelas : '-' }}</div>
+                <div class="white--text text-left">
+                  <v-row no-gutters class="d-flex flex-row justify-center align-center">
+                    <v-col cols="3" class="d-flex flex-column justify-center boxlist">
+                      {{ previewData.waliKelas ? previewData.waliKelas : '-' }}
+                    </v-col>
+                  </v-row>
+                </div>
               </v-col>
             </v-row>
           </div>
@@ -2156,12 +2070,7 @@ export default {
     roleID: '',
     nama: '',
     namaRole: '',
-    isLoadingbtnPDF1: false,
-    isLoadingbtnPDF2: false,
-    isLoadingbtnPDF3: false,
-    isLoadingbtnPDF4: false,
-    isLoadingbtnPDF5: false,
-    isLoadingbtnPDF6: false,
+    isLoadingPDF: [],
     dialogPDF: false,
     urlSk: window.location.href,
     BASE_URL: '',
@@ -2275,6 +2184,7 @@ export default {
       fcAktaLahir: '',
       fcSKL: '',
     },
+    dataBerkas: [],
     arrayData: {
       jabatanGuru: '',
       mengajarBidang: '',
@@ -2325,7 +2235,7 @@ export default {
   }),
   setup() {
     useMeta({
-      title: "Profile - MTsS. SIROJUL ATHFAL",
+      title: "Profile",
       htmlAttrs: {
         lang: "id",
         amp: true,
@@ -2475,6 +2385,14 @@ export default {
           fcAktaLahir: this.roleID === '4' ? value.berkas.fcAktaLahir : null,
           fcSKL: this.roleID === '4' ? value.berkas.fcSKl : null,
         }
+        this.dataBerkas = [
+          { kode: 'ijazah', url: this.previewData.fcIjazah, title: 'FC Ijazah' },
+          { kode: 'skhun', url: this.previewData.fcSKHUN, title: 'FC SKHUN' },
+          { kode: 'kk', url: this.previewData.fcKK, title: 'FC Kartu Keluarga' },
+          { kode: 'ktp', url: this.previewData.fcKTPOrtu, title: 'FC KTP Orangtua' },
+          { kode: 'aktalahir', url: this.previewData.fcAktaLahir, title: 'FC Akta Lahir' },
+          { kode: 'skl', url: this.previewData.fcSKL, title: 'FC SKL' },
+        ]
         this.arrayData = {
           jabatanGuru: this.roleID === '3' ? value.jabatanGuru.map(str => { return str.label; }).sort() : null,
           mengajarBidang: this.roleID === '3' ? value.mengajarBidang.map(str => { return str.label; }).sort() : null,
@@ -2532,6 +2450,7 @@ export default {
     },
 	},
   mounted() {
+    if(!localStorage.getItem('user_token')) return this.$router.push({name: 'LogIn'});
     this.roleID = localStorage.getItem("roleID")
     this.nama = localStorage.getItem("nama")
     this.namaRole = localStorage.getItem("nama_role")
@@ -2701,31 +2620,16 @@ export default {
 			});
     },
     pdfCreate(berkas, jenis) {
-      jenis === 'ijazah' ? this.isLoadingbtnPDF1 = true
-      : jenis === 'skhun' ? this.isLoadingbtnPDF2 = true
-      : jenis === 'kk' ? this.isLoadingbtnPDF3 = true
-      : jenis === 'ktp' ? this.isLoadingbtnPDF4 = true
-      : jenis === 'aktalahir' ? this.isLoadingbtnPDF5 = true
-      : this.isLoadingbtnPDF6 = true
+      this.isLoadingPDF[jenis] = true
       this.dialogPDF = false
       this.urlSk = ''
       if(!berkas) {
-        jenis === 'ijazah' ? this.isLoadingbtnPDF1 = false
-        : jenis === 'skhun' ? this.isLoadingbtnPDF2 = false
-        : jenis === 'kk' ? this.isLoadingbtnPDF3 = false
-        : jenis === 'ktp' ? this.isLoadingbtnPDF4 = false
-        : jenis === 'aktalahir' ? this.isLoadingbtnPDF5 = false
-        : this.isLoadingbtnPDF6 = false
+        this.isLoadingPDF[jenis] = false
         return this.notifikasi("warning", 'Berkas tidak ditemukan !', "1")
       }
       this.urlSk = berkas
       setTimeout(() => {
-        jenis === 'ijazah' ? this.isLoadingbtnPDF1 = false
-        : jenis === 'skhun' ? this.isLoadingbtnPDF2 = false
-        : jenis === 'kk' ? this.isLoadingbtnPDF3 = false
-        : jenis === 'ktp' ? this.isLoadingbtnPDF4 = false
-        : jenis === 'aktalahir' ? this.isLoadingbtnPDF5 = false
-        : this.isLoadingbtnPDF6 = false
+        this.isLoadingPDF[jenis] = false
         this.dialogPDF = true;
       }, 3000);
     },
@@ -2885,10 +2789,27 @@ export default {
 }
 </script>
 <style scoped>
+.boxlist{
+  height: 40px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-khtml-border-radius: 5px; 
+	border-radius: 5px;
+	padding: 2px;
+	margin: 2px;
+	text-align: center;
+  justify-content: center;
+	font-size: 10pt;
+	font-weight: bold;
+	background: rgba(10, 204, 117, 0.694);
+	border: 1px solid #FFFFFF;
+	color: #FFFFFF;
+}
 .listData {
 	background-color: #272727;
 	color: white;
 	margin: 0px !important;
+  padding: 0px !important;
 }
 .tampilView{
   height: 450px;

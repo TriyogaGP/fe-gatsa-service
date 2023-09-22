@@ -54,7 +54,7 @@
 				:loading="loadingtable"
 				:items="DataMenu"
 				expand-on-click
-				show-expand
+				v-model:expanded="expanded"
 				item-value="idMenu"
 				density="comfortable"
 				hide-default-footer
@@ -62,6 +62,7 @@
 				class="elavation-3 rounded"
 				:items-per-page="itemsPerPage"
 				@page-count="pageCount = $event"
+        @click:row="clickrow"
 			>
 				<!-- header -->
 				<template #headers="{ columns }">
@@ -106,10 +107,10 @@
 				<template #bottom>
 					<v-divider :thickness="2" class="border-opacity-100" color="white" />
 					<v-row no-gutters>
-						<v-col cols="10" class="pa-2 d-flex justify-start align-center">
+						<v-col cols="12" lg="10" class="pa-2 d-flex justify-start align-center">
 							<span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
 						</v-col>
-						<v-col cols="2" class="pa-2 text-right">
+						<v-col cols="12" lg="2" class="pa-2 text-right">
 							<div class="d-flex justify-start align-center">
 								<Autocomplete
 									v-model="limit"
@@ -441,7 +442,8 @@ export default {
   name: 'Menu',
 	components: { PopUpNotifikasiVue, draggable: VueDraggableNext },
   data: () => ({
-		tab: "",
+    tab: "",
+		expanded: [],
 		DataMenu: [],
 		searchData: "",
     page: 1,
@@ -497,7 +499,7 @@ export default {
   }),
   setup() {
     useMeta({
-      title: "Settings (Menu) - MTsS. SIROJUL ATHFAL",
+      title: "Settings (Menu)",
       htmlAttrs: {
         lang: "id",
         amp: true,
@@ -602,7 +604,7 @@ export default {
         },
 				STATUSDELETE: {
 					jenis: jenis,
-					id_menu: item.idMenu,
+					id_menu: item?.idMenu,
           status_aktif: status_aktif,
 				}
       }
@@ -688,12 +690,11 @@ export default {
       }
       this.editingSubMenu = !this.editingSubMenu
     },
-    action(kategori){
-      if(kategori === 'Menu'){
-      }
-      if(kategori === 'SubMenu'){
-
-      }
+    clickrow(event, data) {
+      const index = this.$data.expanded.find(i => i === data?.item?.raw?.idMenu);
+      if(typeof index === 'undefined') return this.$data.expanded = [];
+      this.$data.expanded.splice(0, 1)
+      this.$data.expanded.push(data?.item?.raw?.idMenu);
     },
 		notifikasi(kode, text, proses){
       this.dialogNotifikasi = true

@@ -497,10 +497,10 @@
 							<template #bottom>
 								<v-divider :thickness="2" class="border-opacity-100" color="white" />
 								<v-row no-gutters>
-									<v-col cols="9" class="pa-2 d-flex justify-start align-center">
+									<v-col cols="12" lg="9" class="pa-2 d-flex justify-start align-center">
 										<span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
 									</v-col>
-									<v-col cols="3" class="pa-2 text-right">
+									<v-col cols="12" lg="3" class="pa-2 text-right">
 										<div class="d-flex justify-start align-center">
 											<Autocomplete
 												v-model="limit"
@@ -713,7 +713,7 @@ export default {
   }),
 	setup() {
     useMeta({
-      title: "Settings (General CMS) - MTsS. SIROJUL ATHFAL",
+      title: "Settings (General CMS)",
       htmlAttrs: {
         lang: "id",
         amp: true,

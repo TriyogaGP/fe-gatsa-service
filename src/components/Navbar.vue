@@ -1,262 +1,272 @@
 <template>
 	<nav>
-		<v-app-bar color="light-black darken-3" style="position: fixed;" dark app>
-			<img :src="logoSekolah" width="40" />
-			<div class="ml-2 mr-2">{{ namaSekolah }}</div>
+		<v-app-bar
+			color="light-black darken-3"
+			style="position: fixed;"
+			density="comfortable"
+		>
+			<template v-slot:prepend>
+				<v-img class="gambarLogo" :src="logoSekolah" />
+				<span class="textNamaSekolah">{{ namaSekolah }}</span>
+			</template>
 			<v-divider vertical :thickness="2" />
-			<v-list 
-				v-if="roleID !== '4'"
-				:lines="false"
-				density="comfortable"
-				nav
-				style="padding: 2px; margin-left: 3px;"
-			>
-				<v-list-item
-					router to="/dashboard"
-					color="nav-back"
-					class="SelectedMenu"
+			<span class="navigasi">
+				<v-list 
+					v-if="roleID !== '4'"
+					:lines="false"
+					density="comfortable"
+					nav
+					style="padding: 2px; margin-left: 3px;"
 				>
-					<v-list-item-title>
-						<v-icon start size="middle" icon="mdi mdi-view-dashboard" color="icon-white" style="margin-left: 5px;" />
-						<span class="menufont">Dashboard</span>
-					</v-list-item-title>
-				</v-list-item>
-			</v-list>
-			<v-menu
-				v-for="data in menuOptions" :key="data.menuText"
-				open-on-hover
-				rounded="t-xs b-lg"
-				offset-y
-				transition="slide-y-transition"
-				bottom
-			>
-				<template v-slot:activator="{ props }">
+					<v-list-item
+						router to="/dashboard"
+						color="nav-back"
+						class="SelectedMenu"
+					>
+						<v-list-item-title>
+							<v-icon start size="middle" icon="mdi mdi-view-dashboard" color="icon-white" style="margin-left: 5px;" />
+							<span class="menufont">Dashboard</span>
+						</v-list-item-title>
+					</v-list-item>
+				</v-list>
+				<v-menu
+					v-for="data in menuOptions" :key="data.menuText"
+					open-on-click
+					rounded="t-xs b-lg"
+					offset-y
+					transition="slide-y-transition"
+					location="bottom"
+				>
+					<template v-slot:activator="{ props }">
+						<v-list
+							v-bind="props"
+							:lines="false"
+							density="comfortable"
+							nav
+							style="padding: 0px; margin-left: 3px;"
+						>
+							<v-list-item
+								v-if="data.menuText !== 'Wali Kelas' && (roleID === '1' || roleID === '2' || roleID === '4')"
+								router :to="data.menuText === 'Ujian' ? `${data.menuRoute}/${jenisExam}` : !data.kondisi ? data.menuRoute : ''"
+								color="nav-back"
+								class="SelectedMenu"
+							>
+								<v-list-item-title>
+									<v-icon start size="middle" :icon="data.menuIcon" color="icon-white" style="margin-left: 5px;" />
+									<span class="menufont">{{ data.menuText === 'Ujian' ? `${data.menuText} ${jenisExam}` : data.menuText }}</span>
+								</v-list-item-title>
+							</v-list-item>
+							<v-list-item
+								v-if="data.menuText !== 'Wali Kelas' && data.menuText !== 'Jadwal Mengajar' && data.menuText !== 'Guru' && data.menuText !== 'Siswa Siswi' && roleID === '3'"
+								router :to="!data.kondisi ? data.menuRoute : ''"
+								color="nav-back"
+								class="SelectedMenu"
+							>
+								<v-list-item-title>
+									<v-icon start size="middle" :icon="data.menuIcon" color="icon-white" style="margin-left: 5px;" />
+									<span class="menufont">{{ data.menuText }}</span>
+								</v-list-item-title>
+							</v-list-item>
+							<v-list-item
+								v-if="data.menuText === 'Wali Kelas' && wali_kelas !== ''"
+								router :to="data.menuRoute"
+								color="nav-back"
+								class="SelectedMenu"
+							>
+								<v-list-item-title>
+									<v-icon start size="middle" :icon="data.menuIcon" color="icon-white" style="margin-left: 5px;" />
+									<span class="menufont">{{ `${data.menuText}${wali_kelas == null ? '':' '+wali_kelas}` }}</span>
+								</v-list-item-title>
+							</v-list-item>
+							<v-list-item
+								v-if="data.menuText === 'Jadwal Mengajar' && kondisiWaKaBidKurikulum && roleID === '3'"
+								router :to="data.menuRoute"
+								color="nav-back"
+								class="SelectedMenu"
+							>
+								<v-list-item-title>
+									<v-icon start size="middle" :icon="data.menuIcon" color="icon-white" style="margin-left: 5px;" />
+									<span class="menufont">{{ data.menuText }}</span>
+								</v-list-item-title>
+							</v-list-item>
+							<v-list-item
+								v-if="data.menuText === 'Siswa Siswi' && kondisiWaKaBidKesiswaan && roleID === '3'"
+								router :to="data.menuRoute"
+								color="nav-back"
+								class="SelectedMenu"
+							>
+								<v-list-item-title>
+									<v-icon start size="middle" :icon="data.menuIcon" color="icon-white" style="margin-left: 5px;" />
+									<span class="menufont">{{ data.menuText }}</span>
+								</v-list-item-title>
+							</v-list-item>
+							<v-list-item
+								v-if="(data.menuText === 'Siswa Siswi' || data.menuText === 'Guru') && kondisiKepalaSekolah && roleID === '3'"
+								router :to="data.menuRoute"
+								color="nav-back"
+								class="SelectedMenu"
+							>
+								<v-list-item-title>
+									<v-icon start size="middle" :icon="data.menuIcon" color="icon-white" style="margin-left: 5px;" />
+									<span class="menufont">{{ data.menuText }}</span>
+								</v-list-item-title>
+							</v-list-item>
+						</v-list>
+					</template>
+
 					<v-list
-						v-bind="props"
+						v-if="data.subMenu.length && !data.kondisi"
 						:lines="false"
 						density="comfortable"
 						nav
-						style="padding: 0px; margin-left: 3px;"
+						class="listData"
 					>
 						<v-list-item
-							v-if="data.menuText !== 'Wali Kelas' && (roleID === '1' || roleID === '2' || roleID === '4')"
-							router :to="!data.kondisi ? data.menuRoute : ''"
+							v-for="v in data.subMenu"
+							:key="v.menuText"
+							router :to="v.menuRoute"
 							color="nav-back"
 							class="SelectedMenu"
 						>
+							<template v-slot:append>
+								<v-icon size="middle" :icon="v.menuIcon" color="icon-white" />
+							</template>
 							<v-list-item-title>
-								<v-icon start size="middle" :icon="data.menuIcon" color="icon-white" style="margin-left: 5px;" />
-								<span class="menufont">{{ data.menuText }}</span>
-							</v-list-item-title>
-						</v-list-item>
-						<v-list-item
-							v-if="data.menuText !== 'Wali Kelas' && data.menuText !== 'Jadwal Mengajar' && data.menuText !== 'Guru' && data.menuText !== 'Siswa Siswi' && roleID === '3'"
-							router :to="!data.kondisi ? data.menuRoute : ''"
-							color="nav-back"
-							class="SelectedMenu"
-						>
-							<v-list-item-title>
-								<v-icon start size="middle" :icon="data.menuIcon" color="icon-white" style="margin-left: 5px;" />
-								<span class="menufont">{{ data.menuText }}</span>
-							</v-list-item-title>
-						</v-list-item>
-						<v-list-item
-							v-if="data.menuText === 'Wali Kelas' && wali_kelas !== ''"
-							router :to="data.menuRoute"
-							color="nav-back"
-							class="SelectedMenu"
-						>
-							<v-list-item-title>
-								<v-icon start size="middle" :icon="data.menuIcon" color="icon-white" style="margin-left: 5px;" />
-								<span class="menufont">{{ `${data.menuText}${wali_kelas == null ? '':' '+wali_kelas}` }}</span>
-							</v-list-item-title>
-						</v-list-item>
-						<v-list-item
-							v-if="data.menuText === 'Jadwal Mengajar' && kondisiWaKaBidKurikulum && roleID === '3'"
-							router :to="data.menuRoute"
-							color="nav-back"
-							class="SelectedMenu"
-						>
-							<v-list-item-title>
-								<v-icon start size="middle" :icon="data.menuIcon" color="icon-white" style="margin-left: 5px;" />
-								<span class="menufont">{{ data.menuText }}</span>
-							</v-list-item-title>
-						</v-list-item>
-						<v-list-item
-							v-if="data.menuText === 'Siswa Siswi' && kondisiWaKaBidKesiswaan && roleID === '3'"
-							router :to="data.menuRoute"
-							color="nav-back"
-							class="SelectedMenu"
-						>
-							<v-list-item-title>
-								<v-icon start size="middle" :icon="data.menuIcon" color="icon-white" style="margin-left: 5px;" />
-								<span class="menufont">{{ data.menuText }}</span>
-							</v-list-item-title>
-						</v-list-item>
-						<v-list-item
-							v-if="(data.menuText === 'Siswa Siswi' || data.menuText === 'Guru') && kondisiKepalaSekolah && roleID === '3'"
-							router :to="data.menuRoute"
-							color="nav-back"
-							class="SelectedMenu"
-						>
-							<v-list-item-title>
-								<v-icon start size="middle" :icon="data.menuIcon" color="icon-white" style="margin-left: 5px;" />
-								<span class="menufont">{{ data.menuText }}</span>
+								<span class="menufont">{{ v.menuText }}</span>
 							</v-list-item-title>
 						</v-list-item>
 					</v-list>
-				</template>
+					<v-list
+						v-if="data.kondisi"
+						:lines="false"
+						density="comfortable"
+						nav
+					>
+						<v-list-item
+							v-for="v in mengajarOptions"
+							:key="v.label"
+							router :to="'/data-akademis/mapel/'+v.link"
+							color="nav-back"
+							class="SelectedMenu"
+						>
+							<template v-slot:append>
+								<v-icon size="middle" icon="mdi mdi-book-education" color="icon-white" />
+							</template>
+							<v-list-item-title>
+								<span class="menufont">{{ v.label }}</span>
+							</v-list-item-title>
+						</v-list-item>
+					</v-list>
+				</v-menu>
+			</span>
+			<v-spacer></v-spacer>
+			<template v-slot:append>
+				<v-badge
+					v-if="roleID === '1'"
+					:content="totalNotif"
+					:value="totalNotif"
+					color="green"
+					overlap
+					class="badgeNotif"
+				>
+					<v-btn
+						size="small"
+						icon="mdi mdi-bell"
+						color="icon-white"
+						router to="/notifikasi" />
+				</v-badge>
+				<v-menu
+					rounded="t-xs b-lg"
+					open-on-click
+					offset-y
+					transition="slide-y-transition"
+					bottom
+				>
+					<template v-slot:activator="{ props }">
+						<span
+							class="white--text ma-3 UserPanel"
+							v-bind="props"
+						>
+							{{ inisialuppercaseLetterFirst(nama) }}
+							<v-avatar size="35">
+								<v-img :src="fotoProfil"></v-img>
+							</v-avatar>
+						</span>
+					</template>
 
-				<v-list
-					v-if="data.subMenu.length && !data.kondisi"
-					:lines="false"
-					density="comfortable"
-					nav
-					class="listData"
-				>
-					<v-list-item
-						v-for="v in data.subMenu"
-						:key="v.menuText"
-						router :to="v.menuRoute"
-						color="nav-back"
-						class="SelectedMenu"
+					<v-list
+						:lines="false"
+						density="comfortable"
+						nav
+						class="listData"
 					>
-						<template v-slot:append>
-							<v-icon size="middle" :icon="v.menuIcon" color="icon-white" />
-						</template>
-						<v-list-item-title>
-							<span class="menufont">{{ v.menuText }}</span>
-						</v-list-item-title>
-					</v-list-item>
-				</v-list>
-				<v-list
-					v-if="data.kondisi"
-					:lines="false"
-					density="comfortable"
-					nav
-				>
-					<v-list-item
-						v-for="v in mengajarOptions"
-						:key="v.label"
-						router :to="'/dataAkademis/'+v.link"
-						color="nav-back"
-						class="SelectedMenu"
-					>
-						<template v-slot:append>
-							<v-icon size="middle" icon="mdi mdi-book-education" color="icon-white" />
-						</template>
-						<v-list-item-title>
-							<span class="menufont">{{ v.label }}</span>
-						</v-list-item-title>
-					</v-list-item>
-				</v-list>
-			</v-menu>
-			<v-spacer />
-			<v-badge
-				v-if="roleID === '1'"
-				:content="totalNotif"
-				:value="totalNotif"
-				color="green"
-				overlap
-				class="badgeNotif"
-			>
-				<v-btn
-					size="small"
-					icon="mdi mdi-bell"
-					color="icon-white"
-					router to="/notifikasi" />
-			</v-badge>
-			<v-menu
-				open-on-hover
-				rounded="t-xs b-lg"
-				offset-y
-				transition="slide-y-transition"
-				bottom
-			>
-				<template v-slot:activator="{ props }">
-					<span
-						class="white--text ma-3 UserPanel"
-						v-bind="props"
-					>
-						{{ inisialuppercaseLetterFirst(nama) }}
-						<v-avatar size="35">
-							<v-img :src="fotoProfil"></v-img>
-						</v-avatar>
-					</span>
-				</template>
-
-				<v-list
-					:lines="false"
-					density="comfortable"
-					nav
-					class="listData"
-				>
-					<v-list-item
-						v-if="roleID === '1'"
-						router to="/settings"
-						color="nav-back"
-						class="SelectedMenu"
-					>
-						<template v-slot:append>
-							<v-icon size="middle" icon="mdi mdi-cog-outline" color="icon-white" />
-						</template>
-						<v-list-item-title>
-							<span class="menufont">Pengaturan</span>
-						</v-list-item-title>
-					</v-list-item>
-					<v-list-item
-						router to="/profile"
-						color="nav-back"
-						class="SelectedMenu"
-					>
-						<template v-slot:append>
-							<v-icon size="middle" icon="mdi mdi-account" color="icon-white" />
-						</template>
-						<v-list-item-title>
-							<span class="menufont">Profil</span>
-						</v-list-item-title>
-					</v-list-item>
-					<v-list-item
-						router to="/broadcast"
-						color="nav-back"
-						class="SelectedMenu"
-					>
-						<template v-slot:append>
-							<span class="boxnotif" v-html="totalBroadcast" style="margin-left: 5px;" />
-							<v-icon size="middle" icon="mdi mdi-broadcast" color="icon-white" />
-						</template>
-						<v-list-item-title>
-							<span class="menufont">Broadcast</span>
-						</v-list-item-title>
-					</v-list-item>
-					<v-list-item
-						v-if="roleID === '3' || roleID === '4'"
-						router to="/percakapan"
-						color="nav-back"
-						class="SelectedMenu"
-					>
-						<template v-slot:append>
-							<v-icon size="middle" icon="mdi mdi-chat" color="icon-white" />
-						</template>
-						<v-list-item-title>
-							<span class="menufont">Percakapan</span>
-						</v-list-item-title>
-					</v-list-item>
-					<v-list-item
-						@click="keluar()"
-						color="nav-back"
-						class="SelectedMenu"
-					>
-						<template v-slot:append>
-							<v-icon size="middle" icon="mdi mdi-logout" color="icon-white" />
-						</template>
-						<v-list-item-title>
-							<span class="menufont">Keluar</span>
-						</v-list-item-title>
-					</v-list-item>
-				</v-list>
-			</v-menu>
-			<v-icon end style="margin-right: 10px;" size="middle" icon="mdi mdi-format-list-bulleted" v-if="roleID === '1' || roleID === '2'" @click.stop="drawer = !drawer" color="icon-white" />
+						<v-list-item
+							v-if="roleID === '1'"
+							router to="/settings"
+							color="nav-back"
+							class="SelectedMenu"
+						>
+							<template v-slot:append>
+								<v-icon size="middle" icon="mdi mdi-cog-outline" color="icon-white" />
+							</template>
+							<v-list-item-title>
+								<span class="menufont">Pengaturan</span>
+							</v-list-item-title>
+						</v-list-item>
+						<v-list-item
+							router to="/profile"
+							color="nav-back"
+							class="SelectedMenu"
+						>
+							<template v-slot:append>
+								<v-icon size="middle" icon="mdi mdi-account" color="icon-white" />
+							</template>
+							<v-list-item-title>
+								<span class="menufont">Profil</span>
+							</v-list-item-title>
+						</v-list-item>
+						<v-list-item
+							router to="/broadcast"
+							color="nav-back"
+							class="SelectedMenu"
+						>
+							<template v-slot:append>
+								<span class="boxnotif" v-html="totalBroadcast" style="margin-left: 5px;" />
+								<v-icon size="middle" icon="mdi mdi-broadcast" color="icon-white" />
+							</template>
+							<v-list-item-title>
+								<span class="menufont">Broadcast</span>
+							</v-list-item-title>
+						</v-list-item>
+						<v-list-item
+							v-if="roleID === '3' || roleID === '4'"
+							router to="/percakapan"
+							color="nav-back"
+							class="SelectedMenu"
+						>
+							<template v-slot:append>
+								<v-icon size="middle" icon="mdi mdi-chat" color="icon-white" />
+							</template>
+							<v-list-item-title>
+								<span class="menufont">Percakapan</span>
+							</v-list-item-title>
+						</v-list-item>
+						<v-list-item
+							@click="keluar()"
+							color="nav-back"
+							class="SelectedMenu"
+						>
+							<template v-slot:append>
+								<v-icon size="middle" icon="mdi mdi-logout" color="icon-white" />
+							</template>
+							<v-list-item-title>
+								<span class="menufont">Keluar</span>
+							</v-list-item-title>
+						</v-list-item>
+					</v-list>
+				</v-menu>
+				<v-icon end style="margin-right: 10px;" size="middle" icon="mdi mdi-format-list-bulleted" v-if="roleID === '1' || roleID === '2'" @click.stop="drawer = !drawer" color="icon-white" />
+			</template>
 		</v-app-bar>
 		<v-navigation-drawer
       v-model="drawer"
@@ -265,17 +275,21 @@
 			location="right"
     >
 			<h4 class="text-center">----- Menu Lainnya -----</h4>
-      <v-list>
-				<v-list-item>
+      <v-list
+				density="comfortable"
+				nav
+				style="padding: 2px; margin-left: 3px;"
+			>
+				<v-list-item color="nav-back" class="SelectedMenu">
 					<v-list-item-title>Foo</v-list-item-title>
 				</v-list-item>
-				<v-list-item>
+				<v-list-item color="nav-back" class="SelectedMenu">
 					<v-list-item-title>Bar</v-list-item-title>
 				</v-list-item>
-				<v-list-item>
+				<v-list-item color="nav-back" class="SelectedMenu">
 					<v-list-item-title>Fizz</v-list-item-title>
 				</v-list-item>
-				<v-list-item>
+				<v-list-item color="nav-back" class="SelectedMenu">
 					<v-list-item-title>Buzz</v-list-item-title>
 				</v-list-item>
       </v-list>
@@ -298,7 +312,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex";
+import { mapActions, mapState, mapGetters } from "vuex";
 import PopUpNotifikasiVue from "@/views/Layout/PopUpNotifikasi.vue";
 import io from 'socket.io-client'
 export default {
@@ -346,6 +360,12 @@ export default {
 			mengajar: store => store.setting.mengajarOptions,
 			jabatan: store => store.setting.jabatanOptions,
 		}),
+		...mapGetters({
+      cmssettings: 'setting/cmssettings',
+    }),
+    jenisExam(){
+      return this.cmssettings ? this.cmssettings.jenisraport.value.toLowerCase() : null
+    },
 		mengajarOptions(){
 			if(this.roleID === '3'){
 				let mengajar_bidang = localStorage.getItem('mengajar_bidang').split(', ')
@@ -394,9 +414,11 @@ export default {
 		this.Navbar()
 		this.getMengajar()
 		this.getJabatan()
+    this.getCMSSettings()
 	},
 	methods: {
 		...mapActions({
+      getCMSSettings: 'setting/getCMSSettings',
 			getMengajar: "setting/getMengajar",
 			getJabatan: "setting/getJabatan",
 			getMenu: "setting/getMenu",
@@ -423,18 +445,18 @@ export default {
 			.then((res) => {
 				const socket = io(this.API_URL);
         socket.emit("dataonline");
-
-				localStorage.removeItem('user_token');
-				localStorage.removeItem('nama');
-				localStorage.removeItem('nama_role');
-				localStorage.removeItem('idLogin');
-				localStorage.removeItem('roleID');
-				localStorage.removeItem('fotoProfil');
-				localStorage.removeItem('jabatan_guru');
-				localStorage.removeItem('mengajar_bidang');
-				localStorage.removeItem('mengajar_kelas');
-				localStorage.removeItem('wali_kelas');
-				localStorage.removeItem('kelas');
+				localStorage.clear();
+				// localStorage.removeItem('user_token');
+				// localStorage.removeItem('nama');
+				// localStorage.removeItem('nama_role');
+				// localStorage.removeItem('idLogin');
+				// localStorage.removeItem('roleID');
+				// localStorage.removeItem('fotoProfil');
+				// localStorage.removeItem('jabatan_guru');
+				// localStorage.removeItem('mengajar_bidang');
+				// localStorage.removeItem('mengajar_kelas');
+				// localStorage.removeItem('wali_kelas');
+				// localStorage.removeItem('kelas');
 				this.$router.push({name: "LogIn"});
 			})
 			.catch((err) => {
@@ -452,8 +474,14 @@ export default {
 </script>
 
 <style scoped>
+.v-list-item__append > .v-badge .v-icon, .v-list-item__append > .v-icon {
+	margin-inline-start: 5px !important;
+}
 .theme--light.v-list {
 	width: 200px !important;
+}
+.navigasi {
+	display: flex;
 }
 .listData {
 	width: 200px !important;
@@ -476,6 +504,10 @@ export default {
 </style>
 
 <style>
+/* .v-toolbar__content > .v-toolbar-title {
+	margin-inline-start: 16px;
+	max-width: 250px !important;
+} */
 .menufont {
 	font-size: 13px !important;
 	color: #FFFFFF;
@@ -540,7 +572,7 @@ export default {
 	font-size: 8pt;
 	font-weight: bold;
 	background: rgba(10, 204, 117, 0.694);
-	border: 1px solid #000;
-	color: black;
+	border: 1px solid #FFFFFF;
+	color: #FFFFFF;
 }
 </style>

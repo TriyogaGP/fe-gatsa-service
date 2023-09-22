@@ -189,7 +189,7 @@ export default {
   }),
   setup() {
     useMeta({
-      title: "Formulir Siswa Siswi - MTsS. SIROJUL ATHFAL",
+      title: "Formulir Siswa Siswi",
       htmlAttrs: {
         lang: "id",
         amp: true,

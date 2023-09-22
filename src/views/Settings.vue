@@ -7,7 +7,8 @@
           <v-col
             v-for="hasil in pengaturan"
             :key="hasil.link"
-            cols="3"
+            cols="12"
+            lg="3"
           >
             <v-card color="white" @click="LinkRoute(hasil.link)">
               <v-sheet color="green" class="sheetData" elevation="2">
@@ -28,6 +29,7 @@
 			<V_HakAkses v-if="settingPanel == 2" />
 			<V_Menu v-if="settingPanel == 3" />
 			<V_HakAksesMenu v-if="settingPanel == 4" />
+			<V_RFID v-if="settingPanel == 5" />
 		</v-card>
   </div>
 </template>
@@ -38,10 +40,11 @@ import V_GeneralCMSVue from './page-content/Settings/V_GeneralCMS.vue'
 import V_HakAkses from './page-content/Settings/V_HakAkses.vue'
 import V_Menu from './page-content/Settings/V_Menu.vue'
 import V_HakAksesMenu from './page-content/Settings/V_HakAksesMenu.vue'
+import V_RFID from './page-content/Settings/V_RFID.vue'
 
 export default {
 	name: "Pengaturan",
-	components: { V_GeneralCMSVue, V_HakAkses, V_Menu, V_HakAksesMenu },
+	components: { V_GeneralCMSVue, V_HakAkses, V_Menu, V_HakAksesMenu, V_RFID },
 	data: () => ({
 		settingPanel: 0,
     pengaturan: [
@@ -49,6 +52,7 @@ export default {
       { title: 'Hak Akses', icon: 'mdi mdi-shield-account-variant', link: 2 },
       { title: 'Menu', icon: 'mdi mdi-view-list', link: 3 },
       { title: 'Hak Akses Menu', icon: 'mdi mdi-shield-account-variant', link: 4 },
+      { title: 'RFID Card', icon: 'mdi mdi-id-card', link: 5 },
     ]
 	}),
 	mounted() {
@@ -56,7 +60,7 @@ export default {
 	},
   setup() {
     useMeta({
-      title: "Settings - MTsS. SIROJUL ATHFAL",
+      title: "Settings",
       htmlAttrs: {
         lang: "id",
         amp: true,

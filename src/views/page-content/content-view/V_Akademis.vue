@@ -7,7 +7,8 @@
           <v-col
             v-for="hasil in mengajarOptions"
             :key="hasil.label"
-            cols="3"
+            cols="12"
+            lg="3"
           >
             <v-card color="white" @click="roleID === '1' || roleID === '2' ? gotoDetail(hasil.link) : openDetail(hasil.link)">
               <v-sheet color="green" class="sheetData" elevation="2">
@@ -27,9 +28,9 @@
     <v-dialog
       v-model="DialogSiswaSiswi"
       scrollable
-      max-width="800px"
       persistent
       transition="dialog-bottom-transition"
+      width="auto"
     >
       <v-card color="background-dialog-card">
         <v-toolbar color="surface">
@@ -46,7 +47,7 @@
             />
           </v-toolbar-items>
         </v-toolbar>
-        <v-card-text class="pt-4" style="font-size: 13px;">
+        <v-card-text class="pt-4 v-dialog--custom">
           <h2 class="subheading black--text"><u>>>Data Siswa Siswi</u></h2>
           <v-row no-gutters>
             <v-col
@@ -250,7 +251,7 @@ export default {
   }),
   setup() {
     useMeta({
-      title: "Data Akademis - MTsS. SIROJUL ATHFAL",
+      title: "Data Akademis",
       htmlAttrs: {
         lang: "id",
         amp: true,
@@ -304,6 +305,7 @@ export default {
     }
   },
   mounted() {
+    if(!localStorage.getItem('user_token')) return this.$router.push({name: 'LogIn'});
     this.roleID = localStorage.getItem('roleID')
     this.idLogin = localStorage.getItem('idLogin')
     this.kelas = localStorage.getItem('kelas')
@@ -324,7 +326,7 @@ export default {
       this.DialogSiswaSiswi = true
     },
     gotoDetail(mapel) {
-      this.$router.push({name: "DataDetailAkademis", params: { mapel: mapel }});
+      this.$router.push({name: "DataDetailAkademis", params: { mapel: mapel, jenis: 'mapel' }});
     },
     notifikasi(kode, text, proses){
       this.dialogNotifikasi = true

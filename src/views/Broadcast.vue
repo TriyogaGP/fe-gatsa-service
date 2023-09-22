@@ -147,10 +147,10 @@
               <template #bottom>
                 <v-divider :thickness="2" class="border-opacity-100" color="white" />
                 <v-row no-gutters>
-                  <v-col cols="10" class="pa-2 d-flex justify-start align-center">
+                  <v-col cols="12" lg="10" class="pa-2 d-flex justify-start align-center">
                     <span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
                   </v-col>
-                  <v-col cols="2" class="pa-2 text-right">
+                  <v-col cols="12" lg="2" class="pa-2 text-right">
                     <div class="d-flex justify-start align-center">
                       <v-select
                         v-model="limit"
@@ -682,7 +682,7 @@ export default {
   }),
   setup() {
     useMeta({
-      title: "Broadcast - MTsS. SIROJUL ATHFAL",
+      title: "Broadcast",
       htmlAttrs: {
         lang: "id",
         amp: true,
@@ -780,6 +780,7 @@ export default {
     },
   },
   mounted() {
+    if(!localStorage.getItem('user_token')) return this.$router.push({name: 'LogIn'});
     this.roleID = localStorage.getItem('roleID')
   },
   beforeDestroy () {

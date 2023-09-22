@@ -38,7 +38,6 @@
 								placeholder="Tanggal Lahir"
 								format="dd-MM-yyyy"
 								:enable-time-picker="false"
-								:teleport="true"
 								auto-apply
 							/>
 						</v-col>

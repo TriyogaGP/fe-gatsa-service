@@ -7,7 +7,8 @@
           <v-col
             v-for="hasil in DataKelas"
             :key="hasil.kelas"
-            cols="3"
+            cols="12"
+            lg="3"
           >
             <v-card color="white" @click="hasil.jumlah > 0 ? gotoDetail(hasil.kelas) : warningNotif()">
               <v-sheet color="green" class="sheetData" elevation="2">
@@ -60,7 +61,7 @@ export default {
   }),
   setup() {
     useMeta({
-      title: "Data Kelas Siswa - MTsS. SIROJUL ATHFAL",
+      title: "Data Kelas Siswa",
       htmlAttrs: {
         lang: "id",
         amp: true,
