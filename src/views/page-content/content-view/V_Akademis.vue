@@ -10,7 +10,7 @@
             cols="12"
             lg="3"
           >
-            <v-card color="white" @click="roleID === '1' || roleID === '2' ? gotoDetail(hasil.link) : openDetail(hasil.link)">
+            <v-card color="white" style="border: 2px solid #000;" @click="roleID === '1' || roleID === '2' ? gotoDetail(hasil.link) : openDetail(hasil.link)">
               <v-sheet color="green" class="sheetData" elevation="2">
                 <v-icon icon="mdi mdi-book-education" size="large" />
                 <v-card-subtitle class="text-black" style="font-weight: bold; font-size: 15px; margin-left: 5px;">Mata Pelajaran</v-card-subtitle>
@@ -205,6 +205,28 @@
               </tr>
             </tbody>
           </table>
+          <table dark class="mb-2">
+            <thead>
+              <tr>
+                <th>KEHADIRAN</th>
+                <th>TOTAL</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight: bold;">Sakit</td>
+                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataKehadiran.sakit : '' }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: bold;">Ijin</td>
+                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataKehadiran.ijin : '' }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: bold;">Tanpa Keterangan</td>
+                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataKehadiran.alfa : '' }}</td>
+              </tr>
+            </tbody>
+          </table>
         </v-card-text>
         <v-divider />
         <v-card-actions />
@@ -216,7 +238,7 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
+      <PopUpNotifikasi
         :notifikasi-kode="notifikasiKode"
         :notifikasi-text="notifikasiText"
         :notifikasi-button="notifikasiButton"
@@ -229,11 +251,11 @@
 <script>
 import { mapActions, mapState, mapGetters } from "vuex";
 import { useMeta } from 'vue-meta'
-import PopUpNotifikasiVue from "../../Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "../../Layout/PopUpNotifikasi.vue";
 export default {
   name: 'DataAkademis',
   components: {
-    PopUpNotifikasiVue
+    PopUpNotifikasi
   },
   data: () => ({
     roleID: '',
@@ -289,12 +311,30 @@ export default {
         let nilai = this.DataNilai.dataSiswaSiswi.filter(val => val.idUser === value.idUser)[0].nilai
         let semester = this.DataNilai.dataSiswaSiswi.filter(val => val.idUser === value.idUser)[0].semester
         let kehadiran = this.DataNilai.dataSiswaSiswi.filter(val => val.idUser === value.idUser)[0].kehadiran
-        let totalNilaiTugas = Number(nilai.tugas1) + Number(nilai.tugas2) + Number(nilai.tugas3) + Number(nilai.tugas4) + Number(nilai.tugas5) + Number(nilai.tugas6) + Number(nilai.tugas7) + Number(nilai.tugas8) + Number(nilai.tugas9) + Number(nilai.tugas10)
+        let nilaiTugasSementara = Object.values(nilai)
+        // let totalNilaiTugas = Number(nilai.tugas1) + Number(nilai.tugas2) + Number(nilai.tugas3) + Number(nilai.tugas4) + Number(nilai.tugas5) + Number(nilai.tugas6) + Number(nilai.tugas7) + Number(nilai.tugas8) + Number(nilai.tugas9) + Number(nilai.tugas10)
+        let totalNilaiTugas = 0
+        for(let i=0; i<Number(jumlahTugas); i++){
+          totalNilaiTugas = totalNilaiTugas + nilaiTugasSementara[i]
+        }
         let rataRataTugas = totalNilaiTugas === 0 ? 0 : totalNilaiTugas / Number(jumlahTugas)
         let rataRataNilai = (Number(rataRataTugas) + Number(nilai.uts) + Number(nilai.uas)) / 3
         this.dataSiswaSiswi = {
           ...value,
-          dataNilai: nilai,
+          dataNilai: {
+            tugas1: Number(jumlahTugas) > 0 ? nilai.tugas1 : 0,
+            tugas2: Number(jumlahTugas) > 1 ? nilai.tugas2 : 0,
+            tugas3: Number(jumlahTugas) > 2 ? nilai.tugas3 : 0,
+            tugas4: Number(jumlahTugas) > 3 ? nilai.tugas4 : 0,
+            tugas5: Number(jumlahTugas) > 4 ? nilai.tugas5 : 0,
+            tugas6: Number(jumlahTugas) > 5 ? nilai.tugas6 : 0,
+            tugas7: Number(jumlahTugas) > 6 ? nilai.tugas7 : 0,
+            tugas8: Number(jumlahTugas) > 7 ? nilai.tugas8 : 0,
+            tugas9: Number(jumlahTugas) > 8 ? nilai.tugas9 : 0,
+            tugas10: Number(jumlahTugas) > 9 ? nilai.tugas10 : 0,
+            uts: nilai.uts,
+            uas: nilai.uas,
+          },
           semester: semester,
           dataKehadiran: kehadiran,
           totalNilaiTugas: rataRataTugas != 0 ? Math.ceil(rataRataTugas) : 0,

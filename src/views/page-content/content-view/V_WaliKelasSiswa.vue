@@ -22,7 +22,7 @@
               cols="12"
               lg="3"
             >
-              <v-card color="white" @click="hasil.jumlah > 0 ? openDialog(hasil.kelas) : warningNotif()">
+              <v-card color="white" style="border: 2px solid #000;" @click="hasil.jumlah > 0 ? openDialog(hasil.kelas) : warningNotif()">
                 <v-sheet color="green" class="sheetData" elevation="2">
                   <v-icon icon="mdi mdi-account-multiple" size="large" />
                   <v-card-title class="text-black">{{ hasil.jumlah }} Orang</v-card-title>
@@ -114,25 +114,33 @@
           md="6"
           class="pt-2 text-right font-weight-bold"
         >
-          <Button
-            variant="plain"
-            size-button="large"
-            model-button="comfortable"
-            color-button="#000000"
-            icon-button="mdi mdi-arrow-left-circle-outline"
-            :disabled-button="dataSiswaSiswi.length ? pageSummary.page != 1 ? false : true : true"
-            @proses="() => { page = pageSummary.page - 1 }"
-          />
-          <span>{{ dataSiswaSiswi.length ? uppercaseLetterFirst2(dataSiswaSiswi[0].nama) : '-' }}</span>
-          <Button
-            variant="plain"
-            size-button="large"
-            model-button="comfortable"
-            color-button="#000000"
-            icon-button="mdi mdi-arrow-right-circle-outline"
-            :disabled-button="dataSiswaSiswi.length ? pageSummary.page != pageSummary.totalPages ? false : true : true"
-            @proses="() => { page = pageSummary.page + 1 }"
-          />
+          <v-row>
+            <v-col cols="12" lg="2" class="text-right font-weight-bold">
+              <Button
+                variant="plain"
+                size-button="large"
+                model-button="comfortable"
+                color-button="#000000"
+                icon-button="mdi mdi-arrow-left-circle-outline"
+                :disabled-button="dataSiswaSiswi.length ? pageSummary.page != 1 ? false : true : true"
+                @proses="() => { page = pageSummary.page - 1 }"
+              />
+            </v-col>  
+            <v-col cols="12" lg="8" class="d-flex align-center justify-center font-weight-bold">  
+              <span>{{ dataSiswaSiswi.length ? uppercaseLetterFirst2(dataSiswaSiswi[0].nama) : '-' }}</span>
+            </v-col>
+            <v-col cols="12" lg="2" class="text-left font-weight-bold">
+              <Button
+                variant="plain"
+                size-button="large"
+                model-button="comfortable"
+                color-button="#000000"
+                icon-button="mdi mdi-arrow-right-circle-outline"
+                :disabled-button="dataSiswaSiswi.length ? pageSummary.page != pageSummary.totalPages ? false : true : true"
+                @proses="() => { page = pageSummary.page + 1 }"
+              />
+            </v-col> 
+          </v-row>
         </v-col>
       </v-row>
       <table dark class="mb-2">
@@ -315,25 +323,33 @@
               md="6"
               class="pt-2 text-right font-weight-bold"
             >
-              <Button
-                variant="plain"
-                size-button="large"
-                model-button="comfortable"
-                color-button="#000000"
-                icon-button="mdi mdi-arrow-left-circle-outline"
-                :disabled-button="dataSiswaSiswi.length ? pageSummary.page != 1 ? false : true : true"
-                @proses="() => { page = pageSummary.page - 1 }"
-              />
-              <span>{{ dataSiswaSiswi.length ? uppercaseLetterFirst2(dataSiswaSiswi[0].nama) : '-' }}</span>
-              <Button
-                variant="plain"
-                size-button="large"
-                model-button="comfortable"
-                color-button="#000000"
-                icon-button="mdi mdi-arrow-right-circle-outline"
-                :disabled-button="dataSiswaSiswi.length ? pageSummary.page != pageSummary.totalPages ? false : true : true"
-                @proses="() => { page = pageSummary.page + 1 }"
-              />
+              <v-row>
+                <v-col cols="12" lg="2" class="text-right font-weight-bold">
+                  <Button
+                    variant="plain"
+                    size-button="large"
+                    model-button="comfortable"
+                    color-button="#000000"
+                    icon-button="mdi mdi-arrow-left-circle-outline"
+                    :disabled-button="dataSiswaSiswi.length ? pageSummary.page != 1 ? false : true : true"
+                    @proses="() => { page = pageSummary.page - 1 }"
+                  />
+                </v-col>  
+                <v-col cols="12" lg="8" class="d-flex align-center justify-center font-weight-bold">  
+                  <span>{{ dataSiswaSiswi.length ? uppercaseLetterFirst2(dataSiswaSiswi[0].nama) : '-' }}</span>
+                </v-col>
+                <v-col cols="12" lg="2" class="text-left font-weight-bold">
+                  <Button
+                    variant="plain"
+                    size-button="large"
+                    model-button="comfortable"
+                    color-button="#000000"
+                    icon-button="mdi mdi-arrow-right-circle-outline"
+                    :disabled-button="dataSiswaSiswi.length ? pageSummary.page != pageSummary.totalPages ? false : true : true"
+                    @proses="() => { page = pageSummary.page + 1 }"
+                  />
+                </v-col> 
+              </v-row>
             </v-col>
           </v-row>
           <table dark class="mb-2">
@@ -395,7 +411,7 @@
         <v-card-actions />
       </v-card>
     </v-dialog>
-    <v-overlay :value="isLoadingProses" class="align-center justify-center">
+    <v-overlay v-model="isLoadingProses" persistent class="align-center justify-center">
       <div style="width: 550px;">
         <v-progress-linear
           class="pa-3"
@@ -411,7 +427,7 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
+      <PopUpNotifikasi
         :notifikasi-kode="notifikasiKode"
         :notifikasi-text="notifikasiText"
         :notifikasi-button="notifikasiButton"
@@ -424,13 +440,13 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import { useMeta } from 'vue-meta'
-import PopUpNotifikasiVue from "../../Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "../../Layout/PopUpNotifikasi.vue";
 import PdfCetakan from '../../Layout/PdfCetakan.vue';
 
 export default {
   name: 'DataKelasSiswa',
   components: {
-    PopUpNotifikasiVue,
+    PopUpNotifikasi,
     PdfCetakan,
   },
   data: () => ({
@@ -551,7 +567,7 @@ export default {
       this.getKelasSiswa({kelas: null, roleID: this.roleID})
     }else if(this.roleID === '3'){
       this.kelas = localStorage.getItem('wali_kelas')
-      this.getWaliKelas({page: 1, kelas: this.kelas, roleID: this.roleID})
+      this.getWaliKelas({page: 1, kelas: this.kelas})
     }
   },
 	methods: {

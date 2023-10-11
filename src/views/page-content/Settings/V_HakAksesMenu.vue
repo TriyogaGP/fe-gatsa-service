@@ -6,7 +6,7 @@
 			<v-col cols="12" md="6">
 				<v-row no-gutters>
 					<v-col cols="12" md="9">
-						<Autocomplete
+						<TextField
 							v-model="searchData"
 							icon-prepend-tf="mdi mdi-magnify"
 							label-tf="Pencarian..."
@@ -299,7 +299,7 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
+      <PopUpNotifikasi
         :notifikasi-kode="notifikasiKode"
         :notifikasi-text="notifikasiText"
         :notifikasi-button="notifikasiButton"
@@ -313,10 +313,10 @@
 <script>
 import { mapActions, mapGetters, mapState } from "vuex";
 import { useMeta } from 'vue-meta'
-import PopUpNotifikasiVue from "../../Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "../../Layout/PopUpNotifikasi.vue";
 export default {
   name: 'HakAksesMenu',
-	components: { PopUpNotifikasiVue },
+	components: { PopUpNotifikasi },
   data: () => ({
 		expanded: [],
 		DataHakAksesMenu: [],
@@ -539,7 +539,7 @@ export default {
   width: 16px;
 }
 .customScroll::-webkit-scrollbar-thumb {
-  background-color: #4CAF50;
+  background-color: #272727;
   border: 5px solid #e1e1f0;
   border-radius: 10rem;
 }

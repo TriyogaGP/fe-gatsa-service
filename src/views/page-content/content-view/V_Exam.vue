@@ -10,7 +10,7 @@
             cols="12"
             lg="3"
           >
-            <v-card color="white">
+            <v-card color="white" style="border: 2px solid #000;">
               <v-sheet color="green" class="sheetData" elevation="2">
                 <v-icon icon="mdi mdi-book-education" size="large" />
                 <v-card-subtitle class="text-black" style="font-weight: bold; font-size: 15px; margin-left: 5px;">Mata Pelajaran</v-card-subtitle>
@@ -21,17 +21,19 @@
                 <span><strong>Waktu Selesai :</strong> {{ convertDateTime(hasil.endDate) }}</span>
               </div>
               <v-divider :thickness="2" class="border-opacity-75" />
-              <v-row no-gutters>
-                <v-col cols="12" class="pa-0 pr-2 text-end">
-                  <Button
-                    icon-button="mdi mdi-arrow-right-thick"
-                    nama-button="View"
-                    letak-icon-button="end"
-                    :disabled-button="convertDateTime(hasil.endDate) < convertDateTime(now)"
-                    @proses="gotoExam(hasil.idJadwalExam, hasil.kondisi)"
-                  />
-                </v-col>
-              </v-row>
+              <v-card-actions>
+                <v-row no-gutters>
+                  <v-col cols="12" class="pa-0 pr-2 text-end">
+                    <Button
+                      icon-button="mdi mdi-arrow-right-thick"
+                      nama-button="View"
+                      letak-icon-button="end"
+                      :disabled-button="convertDateTime2(hasil.endDate) < convertDateTime2(now)"
+                      @proses="gotoExam(hasil.idJadwalExam, hasil.kondisi)"
+                    />
+                  </v-col>
+                </v-row>
+              </v-card-actions>
             </v-card>
           </v-col>
         </v-row>
@@ -44,7 +46,7 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
+      <PopUpNotifikasi
         :notifikasi-kode="notifikasiKode"
         :notifikasi-text="notifikasiText"
         :notifikasi-button="notifikasiButton"
@@ -58,12 +60,12 @@
 import { computed } from 'vue';
 import { mapActions, mapState, mapGetters } from "vuex";
 import { useMeta } from 'vue-meta'
-import PopUpNotifikasiVue from "../../Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "../../Layout/PopUpNotifikasi.vue";
 import setting from "../../../core/services/composeables/setting";
 export default {
   name: 'DataExam',
   components: {
-    PopUpNotifikasiVue
+    PopUpNotifikasi
   },
   data: () => ({
 

@@ -4,7 +4,7 @@
     <v-row>
       <v-col cols="12" md="12" class="text-right">
 				<v-menu
-					open-on-hover
+					open-on-click
 					rounded="t-xs b-lg"
 					offset-y
 					transition="slide-y-transition"
@@ -324,7 +324,7 @@
 								<Button
 									color-button="light-blue darken-3"
 									icon-button="mdi mdi-upload"
-									nama-button="Upload Berkas"
+									:nama-button="`Upload Berkas ${jenisUpload}`"
 									@proses="() => { $refs.inputMultipleFile.click() }"
 								/>
 							</v-col>  
@@ -335,7 +335,8 @@
 									class="d-flex flex-column justify-space-between align-center"
 									v-for="(file,f) in MultipleBerkas"
 									:key="f"
-									cols="3"
+									cols="12"
+									lg="3"
 								>
 									<v-card color="grey" class="pa-2 kotakGambar">
 										<div class="text-right"><v-icon size="large" color="black" icon="mdi mdi-delete" @click="HapusMultiple(f)" /></div>
@@ -488,14 +489,22 @@
 								</div>
 							</template>
 							<template #[`item.opsi`]="{ item }">
-								<v-switch color="white" v-model="item.raw.statusAktif" hide-details @click="postRecord(item.raw.idBerkas, !item.raw.statusAktif)" />
+								<v-switch color="white" v-model="item.raw.statusAktif" hide-details @click="postRecord(item.raw.idBerkas, 'STATUSRECORD', !item.raw.statusAktif)" />
+							</template>
+							<template #[`item.aksi`]="{ item }">
+								<Button 
+                  color-button="#bd3a07"
+                  icon-button="mdi mdi-delete"
+                  nama-button="Hapus"
+                  @proses="postRecord(item.raw.idBerkas, 'DELETE', null)"
+                />
 							</template>
 							<template #[`item.statusAktif`]="{ item }">
 								<v-icon size="small" v-if="item.raw.statusAktif == true" color="green" icon="mdi mdi-check" />
 								<v-icon size="small" v-else-if="item.raw.statusAktif == false" color="red" icon="mdi mdi-close" />
 							</template>
 							<template #bottom>
-								<v-divider :thickness="2" class="border-opacity-100" color="white" />
+								<!-- <v-divider :thickness="2" class="border-opacity-100" color="white" />
 								<v-row no-gutters>
 									<v-col cols="12" lg="9" class="pa-2 d-flex justify-start align-center">
 										<span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
@@ -529,13 +538,48 @@
 											/>
 										</div>
 									</v-col>
-								</v-row>
+								</v-row> -->
 							</template>
 						</v-data-table>
 					</div>
         </v-card-text>
 				<v-divider />
-        <v-card-actions />
+        <v-card-actions>
+					<v-row no-gutters>
+						<v-col cols="12" lg="9" class="d-flex justify-start align-center">
+							<span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
+						</v-col>
+						<v-col cols="12" lg="3" class="pa-2 text-right">
+							<div class="d-flex justify-start align-center">
+								<Autocomplete
+									v-model="limit"
+									pilihan-a="select"
+									:data-a="limitPage"
+									label-a="Limit"
+									:disabled-a="dataBerkas.length ? false : true"
+								/>
+								<Button
+									variant="plain"
+									size-button="large"
+									model-button="comfortable"
+									color-button="#000000"
+									icon-button="mdi mdi-arrow-left-circle-outline"
+									:disabled-button="dataBerkas.length ? pageSummary.page != 1 ? false : true : true"
+									@proses="() => { page = pageSummary.page - 1 }"
+								/>
+								<Button
+									variant="plain"
+									size-button="large"
+									model-button="comfortable"
+									color-button="#000000"
+									icon-button="mdi mdi-arrow-right-circle-outline"
+									:disabled-button="dataBerkas.length ? pageSummary.page != pageSummary.totalPages ? false : true : true"
+									@proses="() => { page = pageSummary.page + 1 }"
+								/>
+							</div>
+						</v-col>
+					</v-row>
+				</v-card-actions>
       </v-card>
     </v-dialog>
 		<v-dialog
@@ -585,7 +629,7 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
+      <PopUpNotifikasi
         :notifikasi-kode="notifikasiKode"
         :notifikasi-text="notifikasiText"
         :notifikasi-button="notifikasiButton"
@@ -599,7 +643,7 @@
 <script>
 import { useMeta } from 'vue-meta'
 import { mapActions, mapState, mapGetters } from "vuex";
-import PopUpNotifikasiVue from "../../Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "../../Layout/PopUpNotifikasi.vue";
 import { Cropper, RectangleStencil } from 'vue-advanced-cropper'
 import 'vue-advanced-cropper/dist/style.css';
 
@@ -627,7 +671,7 @@ function getMimeType(file, fallback = null) {
 
 export default {
   name: 'GeneralCMS',
-	components: { PopUpNotifikasiVue, Cropper, RectangleStencil },
+	components: { PopUpNotifikasi, Cropper, RectangleStencil },
   data: () => ({
     statusSekolahOptions: [
 			{ label: 'Negeri', kode: 1 },
@@ -694,6 +738,7 @@ export default {
       { title: "FILE NAME", key: "title", sortable: false },
       { title: "STATUS", key: "statusAktif", sortable: false },
       { title: "OPSI", key: "opsi", sortable: false },
+      { title: "ACTION", key: "aksi", sortable: false },
     ],
     rowsPerPageItems: { "items-per-page-options": [5, 10, 25, 50] },
     totalItems: 0,
@@ -1013,9 +1058,9 @@ export default {
 			this.getDataBerkas({page: this.page, limit: this.limit, keyword: this.searchData})
 			this.DialogBerkas = true
 		},
-		postRecord(idBerkas, statusAktif){
+		postRecord(idBerkas, jenis, statusAktif){
 			let bodyData = {
-				jenis: 'STATUSRECORD',
+				jenis: jenis,
 				idBerkas: idBerkas,
 				statusAktif: statusAktif,
       }

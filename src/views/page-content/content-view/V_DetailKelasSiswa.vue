@@ -31,16 +31,30 @@
         density="compact"
         icon="mdi mdi-information"
         title="Informasi"
-        text="Untuk mengubah nilai harus mengubah jumlah tugas dan kkm terlebih dahulu."
-      />
+      >
+        <template v-slot:text>
+          <ul style="font-size: 12px;">
+            <li>- Untuk mengubah nilai atau mengimport nilai harus mengubah jumlah tugas dan kkm terlebih dahulu.</li>
+            <li>- Untuk import nilai pastikan sudah mendapatkan template data nilai siswa</li>
+          </ul>
+        </template>
+      </v-alert>
       <v-row no-gutters class="pa-2">
         <v-col cols="12" md="6">
           <Button 
             v-if="kondisi === 'penilaian'"
             color-button="light-blue darken-3"
             icon-button="mdi mdi-pencil"
-            nama-button="Ubah Tugas & KKM"
+            nama-button="Ubah Jumlah Tugas & KKM"
             @proses="() => { DialogJumlahTugas = true; }"
+          />
+          <Button 
+            v-if="kondisi === 'penilaian'"
+            color-button="#0bd369"
+            icon-button="mdi mdi-import"
+            nama-button="Import Data"
+            :disabled-button="Number(jumlahTugasTemp) <= 0"
+            @proses="() => { dialogImport = true }"
           />
         </v-col>
         <v-col cols="12" md="6">
@@ -1269,9 +1283,9 @@
     <v-dialog
       v-model="DialogKehadiran"
       scrollable
-      max-width="800px"
       persistent
       transition="dialog-bottom-transition"
+      width="auto"
     >
       <v-card color="background-dialog-card">
         <v-toolbar color="surface">
@@ -1288,7 +1302,7 @@
             />
           </v-toolbar-items>
         </v-toolbar>
-        <v-card-text class="pt-4" style="font-size: 13px;">
+        <v-card-text class="pt-4 v-dialog--custom">
           <v-row no-gutters>
             <v-col
               cols="12"
@@ -1454,9 +1468,10 @@
     </v-dialog>
     <v-dialog
       v-model="DialogJumlahTugas"
-      max-width="800px"
+      scrollable
       persistent
       transition="dialog-bottom-transition"
+      width="auto"
     >
       <v-card color="background-dialog-card">
         <v-toolbar color="surface">
@@ -1473,7 +1488,7 @@
             />
           </v-toolbar-items>
         </v-toolbar>
-        <v-card-text class="pt-4" style="font-size: 13px;">
+        <v-card-text class="pt-4 v-dialog--custom">
           <v-row no-gutters>
             <v-col
               cols="12"
@@ -1531,7 +1546,7 @@
             >
               <Button 
                 color-button="black"
-                nama-button="Ubah Tugas & KKM"
+                nama-button="Ubah Jumlah Tugas & KKM"
                 :disabled-button="jumlahTugas === '0' || kkm === '0' ? true : false"
                 @proses="ubahJumlahTask(kelasText, mapel)"
               />
@@ -1748,12 +1763,81 @@
       </v-card>
     </v-dialog>
     <v-dialog
+      v-model="dialogImport"
+      scrollable
+			persistent
+      transition="dialog-bottom-transition"
+      width="800px"
+    >
+      <v-card color="background-dialog-card">
+        <v-toolbar color="surface">
+          <v-toolbar-title>Import Data Nilai Siswa Siswi</v-toolbar-title>
+          <v-spacer />
+          <v-toolbar-items>
+            <Button
+              variant="plain"
+              color-button="#ffffff"
+              icon-button="mdi mdi-close"
+              model-button="comfortable"
+              size-button="large"
+              @proses="() => { dialogImport = false; }"
+            />
+          </v-toolbar-items>
+        </v-toolbar>
+        <v-card-text class="pt-4">
+          <v-card class="pa-2 d-flex justify-center align-center" elevation="1" outlined>
+            <div class="kotak" @click="$refs.inputExcel.click()">
+              <v-icon size="large" icon="mdi mdi-file-excel" color="black" />
+              <div style="font-weight: bold;">Upload File</div>
+            </div>
+            <input 
+              ref="inputExcel"
+              :key="componentKey"
+              type="file"
+              accept=".xlsx,.xls"
+              style="display: none"
+              @change="importExcel($event)"
+            >
+          </v-card>
+        </v-card-text>
+        <v-divider />
+        <v-card-actions>
+          <v-row 
+            no-gutters
+            class="mr-3"
+          >
+            <v-col
+              class="text-end"
+              cols="12"
+            >
+              <Button
+                color-button="light-blue darken-3"
+                icon-button="mdi mdi-download"
+                nama-button="Download Template Nilai"
+                @proses="downloadTemplate()"
+              />
+            </v-col>
+          </v-row>         
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-overlay v-model="isLoadingImport" persistent class="align-center justify-center">
+      <div style="width: 550px;">
+        <v-progress-linear
+          class="pa-3"
+          indeterminate
+          color="black darken-3"
+        />
+        <h4 style="color: #FFF; text-align: center; background-color: #272727;">Sedang proses import data, harap menunggu ...</h4>
+      </div>
+    </v-overlay>
+    <v-dialog
       v-model="dialogNotifikasi"
       transition="dialog-bottom-transition"
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
+      <PopUpNotifikasi
         :notifikasi-kode="notifikasiKode"
         :notifikasi-text="notifikasiText"
         :notifikasi-button="notifikasiButton"
@@ -1767,12 +1851,12 @@
 import { mapActions, mapGetters, mapState } from "vuex";
 import { useMeta } from 'vue-meta'
 // import { useRoute } from "vue-router";
-import PopUpNotifikasiVue from "../../Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "../../Layout/PopUpNotifikasi.vue";
 // import user from "../../../core/services/composeables/user"
 export default {
   name: 'DataKelasSiswa',
   components: {
-    PopUpNotifikasiVue
+    PopUpNotifikasi
   },
   data: () => ({
 		API_URL: process.env.VUE_APP_BASE_URL_VIEW,
@@ -1882,6 +1966,9 @@ export default {
     DialogTask: false,
     DialogJumlahTugas: false,
     DialogKoreksiNilai: false,
+    dialogImport: false,
+    isLoadingImport: false,
+    componentKey: 0,
     endecryptType: '',
     jumlahTugas: 0,
     jumlahTugasTemp: 0,
@@ -1955,9 +2042,15 @@ export default {
             let nilai = str.dataPenilaian.filter(k => k.mapel === this.mapel)[0].dataNK.nilai
             let semester = str.dataPenilaian.filter(k => k.mapel === this.mapel)[0].semester
             let kehadiran = str.dataPenilaian.filter(k => k.mapel === this.mapel)[0].dataNK.kehadiran
-            let totalNilaiTugas = Number(nilai.tugas1) + Number(nilai.tugas2) + Number(nilai.tugas3) + Number(nilai.tugas4) + Number(nilai.tugas5) + Number(nilai.tugas6) + Number(nilai.tugas7) + Number(nilai.tugas8) + Number(nilai.tugas9) + Number(nilai.tugas10)
+						let nilaiTugasSementara = Object.values(nilai)
+            // let totalNilaiTugas = Number(nilai.tugas1) + Number(nilai.tugas2) + Number(nilai.tugas3) + Number(nilai.tugas4) + Number(nilai.tugas5) + Number(nilai.tugas6) + Number(nilai.tugas7) + Number(nilai.tugas8) + Number(nilai.tugas9) + Number(nilai.tugas10)
+						let totalNilaiTugas = 0
+						for(let i=0; i<Number(this.jumlahTugas); i++){
+							totalNilaiTugas = totalNilaiTugas + nilaiTugasSementara[i]
+						}
             let rataRataTugas = totalNilaiTugas === 0 ? 0 : totalNilaiTugas / Number(this.jumlahTugas)
             let rataRataNilai = (Number(rataRataTugas) + Number(nilai.uts) + Number(nilai.uas)) / 3
+
             this.DataSiswaSiswi.push({
               ...str,
               semester: semester,
@@ -2024,6 +2117,7 @@ export default {
 	methods: {
 		...mapActions({
       fetchData: "fetchData", 
+      uploadFiles: 'upload/uploadFiles',
       getSiswaSiswi: "user/getSiswaSiswi", 
       getMengajar: "setting/getMengajar",
     }),
@@ -2442,6 +2536,76 @@ export default {
         this.notifikasi("error", err.response.data.message, "1")
 			});
     },
+    downloadTemplate() {
+      let BASEURL = process.env.VUE_APP_BASE_URL
+			fetch(`${BASEURL}user/templateNilai/${this.kelas}/${this.mapel}`, {
+				method: 'GET',
+				dataType: "xml",
+			})
+			.then(response => response.arrayBuffer())
+			.then(async response => {
+				// console.log(response)
+				let blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+				this.downloadBlob(blob,`Template Data Nilai Siswa.xlsx`)
+				this.notifikasi("success", 'Sukses Download Template', "1")
+			})
+		},
+    downloadBlob(blob, name = '') {
+			const blobUrl = URL.createObjectURL(blob);
+			const link = document.createElement("a");
+			link.href = blobUrl;
+			link.download = name;
+			document.body.appendChild(link);
+			link.dispatchEvent(
+				new MouseEvent('click', { 
+					bubbles: true, 
+					cancelable: true, 
+					view: window 
+				})
+			);
+			document.body.removeChild(link);
+		},
+    async importExcel(e) {
+      let files = e.target.files[0];
+      if(files){
+				const bodyData = {
+					jenis: "excel",
+          kategori: "datanilaisiswa",
+          mapel: this.mapel,
+          kelas: this.kelas,
+				  createupdateBy: localStorage.getItem('idLogin'),
+					files: files,
+				};
+				try {
+          this.isLoadingImport = true
+					await this.uploadFiles(bodyData)
+          .then(response => {
+            setTimeout(() => {
+              files = ''
+              this.$refs.inputExcel.value = null
+              this.dialogImport = false
+              this.isLoadingImport = false
+              this.getSiswaSiswi({page: this.page, limit: this.limit, keyword: this.searchData, kelas: this.kelas})
+              this.notifikasi("success", "Berhasil import Data Nilai Siswa", "1")
+            }, 5000)
+          })
+        } catch (err) {
+					this.dialogImport = false
+          this.isLoadingImport = false
+          this.componentKey++;
+          files = ''
+          this.$refs.inputExcel.value = null
+          this.notifikasi("error", "Gagal Import Data Siswa Siswi", "1")
+				}
+			}else{
+				this.dialogImport = false
+        this.isLoadingImport = false
+        this.componentKey++;
+        files = ''
+        this.$refs.inputExcel.value = null
+        this.notifikasi("warning", "Ulangi lagi Import Data Siswa Siswi", "1")
+      }  
+    },
     gotolist(kondisi, param = null) {
       if(kondisi === 'view'){
         this.$router.push({name: "DataKelasSiswa", params: { kelas: param }});
@@ -2575,5 +2739,22 @@ export default {
 .stroke-icon {
   stroke: black;
   stroke-width: 30px;
+}
+.kotak {
+	border: 2px solid #000;
+  display: inline-flex;
+  justify-content: center;
+  border-radius: 10px !important;
+  background: #FFF;
+  color: #000;
+  padding: 2px;
+  font-size: 10pt;
+  width: 90px;
+  height: 100px;
+  text-align: -webkit-center;
+  align-content: center;
+  flex-wrap: wrap;
+  flex-direction: row;
+  cursor: pointer;
 }
 </style>

@@ -113,7 +113,7 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
+      <PopUpNotifikasi
         :notifikasi-kode="notifikasiKode"
         :notifikasi-text="notifikasiText"
         :notifikasi-button="notifikasiButton"
@@ -126,12 +126,12 @@
 <script>
 import { mapActions, mapGetters, mapState } from "vuex";
 import { useMeta } from 'vue-meta'
-import PopUpNotifikasiVue from "./Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "./Layout/PopUpNotifikasi.vue";
 import io from 'socket.io-client'
 
 export default {
   name: 'Profile',
-  components: { PopUpNotifikasiVue },
+  components: { PopUpNotifikasi },
   data: () => ({
     API_URL: process.env.VUE_APP_BASE_URL_VIEW,
     idLogin: '',
@@ -329,12 +329,6 @@ export default {
 .v-tab {
 	font-size: 8pt !important;
 	font-weight: bold !important;
-}
-.v-input .v-label {
-  font-size: 11pt !important;
-}
-.v-text-field.v-input--dense {
-  font-size: 13px !important;
 }
 .avatar {
   border: solid 2px #FFF;

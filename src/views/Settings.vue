@@ -10,7 +10,7 @@
             cols="12"
             lg="3"
           >
-            <v-card color="white" @click="LinkRoute(hasil.link)">
+            <v-card color="white" style="border: 2px solid #000;" @click="LinkRoute(hasil.link)">
               <v-sheet color="green" class="sheetData" elevation="2">
                 <v-icon :icon="hasil.icon" size="large" />
               </v-sheet>

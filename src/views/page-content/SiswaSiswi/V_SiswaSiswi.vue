@@ -2,6 +2,24 @@
   <div>
     <h1 class="subheading grey--text">Data Siswa Siswi</h1>
     <v-card class="pa-1 rounded" variant="outlined" elevation="4">
+      <v-alert
+        color="surface"
+        border="start"
+        border-color="light-blue accent-4"
+        elevation="2"
+        density="compact"
+        icon="mdi mdi-information"
+        title="Informasi"
+      >
+        <template v-slot:text>
+          <ul style="font-size: 12px;">
+            <li>- Tombol Delete ada 2 (Delete Soft & Delete Hard).</li>
+            <li>- Tombol Delete Soft tidak menghapus data dari database hanya di jadikan nonaktif dengan ditandai dengan flag merah.</li>
+            <li>- Tombol Delete Hard menghapus data dari database secara permanen.</li>
+            <li>- Mengurutkan data berdasarkan NOMOR INDUK, NAMA, KELAS.</li>
+          </ul>
+        </template>
+      </v-alert>
       <v-row no-gutters class="pa-2">
         <v-col cols="12" md="6">
           <Button 
@@ -19,7 +37,7 @@
             @proses="() => { dialogImport = true }"
           />
           <v-menu
-            open-on-hover
+            open-on-click
             rounded="t-xs b-lg"
             offset-y
             transition="slide-y-transition"
@@ -86,6 +104,15 @@
                 }"
               />
             </v-col>
+            <!-- <v-col cols="12" md="3" class="pr-2 d-flex justify-end align-center">
+              <Autocomplete
+                v-model="filter"
+                :data-a="filterOptions"
+                item-title="text"
+                item-value="value"
+                label-a="Filter"
+              />
+            </v-col> -->
             <v-col cols="12" md="3" class="d-flex justify-end align-center">
               <Autocomplete
                 v-model="page"
@@ -112,14 +139,21 @@
           hide-default-footer
           hide-default-header
           class="elavation-3 rounded"
+          v-model:sort-by="sortBy"
+          sort-asc-icon="mdi mdi-sort-alphabetical-ascending"
+          sort-desc-icon="mdi mdi-sort-alphabetical-descending"
           :items-per-page="itemsPerPage"
           @page-count="pageCount = $event"
           @click:row="clickrow"
         >
           <!-- header -->
-          <template #headers="{ columns }">
+          <template #headers="{ columns, isSorted, getSortIcon, toggleSort }">
             <tr>
-              <td v-for="header in columns" :key="header.title" class="tableHeader">{{ header.title.toUpperCase() }}</td>
+              <td v-for="header in columns" :key="header.title" class="tableHeader">
+                <span v-if="header.sortable" class="mr-2" style="cursor: pointer; width: 100%;" @click="() => toggleSort(header)">{{ header.title.toUpperCase() }}</span>
+                <span v-else>{{ header.title.toUpperCase() }}</span>
+                <v-icon v-if="isSorted(header)" :icon="getSortIcon(header)"></v-icon>
+              </td>
             </tr>
           </template>
           <template #[`item.number`]="{ item }">
@@ -162,18 +196,61 @@
                   :disabled-button="item.raw.mutasiAkun == true"
                   @proses="postRecord(item.raw, 'STATUSRECORD', !item.raw.statusAktif)"
                 />
-                <Button 
-                  v-if="roleID === '1' || roleID === '2' || (roleID === '3' && kondisiKepalaSekolah)"
-                  color-button="#bd3a07"
-                  icon-button="mdi mdi-delete"
-                  nama-button="Hapus"
-                  :disabled-button="item.raw.mutasiAkun == true || item.raw.statusAktif == false"
-                  @proses="postRecord(item.raw, 'DELETE', null)"
-                />
+                <v-menu
+                  open-on-click
+                  rounded="t-xs b-lg"
+                  offset-y
+                  transition="slide-y-transition"
+                  bottom
+                >
+                  <template v-slot:activator="{ props }">
+                    <Button 
+                      v-if="roleID === '1' || roleID === '2' || (roleID === '3' && kondisiKepalaSekolah)"
+                      v-bind="props"
+                      color-button="#bd3a07"
+                      icon-button="mdi mdi-delete"
+                      nama-button="Hapus"
+                    />
+                  </template>
+
+                  <v-list
+                    :lines="false"
+                    density="comfortable"
+                    nav
+                    dense
+                    class="listData"
+                  >
+                    <v-list-item
+                      @click="postRecord(item.raw, 'DELETESOFT', null)"
+                      class="SelectedMenu"
+                      active-class="SelectedMenu-active"
+                      :disabled="item.raw.mutasiAkun == true || item.raw.statusAktif === false"
+                    >
+                      <template v-slot:prepend>
+                        <v-icon size="middle" icon="mdi mdi-delete" color="icon-white" />
+                      </template>
+                      <v-list-item-title>
+                        <span class="menufont">Delete Soft</span>
+                      </v-list-item-title>
+                    </v-list-item>
+                    <v-list-item
+                      @click="postRecord(item.raw, 'DELETEHARD', null)"
+                      class="SelectedMenu"
+                      active-class="SelectedMenu-active"
+                    >
+                      <template v-slot:prepend>
+                        <v-icon size="middle" icon="mdi mdi-delete" color="icon-white" />
+                      </template>
+                      <v-list-item-title>
+                        <span class="menufont">Delete Hard</span>
+                      </v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
                 <Button
                   v-if="roleID === '1' || roleID === '2' || (roleID === '3' && kondisiKepalaSekolah)"
                   color-button="#0bd369"
-                  :icon-button="item.raw.validasiAkun === false ? 'mdi mdi-check' : 'mdi mdi-clear'"
+                  :icon-button="item.raw.validasiAkun === false ? 'mdi mdi-check' : 'mdi mdi-close'"
                   :nama-button="item.raw.validasiAkun === false ? 'Validate' : 'Non Validate'"
                   :disabled-button="item.raw.mutasiAkun == true || item.raw.statusAktif == false"
                   @proses="postRecord(item.raw, 'VALIDASIAKUN', !item.raw.validasiAkun)"
@@ -200,11 +277,11 @@
                   @proses="() => { dialogUploadBerkas = true; previewData.idUser = item.raw.idUser; }"
                 />
                 <Button
-                  :loading="isLoadingbtnPDF"
+                  :loading="isLoadingPDFCreate"
                   color-button="#04f7f7"
                   icon-button="mdi mdi-file-pdf-box"
                   nama-button="PDF"
-                  @proses="pdfCreate(item.raw.idUser, null, null, 'create')"
+                  @proses="pdfCreate(item.raw.idUser, null, 'create')"
                 />
               </td>
             </tr>
@@ -213,7 +290,22 @@
             <v-divider :thickness="2" class="border-opacity-100" color="white" />
             <v-row no-gutters>
               <v-col cols="12" lg="10" class="pa-2 d-flex justify-start align-center">
-                <span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
+                <v-row no-gutters>
+                  <v-col cols="12" lg="9" class="d-flex justify-start align-center">
+                    <span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
+                  </v-col>
+                  <v-col cols="12" lg="3" class="pa-2 d-flex justify-end align-center">
+                    <span style="padding-right: 5px;">Filter</span>
+                    <CascadeSelect 
+                      v-model="selectedFilter"
+                      :options="filterOptions"
+                      optionLabel="name"
+                      optionGroupLabel="name"
+                      :optionGroupChildren="['kategori']"
+                      style="padding: 5px;"
+                      placeholder="Pilih Filter" />
+                  </v-col>
+                </v-row>
               </v-col>
               <v-col cols="12" lg="2" class="pa-2 text-right">
                 <div class="d-flex justify-start align-center">
@@ -1222,136 +1314,18 @@
             </v-col>
           </v-row>
           <h2 class="subheading black--text"><u>>>Berkas</u></h2>
-          <v-row no-gutters>
+          <v-row no-gutters class="d-flex flex-row justify-center align-center">
             <v-col
               cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              FC Ijazah
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              <Button
-                :loading="isLoadingbtnPDF1"
-                color-button="#0bd369"
-                icon-button="mdi mdi-file-pdf-box"
-                nama-button="Lihat Berkas"
-                @proses="pdfCreate(previewData.idUser, previewData.fcIjazah, 'ijazah', 'berkas')"
-              />
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              FC SKHUN
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              <Button
-                :loading="isLoadingbtnPDF2"
-                color-button="#0bd369"
-                icon-button="mdi mdi-file-pdf-box"
-                nama-button="Lihat Berkas"
-                @proses="pdfCreate(previewData.idUser, previewData.fcSKHUN, 'skhun', 'berkas')"
-              />
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              FC Kartu Keluarga
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              <Button
-                :loading="isLoadingbtnPDF3"
-                color-button="#0bd369"
-                icon-button="mdi mdi-file-pdf-box"
-                nama-button="Lihat Berkas"
-                @proses="pdfCreate(previewData.idUser, previewData.fcKK, 'kk', 'berkas')"
-              />
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              FC KTP Orangtua
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              <Button
-                :loading="isLoadingbtnPDF4"
-                color-button="#0bd369"
-                icon-button="mdi mdi-file-pdf-box"
-                nama-button="Lihat Berkas"
-                @proses="pdfCreate(previewData.idUser, previewData.fcKTPOrtu, 'ktp', 'berkas')"
-              />
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              FC Akta Lahir
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              <Button
-                :loading="isLoadingbtnPDF5"
-                color-button="#0bd369"
-                icon-button="mdi mdi-file-pdf-box"
-                nama-button="Lihat Berkas"
-                @proses="pdfCreate(previewData.idUser, previewData.fcAktaLahir, 'aktalahir', 'berkas')"
-              />
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              FC SKL
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              <Button
-                :loading="isLoadingbtnPDF6"
-                color-button="#0bd369"
-                icon-button="mdi mdi-file-pdf-box"
-                nama-button="Lihat Berkas"
-                @proses="pdfCreate(previewData.idUser, previewData.fcSKL, 'skl', 'berkas')"
-              />
+              lg="3"
+              class="d-flex flex-column justify-center boxlist"
+              v-for="data in dataBerkas"
+              :key="data.kode"
+              @click="pdfCreate(previewData.idUser, data, 'berkas')">
+              <div>
+                <v-progress-circular v-if="isLoadingPDF[data.kode]" indeterminate />
+                <span v-else><v-icon icon="mdi mdi-file-pdf-box" /> {{ data.title }}</span>
+              </div>
             </v-col>
           </v-row>
         </v-card-text>
@@ -1684,9 +1658,10 @@
                 <v-col
                   v-for="hasil in data.dataKelas"
                   :key="hasil.kelas"
-                  cols="3"
+                  cols="12"
+                  lg="3"
                 >
-                  <v-card color="white" @click="hasil.jumlah > 0 ? exportExcelEmis(hasil.kelas) : warningNotif()">
+                  <v-card color="white" style="border: 2px solid #000;" @click="hasil.jumlah > 0 ? exportExcelEmis(hasil.kelas) : warningNotif()">
                     <v-sheet color="green" class="sheetData" elevation="2">
                       <v-icon icon="mdi mdi-account-multiple" size="large" />
                       <v-card-subtitle class="text-black" style="font-weight: bold; font-size: 15px; margin-left: 5px;">Kelas {{ hasil.kelas }}</v-card-subtitle>
@@ -1703,7 +1678,7 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-    <v-overlay :value="isLoadingExport" class="align-center justify-center">
+    <v-overlay v-model="isLoadingExport" persistent class="align-center justify-center">
       <div style="width: 550px;">
         <v-progress-linear
           class="pa-3"
@@ -1713,16 +1688,27 @@
         <h4 style="color: #FFF; text-align: center; background-color: #272727;">Sedang proses export data, harap menunggu ...</h4>
       </div>
     </v-overlay>
+    <v-overlay v-model="isLoadingImport" persistent class="align-center justify-center">
+      <div style="width: 550px;">
+        <v-progress-linear
+          class="pa-3"
+          indeterminate
+          color="black darken-3"
+        />
+        <h4 style="color: #FFF; text-align: center; background-color: #272727;">Sedang proses import data, harap menunggu ...</h4>
+      </div>
+    </v-overlay>
     <v-dialog
       v-model="dialogNotifikasi"
       transition="dialog-bottom-transition"
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
+      <PopUpNotifikasi
         :notifikasi-kode="notifikasiKode"
         :notifikasi-text="notifikasiText"
         :notifikasi-button="notifikasiButton"
+        @proses="getProses()"
         @cancel="dialogNotifikasi = false"
       />
     </v-dialog>
@@ -1732,46 +1718,52 @@
 <script>
 import { mapActions, mapState, mapGetters } from "vuex";
 import { useMeta } from 'vue-meta'
-import PopUpNotifikasiVue from "../../Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "../../Layout/PopUpNotifikasi.vue";
 import PdfCetakan from '../../Layout/PdfCetakan.vue';
 export default {
   name: 'DataSiswaSiswi',
   components: {
     PdfCetakan,
-    PopUpNotifikasiVue
+    PopUpNotifikasi
   },
   data: () => ({
-    isLoadingbtnPDF: false,
-    isLoadingbtnPDF1: false,
-    isLoadingbtnPDF2: false,
-    isLoadingbtnPDF3: false,
-    isLoadingbtnPDF4: false,
-    isLoadingbtnPDF5: false,
-    isLoadingbtnPDF6: false,
+    isLoadingPDF: [],
+    isLoadingPDFCreate: false,
     isLoadingExport: false,
+    isLoadingImport: false,
     expanded: [],
 		DataSiswaSiswi: [],
     DataKelas: [],
 		searchData: '',
+    filter: '',
     page: 1,
     pageCount: 0,
     itemsPerPage: 100,
     limit: 20,
     limitPage: [5,10,20,50,100],
     pageOptions: [],
+    // filterOptions: [
+    //   { value: 'status-true', text: 'Aktif' },
+    //   { value: 'status-false', text: 'Tidak Aktif' },
+    //   { value: 'validasi-true', text: 'Valid' },
+    //   { value: 'validasi-false', text: 'Tidak Valid' },
+    //   { value: 'mutasi-true', text: 'Mutasi' },
+    //   { value: 'mutasi-false', text: 'Tidak Mutasi' },
+    // ],
 		pageSummary: {
 			page: '',
 			limit: '',
 			total: '',
 			totalPages: ''
 		},
+    sortBy: [],
 		headers: [
       { title: "No", key: "number", sortable: false, width: "5%" },
       { title: "#", key: "data-table-expand", sortable: false, width: "5%" },
-      { title: "NOMOR INDUK", key: "nomorInduk", sortable: false },
-      { title: "NAMA", key: "nama", sortable: false },
+      { title: "NOMOR INDUK", key: "nomorInduk", sortable: true },
+      { title: "NAMA", key: "nama", sortable: true },
       { title: "EMAIL", key: "email", sortable: false },
-      { title: "KELAS", key: "kelas", sortable: false },
+      { title: "KELAS", key: "kelas", sortable: true },
       { title: "VALIDASI AKUN", key: "validasi", sortable: false },
       { title: "MUTASI AKUN", key: "mutasi", sortable: false },
       { title: "STATUS", key: "statusAktif", sortable: false },
@@ -1850,6 +1842,7 @@ export default {
       fcAktaLahir: '',
       fcSKL: '',
     },
+    dataBerkas: [],
     dialogPDF: false,
     DialogSiswaSiswi: false,
     dialogUploadBerkas: false,
@@ -1866,6 +1859,34 @@ export default {
     fcAktaLahir: '',
     fcSKL: '',
     kondisiKepalaSekolah: false,
+    downloadFile: '',
+    selectedFilter: '',
+    filterOptions: [
+      {
+        name: 'Status',
+        code: 'Status',
+        kategori: [
+          { name: 'Status Aktif', value: 'status-true' },
+          { name: 'Status Tidak Aktif', value: 'status-false' },
+        ]
+      },
+      {
+        name: 'Validasi',
+        code: 'Validasi',
+        kategori: [
+          { name: 'Validasi Aktif', value: 'validasi-true' },
+          { name: 'Validasi Tidak Aktif', value: 'validasi-false' },
+        ]
+      },
+      {
+        name: 'Mutasi',
+        code: 'Mutasi',
+        kategori: [
+          { name: 'Mutasi Aktif', value: 'mutasi-true' },
+          { name: 'Mutasi Tidak Aktif', value: 'mutasi-false' },
+        ]
+      },
+    ],
 
     //notifikasi
     dialogNotifikasi: false,
@@ -1967,13 +1988,25 @@ export default {
     page: {
 			deep: true,
 			handler(value) {
-				this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiKepalaSekolah) ? {page: value, limit: this.limit, keyword: this.searchData} : {page: value, limit: this.limit, keyword: this.searchData, kelas: this.mengajarKelas})
+				this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiKepalaSekolah) ? {page: value, limit: this.limit, keyword: this.searchData, filter: this.filter} : {page: value, limit: this.limit, keyword: this.searchData, filter: this.filter, kelas: this.mengajarKelas})
 			}
 		},
     limit: {
 			deep: true,
 			handler(value) {
-				this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiKepalaSekolah) ? {page: 1, limit: value, keyword: this.searchData} : {page: 1, limit: value, keyword: this.searchData, kelas: this.mengajarKelas})
+				this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiKepalaSekolah) ? {page: 1, limit: value, keyword: this.searchData, filter: this.filter} : {page: 1, limit: value, keyword: this.searchData, filter: this.filter, kelas: this.mengajarKelas})
+			}
+		},
+    filter: {
+			deep: true,
+			handler(value) {
+				this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiKepalaSekolah) ? {page: this.page, limit: this.limit, keyword: this.searchData, filter: value} : {page: this.page, limit: this.limit, keyword: this.searchData, filter: value, kelas: this.mengajarKelas})
+			}
+		},
+    selectedFilter: {
+			deep: true,
+			handler(x) {
+        this.filter = x.value
 			}
 		},
     jabatanOptions: {
@@ -1982,12 +2015,8 @@ export default {
 				if(this.roleID === '3'){
 					if(value.includes('Kepala Sekolah')){
 						this.kondisiKepalaSekolah = true
-        		this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiKepalaSekolah) ? {page: this.page, limit: this.limit, keyword: this.searchData} : {page: this.page, limit: this.limit, keyword: this.searchData, kelas: this.mengajarKelas});
+        		this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiKepalaSekolah) ? {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter} : {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter, kelas: this.mengajarKelas});
 					}
-        //   else{
-				// 		this.kondisiKepalaSekolah = false
-        //   }
-        // if(this.roleID === '3' && !this.kondisiKepalaSekolah) return this.headers.splice(6,4)
 				}
 			}
 		}
@@ -1997,7 +2026,7 @@ export default {
     this.BASEURL = process.env.VUE_APP_BASE_URL
     this.roleID = localStorage.getItem('roleID')
     this.mengajarKelas = localStorage.getItem('mengajar_kelas')
-		this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiKepalaSekolah) ? {page: this.page, limit: this.limit, keyword: this.searchData} : {page: this.page, limit: this.limit, keyword: this.searchData, kelas: this.mengajarKelas});
+		this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiKepalaSekolah) ? {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter} : {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter, kelas: this.mengajarKelas});
 		this.getKelas({kondisi: 'All'});
 	},
 	methods: {
@@ -2036,7 +2065,7 @@ export default {
 					}
 					this.$store.dispatch('setting/postNotifikasi', payload)
 				}
-        this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiKepalaSekolah) ? {page: 1, limit: this.limit, keyword: this.searchData} : {page: 1, limit: this.limit, keyword: this.searchData, kelas: this.mengajarKelas})
+        this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiKepalaSekolah) ? {page: 1, limit: this.limit, keyword: this.searchData, filter: this.filter} : {page: 1, limit: this.limit, keyword: this.searchData, filter: this.filter, kelas: this.mengajarKelas})
         this.notifikasi("success", res.data.message, "1")
 			})
 			.catch((err) => {
@@ -2116,11 +2145,17 @@ export default {
         fcAktaLahir: item.berkas.fcAktaLahir,
         fcSKL: item.berkas.fcSKl,
       }
-      console.log(item);
+      this.dataBerkas = [
+        { kode: 'ijazah', url: this.previewData.fcIjazah, title: 'FC Ijazah' },
+        { kode: 'skhun', url: this.previewData.fcSKHUN, title: 'FC SKHUN' },
+        { kode: 'kk', url: this.previewData.fcKK, title: 'FC Kartu Keluarga' },
+        { kode: 'ktp', url: this.previewData.fcKTPOrtu, title: 'FC KTP Orangtua' },
+        { kode: 'aktalahir', url: this.previewData.fcAktaLahir, title: 'FC Akta Lahir' },
+        { kode: 'skl', url: this.previewData.fcSKL, title: 'FC SKL' },
+      ]
       this.DialogSiswaSiswi = true
     },
     downloadTemplate() {
-			this.isLoadingExport = true
 			fetch(`${this.BASEURL}user/template/4`, {
 				method: 'GET',
 				dataType: "xml",
@@ -2128,12 +2163,21 @@ export default {
 			.then(response => response.arrayBuffer())
 			.then(async response => {
 				// console.log(response)
-				this.isLoadingExport = false
 				let blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
 				this.downloadBlob(blob,`Template Data Siswa.xlsx`)
-				this.notifikasi("success", 'Sukses Export Excel', "1")
+				this.notifikasi("success", 'Sukses Download Template', "1")
 			})
 		},
+    getProses() {
+      const a = document.createElement("a");
+      a.href = this.downloadFile;
+      a.download = this.downloadFile.split("/").pop();
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      this.dialogNotifikasi = false
+      this.dialogImport = false
+    },
     exportExcel(kategori) {
       if(kategori === 'full'){
         this.isLoadingExport = true
@@ -2147,10 +2191,12 @@ export default {
         .then(response => response.arrayBuffer())
         .then(async response => {
           // console.log(response)
-          this.isLoadingExport = false
-          let blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
-          this.downloadBlob(blob,`Data Siswa Siswi.xlsx`)
-          this.notifikasi("success", 'Sukses Export Excel', "1")
+          setTimeout(() => {
+            this.isLoadingExport = false
+            let blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+            this.downloadBlob(blob,`Data Siswa Siswi.xlsx`)
+            this.notifikasi("success", 'Sukses Export Excel', "1")
+          }, 1500)
         })
       }else if(kategori === 'emis'){
         this.getKelasSiswa({kelas: null, roleID: this.roleID})
@@ -2169,50 +2215,31 @@ export default {
       .then(response => response.arrayBuffer())
       .then(async response => {
         // console.log(response)
-        this.isLoadingExport = false
-        let blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
-        this.downloadBlob(blob,`Data Siswa Siswi ${kelas} (EMIS).xlsx`)
-        this.notifikasi("success", 'Sukses Export Excel', "1")
+        setTimeout(() => {
+          this.isLoadingExport = false
+          let blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+          this.downloadBlob(blob,`Data Siswa Siswi ${kelas} (EMIS).xlsx`)
+          this.notifikasi("success", 'Sukses Export Excel', "1")
+        }, 1500)
       })
 		},
-    pdfCreate(idUser, berkas = null, jenis = null, view) {
+    pdfCreate(idUser, berkas = null, view) {
       if(view === 'berkas'){
-        jenis === 'ijazah' ? this.isLoadingbtnPDF1 = true
-        : jenis === 'skhun' ? this.isLoadingbtnPDF2 = true
-        : jenis === 'kk' ? this.isLoadingbtnPDF3 = true
-        : jenis === 'ktp' ? this.isLoadingbtnPDF4 = true
-        : jenis === 'aktalahir' ? this.isLoadingbtnPDF5 = true
-        : this.isLoadingbtnPDF6 = true
+        this.isLoadingPDF[berkas.kode] = true
         this.dialogPDF = false
         this.urlSk = ''
-        if(!berkas) {
-          jenis === 'ijazah' ? this.isLoadingbtnPDF1 = false
-          : jenis === 'skhun' ? this.isLoadingbtnPDF2 = false
-          : jenis === 'kk' ? this.isLoadingbtnPDF3 = false
-          : jenis === 'ktp' ? this.isLoadingbtnPDF4 = false
-          : jenis === 'aktalahir' ? this.isLoadingbtnPDF5 = false
-          : this.isLoadingbtnPDF6 = false
-          const nameJenis = jenis === 'ijazah' ? 'Ijazah'
-          : jenis === 'skhun' ? 'SKHUN'
-          : jenis === 'kk' ? 'Kartu Keluarga'
-          : jenis === 'ktp' ? 'KTP Orang Tua'
-          : jenis === 'aktalahir' ? 'Akta Lahir'
-          : 'Surat Keterangan Lulus'
-          return this.notifikasi("warning", `Data Berkas ${nameJenis} tidak ditemukan!`, "1")
+        if(!berkas.url) {
+          this.isLoadingPDF[berkas.kode] = false
+          return this.notifikasi("warning", `Berkas ${berkas.title} tidak ditemukan !`, "1")
         }
-        this.urlSk = berkas
+        this.urlSk = berkas.url
         setTimeout(() => {
-          jenis === 'ijazah' ? this.isLoadingbtnPDF1 = false
-          : jenis === 'skhun' ? this.isLoadingbtnPDF2 = false
-          : jenis === 'kk' ? this.isLoadingbtnPDF3 = false
-          : jenis === 'ktp' ? this.isLoadingbtnPDF4 = false
-          : jenis === 'aktalahir' ? this.isLoadingbtnPDF5 = false
-          : this.isLoadingbtnPDF6 = false
+          this.isLoadingPDF[berkas.kode] = false
           this.dialogPDF = true;
         }, 3000);
       }else if(view === 'create'){
         this.dialogPDF = false
-        this.isLoadingbtnPDF = true
+        this.isLoadingPDFCreate = true
         this.urlSk = ''
         fetch(`${this.BASEURL}user/pdfcreate/${idUser}`, {
           method: 'GET',
@@ -2226,7 +2253,7 @@ export default {
           this.urlSk = window.URL.createObjectURL(blob)
         })
         setTimeout(() => {
-          this.isLoadingbtnPDF = false
+          this.isLoadingPDFCreate = false
           this.dialogPDF = true;
         }, 3000);
       }
@@ -2361,7 +2388,7 @@ export default {
 					this.$store.dispatch('setting/postNotifikasi', payload)
 				}
         this.clearFile(jenis)
-        this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiKepalaSekolah) ? {page: this.page, limit: this.limit, keyword: this.searchData} : {page: this.page, limit: this.limit, keyword: this.searchData, kelas: this.mengajarKelas});
+        this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiKepalaSekolah) ? {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter} : {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter, kelas: this.mengajarKelas});
         this.notifikasi("success", `Berhasil upload berkas ${jenis === 'ijazah' ? 'Ijazah' : jenis === 'skhun' ? 'SKHUN' : jenis === 'kk' ? 'Kartu Keluarga' : jenis === 'ktp' ? 'KTP Orangtua' : jenis === 'aktalahir' ? 'Akta Lahir' : 'SKL'}`, "1")
       }else{ 
         this.componentKey++;
@@ -2413,46 +2440,59 @@ export default {
       }
     },
     async importExcel(e) {
-      this.isLoadingExport = true
       let files = e.target.files[0];
       if(files){
 				const bodyData = {
 					jenis: "excel",
+					kategori: "datasiswa",
+					mapel: null,
+					kelas: null,
 				  createupdateBy: localStorage.getItem('idLogin'),
 					files: files,
 				};
 				try {
-					await this.uploadFiles(bodyData);
-          files = ''
-          this.isLoadingExport = false
-          this.$refs.inputExcel.value = null
-          if(localStorage.getItem('roleID') !== '1'){
-            let payload = {
-              jenis: 'CREATE',
-              idUser: '2MMOu7xFdkbe4YFRjpp71fRkV26',
-              type: 'Record',
-              judul: `Import data siswa/siswa`,
-              pesan: {
-                message: `data siswa/siswa telah diimport oleh <strong>${localStorage.getItem('nama')}</strong>`,
-                payload: null,
-              },
-              params: null,
-              dikirim: `dikirim oleh <strong>${localStorage.getItem('nama')}</strong>`,
-              createBy: localStorage.getItem('idLogin'),
-            }
-            this.$store.dispatch('setting/postNotifikasi', payload)
-          }
-          this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiKepalaSekolah) ? {page: this.page, limit: this.limit, keyword: this.searchData} : {page: this.page, limit: this.limit, keyword: this.searchData, kelas: this.mengajarKelas});
-					this.notifikasi("success", "Berhasil Import Data Siswa Siswi", "1")
-				} catch (err) {
-          this.isLoadingExport = false
+          this.isLoadingImport = true
+					await this.uploadFiles(bodyData)
+          .then(async response => {
+            setTimeout(() => {
+              files = ''
+              this.$refs.inputExcel.value = null
+              this.isLoadingImport = false
+              this.dialogImport = false
+              if(localStorage.getItem('roleID') !== '1'){
+                let payload = {
+                  jenis: 'CREATE',
+                  idUser: '2MMOu7xFdkbe4YFRjpp71fRkV26',
+                  type: 'Record',
+                  judul: `Import data siswa/siswa`,
+                  pesan: {
+                    message: `data siswa/siswa telah diimport oleh <strong>${localStorage.getItem('nama')}</strong>`,
+                    payload: null,h
+                  },
+                  params: null,
+                  dikirim: `dikirim oleh <strong>${localStorage.getItem('nama')}</strong>`,
+                  createBy: localStorage.getItem('idLogin'),
+                }
+                this.$store.dispatch('setting/postNotifikasi', payload)
+              }
+              let dataResp = response.data.result
+              if (dataResp.jsonDataPending > 0) { 
+                this.downloadFile = dataResp.path
+                return this.notifikasi("warning2", "Masih terdapat data yang sudah diinputkan !", "2");
+              }
+              this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiKepalaSekolah) ? {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter} : {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter, kelas: this.mengajarKelas});
+              this.notifikasi("success", "Berhasil import Data Siswa", "1")
+            }, 5000)
+          })
+        } catch (err) {
+          this.isLoadingImport = false
           this.componentKey++;
           files = ''
           this.$refs.inputExcel.value = null
           this.notifikasi("error", "Gagal Import Data Siswa Siswi", "1")
 				}
 			}else{
-        this.isLoadingExport = false
+        this.isLoadingImport = false
         this.componentKey++;
         files = ''
         this.$refs.inputExcel.value = null
@@ -2495,14 +2535,25 @@ export default {
 </script>
 
 <style scoped>
+.boxlist{
+  height: 40px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-khtml-border-radius: 5px; 
+	border-radius: 5px;
+	padding: 2px;
+	margin: 2px;
+	text-align: center;
+  justify-content: center;
+	font-size: 10pt;
+	font-weight: bold;
+	background: rgba(10, 204, 117, 0.694);
+	border: 1px solid #FFFFFF;
+	color: #FFFFFF;
+  cursor: pointer;
+}
 .listData {
 	width: 200px !important;
-}
-.v-input .v-label {
-  font-size: 11pt !important;
-}
-.v-text-field.v-input--dense {
-  font-size: 13px !important;
 }
 .kotak {
 	border: 2px solid #000;

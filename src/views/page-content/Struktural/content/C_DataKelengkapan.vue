@@ -173,7 +173,7 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
+      <PopUpNotifikasi
         :notifikasi-kode="notifikasiKode"
         :notifikasi-text="notifikasiText"
         :notifikasi-button="notifikasiButton"
@@ -185,10 +185,10 @@
 
 <script>
 import { mapActions, mapState } from "vuex";
-import PopUpNotifikasiVue from "../../../Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "../../../Layout/PopUpNotifikasi.vue";
 export default {
 	components: {
-    PopUpNotifikasiVue
+    PopUpNotifikasi
   },
 	props: {
     stepperVal: {
@@ -242,8 +242,8 @@ export default {
 						this.kondisiJabatan = true
 					}
 				}
-
-				if(value.nomor_induk != '' && value.pendidikan_guru != null && value.jabatan_guru != null && value.mengajar_bidang != null && value.mengajar_kelas != null){
+				// && value.jabatan_guru != null && value.mengajar_bidang != null && value.mengajar_kelas != null
+				if(value.nomor_induk != '' && value.pendidikan_guru != null){
 					this.kondisiTombol = false
 				}else{
 					this.kondisiTombol = true

@@ -21,7 +21,7 @@
               :key="hasil.label"
               cols="3"
             >
-              <v-card color="white" @click="hasil.jumlah > 0 ? gotoDetail(hasil.kelas, mapelText) : warningNotif()">
+              <v-card color="white" style="border: 2px solid #000;" @click="hasil.jumlah > 0 ? gotoDetail(hasil.kelas, mapelText) : warningNotif()">
                 <v-sheet color="green" class="sheetData" elevation="2">
                   <v-icon icon="mdi mdi-account-multiple" size="large" />
                   <v-card-subtitle class="text-black" style="font-weight: bold; font-size: 15px; margin-left: 5px;">Kelas {{ hasil.kelas }}</v-card-subtitle>
@@ -42,7 +42,7 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
+      <PopUpNotifikasi
         :notifikasi-kode="notifikasiKode"
         :notifikasi-text="notifikasiText"
         :notifikasi-button="notifikasiButton"
@@ -55,11 +55,11 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import { useMeta } from 'vue-meta'
-import PopUpNotifikasiVue from "../../Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "../../Layout/PopUpNotifikasi.vue";
 export default {
   name: 'DataDetailAkademis',
   components: {
-    PopUpNotifikasiVue
+    PopUpNotifikasi
   },
   data: () => ({
     roleID: '',

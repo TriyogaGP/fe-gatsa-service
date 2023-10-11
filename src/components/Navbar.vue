@@ -300,7 +300,7 @@
 			persistent
 			width="500px"
 		>
-			<PopUpNotifikasiVue
+			<PopUpNotifikasi
 				:notifikasi-kode="notifikasiKode"
 				:notifikasi-text="notifikasiText"
 				:notifikasi-button="notifikasiButton"
@@ -313,11 +313,11 @@
 
 <script>
 import { mapActions, mapState, mapGetters } from "vuex";
-import PopUpNotifikasiVue from "@/views/Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "@/views/Layout/PopUpNotifikasi.vue";
 import io from 'socket.io-client'
 export default {
 	components: {
-    PopUpNotifikasiVue
+    PopUpNotifikasi
   },
 	props: {
     namaSekolah: {
@@ -509,7 +509,7 @@ export default {
 	max-width: 250px !important;
 } */
 .menufont {
-	font-size: 13px !important;
+	font-size: 9pt !important;
 	color: #FFFFFF;
 }
 .SelectedTile:hover {

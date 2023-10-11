@@ -10,7 +10,7 @@
         <v-col v-else-if="kode == 'error'" cols="12" class="d-flex flex-column justify-space-between align-center">
           <v-img class="ukuran" :src="`${API_URL}/bahan/media-notifikasi/Failed.png`" />
         </v-col>
-        <v-col v-else-if="kode == 'warning'" cols="12" class="d-flex flex-column justify-space-between align-center">
+        <v-col v-else-if="kode == 'warning' || kode == 'warning2'" cols="12" class="d-flex flex-column justify-space-between align-center">
           <v-img class="ukuran" :src="`${API_URL}/bahan/media-notifikasi/Warning.png`" />
         </v-col>
         <v-col v-else-if="kode == 'question' || kode == 'question2' || kode == 'questionProses'" cols="12" class="d-flex flex-column justify-space-between align-center">
@@ -78,6 +78,19 @@
             nama-button="Lanjut"
             @proses="tombolProses(notifikasiButton)"
           />
+          <Button 
+            v-if="kode == 'warning2'"
+            class="elevation-0 tombol-question white--text"
+            color-button="#5b0505"
+            nama-button="Download Data Pending"
+            @proses="tombolProses(notifikasiButton)"
+          />
+          <!-- <Button 
+            v-if="kode == 'warning2'"
+            class="elevation-0 tombol-tutup"
+            nama-button="Tutup"
+            @proses="tombolProses(1)"
+          /> -->
         </v-col>
       </v-row>
     </v-card-text>

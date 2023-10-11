@@ -85,7 +85,7 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
+      <PopUpNotifikasi
         :notifikasi-kode="notifikasiKode"
         :notifikasi-text="notifikasiText"
         :notifikasi-button="notifikasiButton"
@@ -99,12 +99,12 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import { useMeta } from 'vue-meta'
-import PopUpNotifikasiVue from "./Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "./Layout/PopUpNotifikasi.vue";
 import Footer from '../components/Footer.vue';
 export default {
   name: 'ForgotPass',
   components: {
-    PopUpNotifikasiVue,
+    PopUpNotifikasi,
     Footer
   },
   data: () => ({
@@ -215,7 +215,7 @@ export default {
 <style>
 .v-input--density-comfortable .v-field--variant-solo .v-label.v-field-label--floating {
   top: 2px;
-  font-size: 13px !important;
+  font-size: 9pt !important;
   font-weight: bold !important;
 }
 /* .v-toolbar__content > .v-toolbar-title {
@@ -247,7 +247,7 @@ export default {
   height: 35px;
 }
 .bg-white {
-  font-size: 14px !important;
+  font-size: 9pt !important;
 }
 </style>
 

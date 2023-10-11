@@ -2,6 +2,24 @@
   <div>
     <h1 class="subheading grey--text">Data {{ roleID === '4' || roleID === '3' ? 'Guru' : 'Struktural' }}</h1>
     <v-card class="pa-1 rounded" variant="outlined" elevation="4">
+      <v-alert
+        color="surface"
+        border="start"
+        border-color="light-blue accent-4"
+        elevation="2"
+        density="compact"
+        icon="mdi mdi-information"
+        title="Informasi"
+      >
+        <template v-slot:text>
+          <ul style="font-size: 12px;">
+            <li>- Tombol Delete ada 2 (Delete Soft & Delete Hard).</li>
+            <li>- Tombol Delete Soft tidak menghapus data dari database hanya di jadikan nonaktif dengan ditandai dengan flag merah.</li>
+            <li>- Tombol Delete Hard menghapus data dari database secara permanen.</li>
+            <li>- Mengurutkan data berdasarkan NOMOR INDUK.</li>
+          </ul>
+        </template>
+      </v-alert>
       <v-row no-gutters class="pa-2">
         <v-col cols="12" md="6">
           <Button 
@@ -56,14 +74,21 @@
           hide-default-footer
           hide-default-header
           class="elavation-3 rounded"
+          v-model:sort-by="sortBy"
+          sort-asc-icon="mdi mdi-sort-alphabetical-ascending"
+          sort-desc-icon="mdi mdi-sort-alphabetical-descending"
           :items-per-page="itemsPerPage"
           @page-count="pageCount = $event"
           @click:row="clickrow"
         >
           <!-- header -->
-          <template #headers="{ columns }">
+          <template #headers="{ columns, isSorted, getSortIcon, toggleSort }">
             <tr>
-              <td v-for="header in columns" :key="header.title" class="tableHeader">{{ header.title.toUpperCase() }}</td>
+              <td v-for="header in columns" :key="header.title" class="tableHeader">
+                <span v-if="header.sortable" class="mr-2" style="cursor: pointer; width: 100%;" @click="() => toggleSort(header)">{{ header.title.toUpperCase() }}</span>
+                <span v-else>{{ header.title.toUpperCase() }}</span>
+                <v-icon v-if="isSorted(header)" :icon="getSortIcon(header)"></v-icon>
+              </td>
             </tr>
           </template>
           <template #[`item.number`]="{ item }">
@@ -74,14 +99,17 @@
             <span v-html="item.raw.email" /> 
           </template>
           <template #[`item.jabatan`]="{ item }">
-            <ul><li v-for="v in item.raw.jabatanGuru" :key="v.kode">{{ v.label === 'Wali Kelas' ? `${v.label} (${item.raw.waliKelas})` : v.label }}</li></ul>
+            <span v-if="item.raw.jabatanGuru === null">-</span>
+            <ul v-else><li v-for="v in item.raw.jabatanGuru" :key="v.kode">{{ v.label === 'Wali Kelas' ? `${v.label} (${item.raw.waliKelas})` : v.label }}</li></ul>
           </template>
           <template #[`item.mapel`]="{ item }">
-            <ul><li v-for="v in item.raw.mengajarBidang" :key="v.kode">{{ v.label }}</li></ul>
+            <span v-if="item.raw.mengajarBidang === null">-</span>
+            <ul v-else><li v-for="v in item.raw.mengajarBidang" :key="v.kode">{{ v.label }}</li></ul>
           </template>
           <template #[`item.kelas`]="{ item }">
             <!-- <ul><li v-for="kelas in item.raw.mengajarKelas.split(', ')" :key="kelas">{{ kelas }}</li></ul> -->
-            <span v-html="item.raw.mengajarKelas"></span>
+            <span v-if="item.raw.mengajarKelas === null">-</span>
+            <span v-else v-html="item.raw.mengajarKelas" />
           </template>
           <template #[`item.statusAktif`]="{ item }">
             <v-icon size="small" v-if="item.raw.statusAktif == true" color="green" icon="mdi mdi-check" />
@@ -108,14 +136,57 @@
                   :nama-button="item.raw.statusAktif === false ? 'Active' : 'Non Active'"
                   @proses="postRecord(item.raw, 'STATUSRECORD', !item.raw.statusAktif)"
                 />
-                <Button 
-                  v-if="roleID === '1' || roleID === '2' || (roleID === '3' && kondisiKepalaSekolah)"
-                  color-button="#bd3a07"
-                  icon-button="mdi mdi-delete"
-                  nama-button="Hapus"
-                  :disabled-button="item.raw.statusAktif === false"
-                  @proses="postRecord(item.raw, 'DELETE', null)"
-                />
+                <v-menu
+                  open-on-click
+                  rounded="t-xs b-lg"
+                  offset-y
+                  transition="slide-y-transition"
+                  bottom
+                >
+                  <template v-slot:activator="{ props }">
+                    <Button 
+                      v-if="roleID === '1' || roleID === '2' || (roleID === '3' && kondisiKepalaSekolah)"
+                      v-bind="props"
+                      color-button="#bd3a07"
+                      icon-button="mdi mdi-delete"
+                      nama-button="Hapus"
+                    />
+                  </template>
+
+                  <v-list
+                    :lines="false"
+                    density="comfortable"
+                    nav
+                    dense
+                    class="listData"
+                  >
+                    <v-list-item
+                      @click="postRecord(item.raw, 'DELETESOFT', null)"
+                      class="SelectedMenu"
+                      active-class="SelectedMenu-active"
+                      :disabled="item.raw.statusAktif === false"
+                    >
+                      <template v-slot:prepend>
+                        <v-icon size="middle" icon="mdi mdi-delete" color="icon-white" />
+                      </template>
+                      <v-list-item-title>
+                        <span class="menufont">Delete Soft</span>
+                      </v-list-item-title>
+                    </v-list-item>
+                    <v-list-item
+                      @click="postRecord(item.raw, 'DELETEHARD', null)"
+                      class="SelectedMenu"
+                      active-class="SelectedMenu-active"
+                    >
+                      <template v-slot:prepend>
+                        <v-icon size="middle" icon="mdi mdi-delete" color="icon-white" />
+                      </template>
+                      <v-list-item-title>
+                        <span class="menufont">Delete Hard</span>
+                      </v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
                 <Button 
                   color-button="#04f7f7"
                   icon-button="mdi mdi-information"
@@ -551,7 +622,7 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
+      <PopUpNotifikasi
         :notifikasi-kode="notifikasiKode"
         :notifikasi-text="notifikasiText"
         :notifikasi-button="notifikasiButton"
@@ -564,11 +635,11 @@
 <script>
 import { mapActions, mapState, mapGetters } from "vuex";
 import { useMeta } from 'vue-meta'
-import PopUpNotifikasiVue from "../../Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "../../Layout/PopUpNotifikasi.vue";
 export default {
   name: 'DataStruktural',
   components: {
-    PopUpNotifikasiVue
+    PopUpNotifikasi
   },
   data: () => ({
 		expanded: [],
@@ -586,11 +657,12 @@ export default {
 			total: '',
 			totalPages: ''
 		},
+    sortBy: [],
 		headers: [
       { title: "No", key: "number", sortable: false, width: "5%" },
       { title: "#", key: "data-table-expand", sortable: false, width: "5%" },
-      { title: "NOMOR INDUK", key: "nomorInduk", sortable: false },
-      { title: "NAMA / EMAIl", key: "nama", sortable: false },
+      { title: "NOMOR INDUK", key: "nomorInduk", sortable: true },
+      { title: "NAMA / EMAIl", key: "nama", sortable: true },
       { title: "JABATAN", key: "jabatan", sortable: false },
       { title: "MATA PELAJARAN", key: "mapel", sortable: false },
       { title: "KELAS", key: "kelas", sortable: false, width: "15%" },
@@ -784,9 +856,9 @@ export default {
         kodePos: item.kodePos,
         nomorInduk: item.nomorInduk,
         pendidikanGuru: item.pendidikanGuru.label,
-        jabatanGuru: item.jabatanGuru.map(str => { return str.label; }).sort().join(', '),
-        mengajarBidang: item.mengajarBidang.map(str => { return str.label; }).sort().join(', '),
-        mengajarKelas: item.mengajarKelas,
+        jabatanGuru: item.jabatanGuru === null ? '-' : item.jabatanGuru.map(str => { return str.label; }).sort().join(', '),
+        mengajarBidang: item.mengajarBidang === null ? '-' : item.mengajarBidang.map(str => { return str.label; }).sort().join(', '),
+        mengajarKelas: item.mengajarKelas === null ? '-' : item.mengajarKelas,
         waliKelas: item.waliKelas,
         fotoProfil: item.fotoProfil,
       }

@@ -258,9 +258,9 @@
     <v-dialog
       v-model="DialogNotifikasi"
       scrollable
-      max-width="800px"
       persistent
       transition="dialog-bottom-transition"
+      width="auto"
     >
       <v-card color="background-dialog-card">
         <v-toolbar color="surface">
@@ -277,7 +277,7 @@
             />
           </v-toolbar-items>
         </v-toolbar>
-        <v-card-text class="pt-4" style="font-size: 13px;">
+        <v-card-text class="pt-4 v-dialog--custom">
           <v-row no-gutters>
             <v-col
               cols="12"
@@ -400,9 +400,9 @@
     <v-dialog
       v-model="DialogBroadcast"
       scrollable
-      max-width="800px"
       persistent
       transition="dialog-bottom-transition"
+      width="auto"
     >
       <v-card color="background-dialog-card">
         <v-toolbar color="surface">
@@ -419,7 +419,7 @@
             />
           </v-toolbar-items>
         </v-toolbar>
-        <v-card-text class="pt-4" style="font-size: 13px;">
+        <v-card-text class="pt-4 v-dialog--custom">
           <v-row no-gutters>
             <v-col
               cols="12"
@@ -560,7 +560,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-overlay v-model="isProcessing" class="align-center justify-center">
+    <v-overlay v-model="isProcessing" persistent class="align-center justify-center">
       <div style="width: 550px;">
         <v-progress-linear
           v-model="progress"
@@ -584,7 +584,7 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
+      <PopUpNotifikasi
         :notifikasi-kode="notifikasiKode"
         :notifikasi-text="notifikasiText"
         :notifikasi-button="notifikasiButton"
@@ -597,13 +597,13 @@
 <script>
 import { mapActions, mapState, mapGetters } from "vuex";
 import { useMeta } from 'vue-meta'
-import PopUpNotifikasiVue from "./Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "./Layout/PopUpNotifikasi.vue";
 import notifikasi from "../core/services/composeables/notifikasi";
 
 export default {
   name: 'Broadcast',
   components: {
-    PopUpNotifikasiVue
+    PopUpNotifikasi
   },
   data: () => ({
     roleID: '',
@@ -990,9 +990,6 @@ export default {
 .v-tab {
 	font-size: 8pt !important;
 	font-weight: bold !important;
-}
-.v-input .v-label {
-  font-size: 11pt !important;
 }
 .kondisiNotif {
 	margin-bottom: 1px !important;

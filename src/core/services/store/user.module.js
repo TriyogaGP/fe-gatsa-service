@@ -256,7 +256,7 @@ const actions = {
   [GET_SISWASISWI](context, data) {
     return new Promise((resolve, reject) => {
       context.commit('SET_LOADINGTABLE', true)
-      ApiService.get(`user/siswasiswi?page=${data.page}&limit=${data.limit}${data.keyword ? `&keyword=${data.keyword}` : ''}${typeof data.kelas !== 'undefined' || data.kelas ? `&kelas=${data.kelas}` : ''}`, token)
+      ApiService.get(`user/siswasiswi?page=${data.page}&limit=${data.limit}${data.keyword ? `&keyword=${data.keyword}` : ''}${typeof data.kelas !== 'undefined' || data.kelas ? `&kelas=${data.kelas}` : ''}&filter=${data.filter}`, token)
       .then((response) => {
         context.commit('SET_LOADINGTABLE', false)
         context.commit('SET_SISWASISWI', response.data.result)
@@ -322,7 +322,7 @@ const actions = {
   },
   [GET_WALI_KELAS](context, data) {
     return new Promise((resolve, reject) => {
-      ApiService.get(`user/walikelas?page=${data.page}&kelas=${data.kelas}&roleID=${data.roleID}`, token)
+      ApiService.get(`user/walikelas?page=${data.page}&kelas=${data.kelas}`, token)
       .then((response) => {
         context.commit('SET_WALI_KELAS', response.data.result)
         resolve(response);

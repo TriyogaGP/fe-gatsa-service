@@ -173,7 +173,7 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
+      <PopUpNotifikasi
         :notifikasi-kode="notifikasiKode"
         :notifikasi-text="notifikasiText"
         :notifikasi-button="notifikasiButton"
@@ -186,10 +186,10 @@
 <script>
 import { mapActions, mapGetters, mapState } from "vuex";
 import { useMeta } from 'vue-meta'
-import PopUpNotifikasiVue from "../../Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "../../Layout/PopUpNotifikasi.vue";
 export default {
   name: 'RFIDCard',
-	components: { PopUpNotifikasiVue },
+	components: { PopUpNotifikasi },
   data: () => ({
 		expanded: [],
 		DataRFIDCard: [],

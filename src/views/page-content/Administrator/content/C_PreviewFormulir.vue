@@ -267,7 +267,7 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
+      <PopUpNotifikasi
         :notifikasi-kode="notifikasiKode"
         :notifikasi-text="notifikasiText"
         :notifikasi-button="notifikasiButton"
@@ -280,10 +280,10 @@
 
 <script>
 import { mapActions, mapState } from "vuex";
-import PopUpNotifikasiVue from "../../../Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "../../../Layout/PopUpNotifikasi.vue";
 export default {
   components: {
-    PopUpNotifikasiVue
+    PopUpNotifikasi
   },
 	props: {
     stepperVal: {
@@ -416,10 +416,4 @@ export default {
 </script>
 
 <style>
-.v-input .v-label {
-  font-size: 11pt !important;
-}
-.v-text-field.v-input--dense {
-  font-size: 13px !important;
-}
 </style>

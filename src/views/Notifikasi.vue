@@ -67,9 +67,9 @@
     <v-dialog
       v-model="DialogNotifikasi"
       scrollable
-      max-width="800px"
       persistent
       transition="dialog-bottom-transition"
+      width="auto"
     >
       <v-card color="background-dialog-card">
         <v-toolbar color="surface">
@@ -86,7 +86,7 @@
             />
           </v-toolbar-items>
         </v-toolbar>
-        <v-card-text class="pt-4" style="font-size: 13px;">
+        <v-card-text class="pt-4 v-dialog--custom">
           <v-row no-gutters>
             <v-col
               cols="12"
@@ -197,7 +197,7 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
+      <PopUpNotifikasi
         :notifikasi-kode="notifikasiKode"
         :notifikasi-text="notifikasiText"
         :notifikasi-button="notifikasiButton"
@@ -210,13 +210,13 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import { useMeta } from 'vue-meta'
-import PopUpNotifikasiVue from "./Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "./Layout/PopUpNotifikasi.vue";
 import notifikasi from "../core/services/composeables/notifikasi";
 
 export default {
   name: 'Notifikasi',
   components: {
-    PopUpNotifikasiVue
+    PopUpNotifikasi
   },
   data: () => ({
     API_URL: '',

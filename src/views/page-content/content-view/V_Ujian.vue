@@ -32,21 +32,28 @@
 								<h3 style="text-decoration: overline underline;">Pilihan Ganda</h3>
 								<v-row v-if="jawabanPilihanTemp.length" no-gutters>
 									<v-col cols="12" lg="2" class="d-flex flex-row justify-center align-center" v-for="(data, index) in jawabanPilihanTemp" :key="data.kode">
-										<div class="lingkaran" :style="!data.jawaban ? 'background-color: red;' : 'background-color: green;'">{{ index }}</div>
+										<div class="lingkaran" :style="!data.jawaban ? 'background-color: red;' : 'background-color: green;'">{{ (index+1) }}</div>
 									</v-col>
 								</v-row>
 								<v-divider v-if="jawabanMenjodohkanTemp.length" :thickness="2" class="border-opacity-100 mt-3 mb-3" />
 								<h3 style="text-decoration: overline underline;">Menjodohkan</h3>
 								<v-row v-if="jawabanMenjodohkanTemp.length" no-gutters>
 									<v-col cols="12" lg="2" class="d-flex flex-row justify-center align-center" v-for="(data, index) in jawabanMenjodohkanTemp" :key="data.kode">
-										<div class="lingkaran" :style="!data.jawaban ? 'background-color: red;' : 'background-color: green;'">{{ index+1 }}</div>
+										<div class="lingkaran" :style="!data.jawaban ? 'background-color: red;' : 'background-color: green;'">{{ (index+1) + jawabanPilihanTemp.length }}</div>
+									</v-col>
+								</v-row>
+								<v-divider v-if="jawabanBenarSalahTemp.length" :thickness="2" class="border-opacity-100 mt-3 mb-3" />
+								<h3 style="text-decoration: overline underline;">Benar Salah</h3>
+								<v-row v-if="jawabanBenarSalahTemp.length" no-gutters>
+									<v-col cols="12" lg="2" class="d-flex flex-row justify-center align-center" v-for="(data, index) in jawabanBenarSalahTemp" :key="data.kode">
+										<div class="lingkaran" :style="!data.jawaban ? 'background-color: red;' : 'background-color: green;'">{{ (index+1) + jawabanPilihanTemp.length + jawabanMenjodohkanTemp.length }}</div>
 									</v-col>
 								</v-row>
 								<v-divider v-if="jawabanEssayTemp.length" :thickness="2" class="border-opacity-100 mt-3 mb-3" />
 								<h3 style="text-decoration: overline underline;">Essay</h3>
 								<v-row v-if="jawabanEssayTemp.length" no-gutters>
 									<v-col cols="12" lg="2" class="d-flex flex-row justify-center align-center" v-for="(data, index) in jawabanEssayTemp" :key="data.kode">
-										<div class="lingkaran" :style="!data.jawaban ? 'background-color: red;' : 'background-color: green;'">{{ index+1 }}</div>
+										<div class="lingkaran" :style="!data.jawaban ? 'background-color: red;' : 'background-color: green;'">{{ (index+1) + jawabanPilihanTemp.length + jawabanMenjodohkanTemp.length + jawabanBenarSalahTemp.length }}</div>
 									</v-col>
 								</v-row>
 							</div>
@@ -293,7 +300,7 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
+      <PopUpNotifikasi
         :notifikasi-kode="notifikasiKode"
         :notifikasi-text="notifikasiText"
         :notifikasi-button="notifikasiButton"
@@ -306,12 +313,12 @@
 
 <script>import { mapActions, mapState, mapGetters } from "vuex";
 import { useMeta } from 'vue-meta'
-import PopUpNotifikasiVue from "../../Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "../../Layout/PopUpNotifikasi.vue";
 import CountDown from "../../Layout/CountDown.vue";
 export default {
   name: 'Ujian',
   components: {
-    PopUpNotifikasiVue,
+    PopUpNotifikasi,
 		CountDown,
   },
   data: () => ({
@@ -687,7 +694,7 @@ export default {
 	color: #000;
 }
 .kotaksoal {
-	width: 100%;
+	// width: 100%;
 	height: auto;
 	// background-color: #c3c2c2;
 	border: 2px dashed #000;

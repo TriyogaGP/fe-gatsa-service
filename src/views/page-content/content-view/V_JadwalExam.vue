@@ -196,9 +196,9 @@
     <v-dialog
       v-model="DialogJadwalExam"
       scrollable
-      max-width="800px"
       persistent
       transition="dialog-bottom-transition"
+      width="auto"
     >
       <v-card color="background-dialog-card">
         <v-toolbar color="surface">
@@ -444,7 +444,7 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
+      <PopUpNotifikasi
         :notifikasi-kode="notifikasiKode"
         :notifikasi-text="notifikasiText"
         :notifikasi-button="notifikasiButton"
@@ -457,11 +457,11 @@
 <script>
 import { mapActions, mapGetters, mapState } from "vuex";
 import { useMeta } from 'vue-meta'
-import PopUpNotifikasiVue from "../../Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "../../Layout/PopUpNotifikasi.vue";
 export default {
   name: 'JadwalExam',
   components: {
-    PopUpNotifikasiVue,
+    PopUpNotifikasi,
   },
   data: () => ({
 		expanded: [],

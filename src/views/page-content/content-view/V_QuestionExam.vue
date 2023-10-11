@@ -2,6 +2,23 @@
   <div>
     <h1 class="subheading grey--text">Data Question Exam</h1>
     <v-card class="pa-1 rounded" variant="outlined" elevation="4">
+      <v-alert
+        color="surface"
+        border="start"
+        border-color="light-blue accent-4"
+        elevation="2"
+        density="compact"
+        icon="mdi mdi-information"
+        title="Informasi"
+      >
+        <template v-slot:text>
+          <ul style="font-size: 12px;">
+            <li>- Tombol Delete ada 2 (Delete Soft & Delete Hard).</li>
+            <li>- Tombol Delete Soft tidak menghapus data dari database hanya di jadikan nonaktif dengan ditandai dengan flag merah.</li>
+            <li>- Tombol Delete Hard menghapus data dari database secara permanen.</li>
+          </ul>
+        </template>
+      </v-alert>
       <v-row no-gutters class="pa-2">
         <v-col cols="12" md="6">
           <Button 
@@ -132,15 +149,58 @@
                   color-button="#0bd369"
                   :icon-button="item.raw.statusAktif === false ? 'mdi mdi-eye' : 'mdi mdi-eye-off'"
                   :nama-button="item.raw.statusAktif === false ? 'Active' : 'Non Active'"
-                  @proses="postRecordTwo('STATUSRECORD', item.raw, !item.raw.statusAktif)"
+                  @proses="postRecordTwo(item.raw, 'STATUSRECORD', !item.raw.statusAktif)"
                 />
-                <Button 
-                  color-button="#bd3a07"
-                  icon-button="mdi mdi-delete"
-                  nama-button="Hapus"
-                  :disabled-button="item.raw.statusAktif === false"
-                  @proses="postRecordTwo('DELETE', item.raw, null)"
-                />
+                <v-menu
+                  open-on-click
+                  rounded="t-xs b-lg"
+                  offset-y
+                  transition="slide-y-transition"
+                  bottom
+                >
+                  <template v-slot:activator="{ props }">
+                    <Button 
+                      v-bind="props"
+                      color-button="#bd3a07"
+                      icon-button="mdi mdi-delete"
+                      nama-button="Hapus"
+                    />
+                  </template>
+
+                  <v-list
+                    :lines="false"
+                    density="comfortable"
+                    nav
+                    dense
+                    class="listData"
+                  >
+                    <v-list-item
+                      @click="postRecordTwo(item.raw, 'DELETESOFT', null)"
+                      class="SelectedMenu"
+                      active-class="SelectedMenu-active"
+                      :disabled="item.raw.statusAktif === false"
+                    >
+                      <template v-slot:prepend>
+                        <v-icon size="middle" icon="mdi mdi-delete" color="icon-white" />
+                      </template>
+                      <v-list-item-title>
+                        <span class="menufont">Delete Soft</span>
+                      </v-list-item-title>
+                    </v-list-item>
+                    <v-list-item
+                      @click="postRecordTwo(item.raw, 'DELETEHARD', null)"
+                      class="SelectedMenu"
+                      active-class="SelectedMenu-active"
+                    >
+                      <template v-slot:prepend>
+                        <v-icon size="middle" icon="mdi mdi-delete" color="icon-white" />
+                      </template>
+                      <v-list-item-title>
+                        <span class="menufont">Delete Hard</span>
+                      </v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
               </td>
             </tr>
           </template>
@@ -490,7 +550,7 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
+      <PopUpNotifikasi
         :notifikasi-kode="notifikasiKode"
         :notifikasi-text="notifikasiText"
         :notifikasi-button="notifikasiButton"
@@ -503,11 +563,11 @@
 <script>
 import { mapActions, mapGetters, mapState } from "vuex";
 import { useMeta } from 'vue-meta'
-import PopUpNotifikasiVue from "../../Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "../../Layout/PopUpNotifikasi.vue";
 export default {
   name: 'QuestionExam',
   components: {
-    PopUpNotifikasiVue
+    PopUpNotifikasi
   },
   data: () => ({
 		expanded: [],
@@ -747,7 +807,7 @@ export default {
         this.notifikasi("error", err.response.data.message, "1")
 			});
     },
-    postRecordTwo(jenis, item = null, statusAktif) {
+    postRecordTwo(item = null, jenis, statusAktif) {
       let bodyData = {
         proses: jenis,
         kode: item?.kode ? item?.kode : null,
@@ -901,7 +961,7 @@ export default {
   width: 16px;
 }
 .customScroll::-webkit-scrollbar-thumb {
-  background-color: #4CAF50;
+  background-color: #272727;
   border: 5px solid #e1e1f0;
   border-radius: 10rem;
 }

@@ -64,10 +64,19 @@
           <template #[`item.nama`]="{ item }">
             <span v-html="uppercaseLetterFirst2(item.raw.nama)" /> 
           </template>
-          <template #[`item.datamapel`]="{ item }"> 
-						<span v-for="(val, i) in item.raw.dataJadwalMengajar" :key="i" class="box fourcorners" @click="bukadialog(item.raw.dataJadwalMengajar[i])">
-							<strong><span v-html="val.mapel" /></strong>
-						</span>
+          <template #[`item.datamapel`]="{ item }">
+            <v-row no-gutters>
+              <v-col cols="12" lg="3" v-for="(val, i) in item.raw.dataJadwalMengajar" :key="i" class="box fourcorners" @click="bukadialog(item.raw.dataJadwalMengajar[i])">
+                <strong><span v-html="val.mapel" /></strong>
+              </v-col>
+            </v-row>
+					</template>
+          <template #[`item.datakelas`]="{ item }">
+            <v-row no-gutters>
+              <v-col cols="12" lg="2" v-for="(val, i) in item.raw.kelas" :key="i" class="box fourcorners">
+                <strong><span v-html="val" /></strong>
+              </v-col>
+            </v-row>
 					</template>
           <template #expanded-row="{ columns, item }">
             <tr>
@@ -124,9 +133,9 @@
     <v-dialog
       v-model="DialogJadwalMengajar"
       scrollable
-      max-width="800px"
       persistent
       transition="dialog-bottom-transition"
+      width="auto"
     >
       <v-card color="background-dialog-card">
         <v-toolbar color="surface">
@@ -143,7 +152,7 @@
             />
           </v-toolbar-items>
         </v-toolbar>
-        <v-card-text class="pt-4" style="font-size: 13px;">
+        <v-card-text class="pt-4 v-dialog--custom">
           <v-row no-gutters>
             <v-col
               cols="12"
@@ -220,9 +229,9 @@
     <v-dialog
       v-model="DialogMataPelajaran"
       scrollable
-      max-width="800px"
       persistent
       transition="dialog-bottom-transition"
+      width="auto"
     >
       <v-card color="background-dialog-card">
         <v-toolbar color="surface">
@@ -239,7 +248,7 @@
             />
           </v-toolbar-items>
         </v-toolbar>
-        <v-card-text class="pt-4" style="font-size: 13px;">
+        <v-card-text class="pt-4 v-dialog--custom">
           hahaha
         </v-card-text>
         <v-divider />
@@ -252,7 +261,7 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
+      <PopUpNotifikasi
         :notifikasi-kode="notifikasiKode"
         :notifikasi-text="notifikasiText"
         :notifikasi-button="notifikasiButton"
@@ -265,11 +274,11 @@
 <script>
 import { mapActions, mapGetters, mapState } from "vuex";
 import { useMeta } from 'vue-meta'
-import PopUpNotifikasiVue from "../../Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "../../Layout/PopUpNotifikasi.vue";
 export default {
   name: 'DataJadwalMengajar',
   components: {
-    PopUpNotifikasiVue
+    PopUpNotifikasi
   },
   data: () => ({
 		expanded: [],
@@ -294,6 +303,7 @@ export default {
       { title: "NOMOR INDUK", key: "nomorInduk", sortable: false, width: "20%" },
       { title: "NAMA", key: "nama", sortable: false, width: "20%" },
       { title: "MATA PELAJARAN", key: "datamapel", sortable: false, width: "35%" },
+      { title: "KELAS", key: "datakelas", sortable: false, width: "35%" },
     ],
     rowsPerPageItems: { "items-per-page-options": [5, 10, 25, 50] },
     totalItems: 0,
@@ -386,14 +396,6 @@ export default {
         this.notifikasi("error", err.response.data.message, "1")
 			});
     },
-    remove(item, kondisi) {
-      if(kondisi === 'mapel'){
-        this.inputData.mapel.splice(this.inputData.mapel.indexOf(item.label), 1);
-      }else if(kondisi === 'kelas'){
-        this.inputData.kelas.splice(this.inputData.kelas.indexOf(item.kelas), 1);
-      }
-      console.log(this.inputData.mapel);
-    },
     bukadialog(item){
       this.dataKelasMapel = item.resdata
       this.DialogMataPelajaran = true
@@ -429,21 +431,23 @@ export default {
 
 <style scoped>
 .box{
-	width: 75px;
-	height: 40px;
+	height: 25px;
   background-image:-moz-linear-gradient(top, #272727, #5a5757);
 	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#272727), to(#5a5757), color-stop(1,#5a5757));
-	margin: 2px;
+	/* margin: 3px; */
   color: #FFF;
-  z-index: 100;
 }
 .fourcorners{
 	-moz-border-radius: 10px;
 	-webkit-border-radius: 10px;
 	-khtml-border-radius: 10px; 
 	border-radius: 10px;
-	padding: 10px;
-	text-align: center;
+  border: 1px solid white;
+	padding: 5px;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
 	font-size: 12px;
   cursor: pointer;
 }

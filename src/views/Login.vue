@@ -99,7 +99,7 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
+      <PopUpNotifikasi
         :notifikasi-kode="notifikasiKode"
         :notifikasi-text="notifikasiText"
         :notifikasi-button="notifikasiButton"
@@ -114,13 +114,13 @@
 import { computed } from "vue";
 import { mapActions, mapGetters, useStore } from "vuex";
 import { useMeta } from 'vue-meta'
-import PopUpNotifikasiVue from "./Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "./Layout/PopUpNotifikasi.vue";
 import Footer from '../components/Footer.vue';
 import io from 'socket.io-client'
 export default {
   name: 'Login',
   components: {
-    PopUpNotifikasiVue,
+    PopUpNotifikasi,
     Footer
   },
   data: () => ({
@@ -172,7 +172,11 @@ export default {
       getCMSSettings: 'setting/getCMSSettings',
     }),
     AutentificationLogin(){
-      if(this.captcha === '') return this.notifikasi("warning", "Captcha tidak boleh kosong !", "1");
+      if(this.captcha === '') {
+        this.createCaptcha();
+        this.captcha = '';
+        return this.notifikasi("warning", "Captcha tidak boleh kosong !", "1");
+      }
       if(this.captchaArray.join('') !== this.captcha) {
         this.createCaptcha();
         this.captcha = '';
@@ -192,6 +196,13 @@ export default {
         localStorage.setItem('roleID', data.consumerType);
         localStorage.setItem('fotoProfil', data.fotoProfil);
         if(data.consumerType === 3){
+          if(data.mengajarBidang === null || data.mengajarKelas === null){
+            this.createCaptcha();
+            this.captcha = '';
+            this.username = '';
+            this.katasandi = '';
+            return this.notifikasi("warning", "Anda tidak bisa akses panel ini, karena anda bukan Guru Pengajar!", "1")
+          }
           localStorage.setItem('jabatan_guru', data.jabatanGuru);
           localStorage.setItem('mengajar_bidang', data.mengajarBidang);
           localStorage.setItem('mengajar_kelas', data.mengajarKelas);
@@ -199,6 +210,8 @@ export default {
         }else if(data.consumerType === 4){
           localStorage.setItem('kelas', data.kelas);
         }
+
+
         const socket = io(this.API_URL);
         socket.emit("dataonline");
         this.notifikasi("success", res.data.message, "2")
@@ -257,7 +270,7 @@ export default {
 <style>
 .v-input--density-comfortable .v-field--variant-solo .v-label.v-field-label--floating {
   top: 2px;
-  font-size: 13px !important;
+  font-size: 9pt !important;
   font-weight: bold !important;
 }
 /* .v-toolbar__content > .v-toolbar-title {
@@ -289,7 +302,7 @@ export default {
   height: 35px;
 }
 .bg-white {
-  font-size: 14px !important;
+  font-size: 9pt !important;
 }
 </style>
 

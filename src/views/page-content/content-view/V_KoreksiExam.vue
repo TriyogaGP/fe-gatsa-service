@@ -10,7 +10,7 @@
             cols="12"
             lg="3"
           >
-            <v-card color="white" @click="gotoDetail(hasil.link)">
+            <v-card color="white" style="border: 2px solid #000;" @click="gotoDetail(hasil.link)">
               <v-sheet color="green" class="sheetData" elevation="2">
                 <v-icon icon="mdi mdi-book-education" size="large" />
                 <v-card-subtitle class="text-black" style="font-weight: bold; font-size: 15px; margin-left: 5px;">Mata Pelajaran</v-card-subtitle>
@@ -31,7 +31,7 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
+      <PopUpNotifikasi
         :notifikasi-kode="notifikasiKode"
         :notifikasi-text="notifikasiText"
         :notifikasi-button="notifikasiButton"
@@ -44,11 +44,11 @@
 <script>
 import { mapActions, mapState, mapGetters } from "vuex";
 import { useMeta } from 'vue-meta'
-import PopUpNotifikasiVue from "../../Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "../../Layout/PopUpNotifikasi.vue";
 export default {
   name: 'DataAkademis',
   components: {
-    PopUpNotifikasiVue
+    PopUpNotifikasi
   },
   data: () => ({
     roleID: '',

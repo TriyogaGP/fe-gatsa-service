@@ -1875,13 +1875,13 @@
             <h4 class="white--text text-center ma-4">******&nbsp;Berkas - Berkas&nbsp;******</h4>
             <v-row no-gutters class="d-flex flex-row justify-center align-center">
               <v-col
-                cols="5"
+                cols="12"
+                lg="5"
                 class="d-flex flex-column justify-center boxlist"
                 style="cursor: pointer;"
                 v-for="data in dataBerkas"
                 :key="data.kode"
-                :loading="true"
-                @click="pdfCreate(data.url, data.kode)">
+                @click="pdfCreate(data)">
                 <div>
                   <v-progress-circular v-if="isLoadingPDF[data.kode]" indeterminate />
                   <span v-else><v-icon icon="mdi mdi-file-pdf-box" /> {{ data.title }}</span>
@@ -1921,7 +1921,14 @@
                 <div class="white--text text-left" style="font-weight: bold;">*Mangajar Kelas</div>
                 <div class="white--text text-left">
                   <v-row no-gutters class="d-flex flex-row justify-center align-center">
-                    <v-col cols="3" class="d-flex flex-column justify-center boxlist" v-for="kelas in arrayData.mengajarKelas" :key="kelas">
+                    <v-col
+                      cols="3"
+                      class="d-flex flex-column justify-center boxlist"
+                      v-for="kelas in arrayData.mengajarKelas"
+                      :key="kelas"
+                      @click="gotoDetail(kelas)"
+                      style="cursor: pointer;" 
+                    >
                       {{ kelas }}
                     </v-col>
                   </v-row>
@@ -1965,7 +1972,7 @@
             />
           </v-toolbar-items>
         </v-toolbar>
-        <v-card-text class="pt-4" style="font-size: 13px;">
+        <v-card-text class="pt-4">
           <PdfCetakan
             :dialog-pdf="dialogPDF"
             :url-sk="urlSk"
@@ -1975,13 +1982,13 @@
     </v-dialog>
     <v-dialog
       v-model="dialogCrop"
-      width="700px"
       scrollable
       persistent
       transition="dialog-bottom-transition"
+      width="auto"
     >
       <v-card color="background-dialog-card">
-        <v-card-text class="pt-4">
+        <v-card-text class="pt-4 v-dialog--custom">
           <Cropper
             ref="cropper"
             class="cropper"
@@ -2021,7 +2028,7 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
+      <PopUpNotifikasi
         :notifikasi-kode="notifikasiKode"
         :notifikasi-text="notifikasiText"
         :notifikasi-button="notifikasiButton"
@@ -2035,7 +2042,7 @@
 <script>
 import { mapActions, mapGetters, mapState } from "vuex";
 import { useMeta } from 'vue-meta'
-import PopUpNotifikasiVue from "./Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "./Layout/PopUpNotifikasi.vue";
 import PdfCetakan from "./Layout/PdfCetakan.vue";
 import Stencil from "./Layout/Stencil.vue";
 import { Cropper, CircleStencil } from 'vue-advanced-cropper'
@@ -2065,7 +2072,7 @@ function getMimeType(file, fallback = null) {
 
 export default {
   name: 'Profile',
-  components: { PopUpNotifikasiVue, PdfCetakan, Cropper, CircleStencil, Stencil },
+  components: { PopUpNotifikasi, PdfCetakan, Cropper, CircleStencil, Stencil },
   data: () => ({
     roleID: '',
     nama: '',
@@ -2373,9 +2380,9 @@ export default {
           jarakRumah: this.roleID === '4' ? value.dataLainnya.jarakRumah ? value.dataLainnya.jarakRumah.label : '-' : null,
           transportasi: this.roleID === '4' ? value.dataLainnya.transportasi ? value.dataLainnya.transportasi.label : '-' : null,
           pendidikanGuru: this.roleID === '3' ? value.pendidikanGuru.label : null,
-          jabatanGuru: this.roleID === '3' ? value.jabatanGuru.map(str => { return str.label; }).sort().join(', ') : null,
-          mengajarBidang: this.roleID === '3' ? value.mengajarBidang.map(str => { return str.label; }).sort().join(', ') : null,
-          mengajarKelas: this.roleID === '3' ? value.mengajarKelas : null,
+          jabatanGuru: this.roleID === '3' ? value.jabatanGuru === null ? '-' : value.jabatanGuru.map(str => { return str.label; }).sort().join(', ') : null,
+          mengajarBidang: this.roleID === '3' ? value.mengajarBidang === null ? '-' : value.mengajarBidang.map(str => { return str.label; }).sort().join(', ') : null,
+          mengajarKelas: this.roleID === '3' ? value.mengajarKelas === null ? '-' : value.mengajarKelas : null,
           waliKelas: this.roleID === '3' ? value.waliKelas : null,
           fotoProfil: value.fotoProfil,
           fcIjazah: this.roleID === '4' ? value.berkas.fcIjazah : null,
@@ -2394,9 +2401,9 @@ export default {
           { kode: 'skl', url: this.previewData.fcSKL, title: 'FC SKL' },
         ]
         this.arrayData = {
-          jabatanGuru: this.roleID === '3' ? value.jabatanGuru.map(str => { return str.label; }).sort() : null,
-          mengajarBidang: this.roleID === '3' ? value.mengajarBidang.map(str => { return str.label; }).sort() : null,
-          mengajarKelas: this.roleID === '3' ? value.mengajarKelas.split(', ') : null,
+          jabatanGuru: this.roleID === '3' ? value.jabatanGuru === null ? '-' : value.jabatanGuru.map(str => { return str.label; }).sort() : null,
+          mengajarBidang: this.roleID === '3' ? value.mengajarBidang === null ? '-' : value.mengajarBidang.map(str => { return str.label; }).sort() : null,
+          mengajarKelas: this.roleID === '3' ? value.mengajarKelas === null ? '-' : value.mengajarKelas.split(', ') : null,
         }
         localStorage.setItem('fotoProfil', this.previewData.fotoProfil)
 			}
@@ -2619,17 +2626,17 @@ export default {
         this.notifikasi("error", err.response.data.message, "1")
 			});
     },
-    pdfCreate(berkas, jenis) {
-      this.isLoadingPDF[jenis] = true
+    pdfCreate(berkas) {
+      this.isLoadingPDF[berkas.kode] = true
       this.dialogPDF = false
       this.urlSk = ''
-      if(!berkas) {
-        this.isLoadingPDF[jenis] = false
-        return this.notifikasi("warning", 'Berkas tidak ditemukan !', "1")
+      if(!berkas.url) {
+        this.isLoadingPDF[berkas.kode] = false
+        return this.notifikasi("warning", `Berkas ${berkas.title} tidak ditemukan !`, "1")
       }
-      this.urlSk = berkas
+      this.urlSk = berkas.url
       setTimeout(() => {
-        this.isLoadingPDF[jenis] = false
+        this.isLoadingPDF[berkas.kode] = false
         this.dialogPDF = true;
       }, 3000);
     },
@@ -2711,6 +2718,9 @@ export default {
 		},
     goToProses() {
       window.location.reload();
+    },
+    gotoDetail(kelas) {
+      this.$router.push({name: "DataDetailKelasSiswa", params: { kondisi: 'view', kelas: kelas }});
     },
     onClickVisible(d) {
       this[d] = !this[d]
@@ -2900,6 +2910,7 @@ export default {
   border: 2px solid #272727;
 	border-radius: 5px;
   color: #ffffff;
+  font-size: 10pt;
 }
 
 .customScrollLeft::-webkit-scrollbar {

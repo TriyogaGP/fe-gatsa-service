@@ -13,6 +13,16 @@ export default {
   data: () => ({
     site_name: 'MTsS. SIROJUL ATHFAL',
   }),
+  watch: {
+    overlay(val) {
+      val && setTimeout(() => {
+        this.overlay = false
+      }, 3000)
+    },
+  },
+  beforeMount(){
+    this.overlay = true
+  },
 }
 </script>
 <style>
