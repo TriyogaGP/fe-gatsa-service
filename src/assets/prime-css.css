@@ -1,0 +1,46 @@
+.p-cascadeselect .p-cascadeselect-label {
+  font-size: 9pt;
+}
+.p-cascadeselect-item-content {
+  padding: 5px 0px 5px 10px;
+}
+/* .p-component {
+  width: auto;
+  font-size: 9pt;
+} */
+.p-fieldset {
+  background-color: white;
+  border: 2px solid black;
+  border-radius: 10px;
+  color: black;
+  margin-bottom: 10px;
+  padding: 10px;
+  font-size: 9pt;
+}
+.p-fieldset-legend {
+  background-color: #272727;
+  border: 2px solid #e1e1f0;
+  border-radius: 10px;
+}
+.p-icon {
+  width: 9px;
+  height: 9px;
+  margin-left: 10px;
+  color: white;
+}
+.p-fieldset-legend-text {
+  font-size: 9pt;
+  font-weight: 300;
+  padding: 10px;
+  color: white;
+}
+.p-cascadeselect-panel {
+  width: auto;
+  font-size: 9pt;
+}
+.p-cascadeselect {
+  height: 50px;
+  display: flex;
+  align-items: center;
+  font-weight: bold !important;
+}

@@ -40,7 +40,8 @@
     density="comfortable"
     color="light-black darken-3"
     bg-color="white"
-    hide-details
+    :rules="TFrules ? [rules.emailRules] : []"
+    hide-details="auto"
     :clearable="TFclearable"
     :readonly="TFreadonly"
     :disabled="TFdisabled"
@@ -90,9 +91,19 @@ export default {
       type: Boolean,
       default: false
     },
+    rulesTf: {
+      type: Boolean,
+      default: false
+    },
   },
   data() {
     return{
+      rules: {
+        emailRules: value => {
+          const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+          return pattern.test(value) || 'email tidak valid'
+        },
+      }
     }
   },
   computed: {
@@ -125,6 +136,9 @@ export default {
     },
     TFdisabled() {
       return this.disabledTf;
+    },
+    TFrules() {
+      return this.rulesTf;
     },
   },
   methods:{

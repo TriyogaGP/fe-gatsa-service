@@ -48,6 +48,7 @@ const actions = {
       }
       fData.append('nama_file', data.nama_file); //nama_file
       fData.append('table', data.table); //table
+      fData.append('folder', data.folder); //table
       fData.append('file', data.files); //data files
       // axios services
       ApiService.postFile('settings/updateBerkas', fData)

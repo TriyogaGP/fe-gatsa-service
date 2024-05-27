@@ -1,0 +1,292 @@
+.v-overlay__scrim {
+  background: #272727 !important;
+  opacity: 0.2 !important;
+}
+.dp__input {
+	height: 50px !important;
+}
+.v-dialog > .v-overlay__content > .v-card > .v-card-text, .v-dialog > .v-overlay__content > form > .v-card > .v-card-text {
+  padding: 15px !important;
+}
+.bg-white {
+  font-size: 9pt !important;
+}
+.v-input--density-comfortable .v-field--variant-solo .v-label.v-field-label--floating {
+  top: 2px;
+  font-size: 9pt !important;
+  font-weight: bold !important;
+}
+.v-label.v-field-label {
+  font-size: 9pt !important;
+  font-weight: bold !important;
+}
+.v-stepper.v-sheet {
+  background-color: white !important;
+}
+.tableHeader {
+  font-weight: bold;
+  color: white;
+  font-size: 9pt;
+  border-bottom: 2px solid white;
+}
+.v-table .v-table__wrapper > table > tbody > tr:not(:last-child) > td, .v-table .v-table__wrapper > table > tbody > tr:not(:last-child) > th {
+  border-bottom: thin solid white;
+}
+.v-table--density-comfortable > .v-table__wrapper > table > tbody > tr > td, .v-table--density-comfortable > .v-table__wrapper > table > tfoot > tr > td {
+  height: 100%;
+}
+.v-data-table__tr--clickable {
+  cursor: pointer;
+  font-size: 9pt;
+}
+.v-data-table__tr {
+  font-size: 9pt;
+  height: 50px;
+}
+.sheetData {
+  height: 50px;
+  width: auto;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+}
+.flag {
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  width: 15px;
+  height: 15px;
+}
+.wadah {
+  font-size: 10pt;
+  font-weight: bold;
+  margin-top: 15px;
+  margin-bottom: 5px;
+}
+.iconstyle {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+.link {
+  color: #000;
+  text-decoration: none;
+}
+.link:hover {
+  color: #6fe484;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.gambarLogo {
+  margin-right: 5px;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  line-height: normal;
+  position: relative;
+  text-align: center;
+  vertical-align: middle;
+  float:left;
+  overflow: hidden;
+  width: 35px;
+  height: 35px;
+}
+.textNamaSekolah {
+	color: #FFF;
+	font-weight: bold;
+	font-size: 10pt;
+  align-items: center;
+  display: flex;
+  line-height: normal;
+  margin-right: 10px;
+  height: 35px;
+}
+.v-dialog--custom {
+  width: 800px !important;
+  height: 100% !important;
+  max-height: 400px !important;
+  font-size: 13px !important;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-top: 5px;
+  padding: 8px;
+	border-radius: 5px;
+}
+.v-dialog--custom::-webkit-scrollbar {
+  width: 16px;
+}
+.v-dialog--custom::-webkit-scrollbar-thumb {
+  background-color: #272727;
+  border: 5px solid #e1e1f0;
+  border-radius: 10rem;
+}
+.v-dialog--custom::-webkit-scrollbar-track {
+  position: absolute;
+  right: -3rem;
+  top: -50rem;
+  background: transparent;
+}
+.ScrollFullscreen {
+  height: 100%;
+  font-size: 13px !important;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-top: 5px;
+  padding: 8px;
+	border-radius: 5px;
+}
+.ScrollFullscreen::-webkit-scrollbar {
+  width: 16px;
+}
+.ScrollFullscreen::-webkit-scrollbar-thumb {
+  background-color: #272727;
+  border: 5px solid #e1e1f0;
+  border-radius: 10rem;
+}
+.ScrollFullscreen::-webkit-scrollbar-track {
+  position: absolute;
+  right: -3rem;
+  top: -50rem;
+  background: transparent;
+}
+.v-infinite-scroll__side {
+  padding: 0px 8px !important;
+  overflow-y: hidden !important;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+.wadah-notif-scroll {
+  height: 100% !important;
+  max-height: 430px !important;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px;
+}
+.wadah-notif-scroll::-webkit-scrollbar {
+  width: 16px;
+}
+.wadah-notif-scroll::-webkit-scrollbar-thumb {
+  background-color: #4CAF50;
+  border: 5px solid #FFFFFF;
+  border-radius: 10rem;
+}
+.wadah-notif-scroll::-webkit-scrollbar-track {
+  position: absolute;
+  right: -3rem;
+  top: -50rem;
+  background: transparent;
+}
+.list-pick {
+  height: 100% !important;
+  max-height: 370px !important;
+  font-size: 10pt !important;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-top: 5px;
+  padding: 8px;
+	border-radius: 5px;
+}
+.list-pick::-webkit-scrollbar {
+  width: 16px;
+}
+.list-pick::-webkit-scrollbar-thumb {
+  background-color: #4CAF50;
+  border: 5px solid #272727;
+  border-radius: 10rem;
+}
+.list-pick::-webkit-scrollbar-track {
+  position: absolute;
+  right: -3rem;
+  top: -50rem;
+  background: transparent;
+}
+.cross {
+  position: relative;
+  display: inline-block;
+}
+.cross::before, .cross::after {
+  content: '';
+  width: 100%;
+  position: absolute;
+  right: 0;
+  top: 35%;
+}
+.cross::before {
+  border-bottom: 3px solid red;
+  -webkit-transform: skewY(-45deg);
+  transform: skewY(-45deg);
+}
+.cross::after {
+  border-bottom: 3px solid red;
+  -webkit-transform: skewY(45deg);
+  transform: skewY(45deg);
+}
+.blurBack {
+  animation: fadeInAnimation ease 1s;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+.vue-advanced-cropper__background, .vue-advanced-cropper__foreground {
+  background: white !important;
+}
+.vue-line-wrapper--east, .vue-line-wrapper--west {
+  width: 0px !important;
+  border: 1px solid black;
+}
+.vue-line-wrapper--north, .vue-line-wrapper--south {
+  height: 0px !important;
+  border: 1px solid black;
+}
+.vue-simple-handler {
+  background: black !important;
+}
+.cropper-signature {
+  border: double 3px transparent;
+  border-radius: 5px;
+  background-image: linear-gradient(white, white),
+    radial-gradient(circle at top left, #4bc5e8, #9f6274);
+  background-origin: border-box;
+  background-clip: content-box, border-box;
+  min-height: 300px;
+  width: 300px;
+}
+#signature {
+  border: double 3px transparent;
+  border-radius: 5px;
+  background-image: linear-gradient(white, white),
+    radial-gradient(circle at top left, #4bc5e8, #9f6274);
+  background-origin: border-box;
+  background-clip: content-box, border-box;
+}
+.v-label--clickable {
+  cursor: pointer;
+  font-size: 10pt !important;
+}
+@keyframes fadeInAnimation {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@media screen and (max-width: 680px) {
+  .textNamaSekolah {
+    font-size: 9pt;
+  }
+}
+
+@media screen and (min-width: 1920px) {
+  .v-dialog--custom {
+    width: 1000px !important;
+    height: 100% !important;
+    max-height: 700px !important;
+  }
+  .wadah-notif-scroll {
+    height: 100% !important;
+    max-height: 720px !important;
+  }
+  .list-pick {
+    height: 100% !important;
+    max-height: 650px !important;
+  }
+}

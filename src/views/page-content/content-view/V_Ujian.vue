@@ -29,28 +29,28 @@
 					<v-expansion-panel title="Panel Jawaban">
 						<template v-slot:text>
 							<div class="panelScroll">
-								<h3 style="text-decoration: overline underline;">Pilihan Ganda</h3>
+								<h3 v-if="jawabanPilihanTemp.length" style="text-decoration: overline underline;">Pilihan Ganda</h3>
 								<v-row v-if="jawabanPilihanTemp.length" no-gutters>
 									<v-col cols="12" lg="2" class="d-flex flex-row justify-center align-center" v-for="(data, index) in jawabanPilihanTemp" :key="data.kode">
 										<div class="lingkaran" :style="!data.jawaban ? 'background-color: red;' : 'background-color: green;'">{{ (index+1) }}</div>
 									</v-col>
 								</v-row>
-								<v-divider v-if="jawabanMenjodohkanTemp.length" :thickness="2" class="border-opacity-100 mt-3 mb-3" />
-								<h3 style="text-decoration: overline underline;">Menjodohkan</h3>
+								<v-divider v-if="jawabanMenjodohkanTemp.length && jawabanPilihanTemp.length" :thickness="2" class="border-opacity-100 mt-3 mb-3" />
+								<h3 v-if="jawabanMenjodohkanTemp.length" style="text-decoration: overline underline;">Menjodohkan</h3>
 								<v-row v-if="jawabanMenjodohkanTemp.length" no-gutters>
 									<v-col cols="12" lg="2" class="d-flex flex-row justify-center align-center" v-for="(data, index) in jawabanMenjodohkanTemp" :key="data.kode">
 										<div class="lingkaran" :style="!data.jawaban ? 'background-color: red;' : 'background-color: green;'">{{ (index+1) + jawabanPilihanTemp.length }}</div>
 									</v-col>
 								</v-row>
-								<v-divider v-if="jawabanBenarSalahTemp.length" :thickness="2" class="border-opacity-100 mt-3 mb-3" />
-								<h3 style="text-decoration: overline underline;">Benar Salah</h3>
+								<v-divider v-if="jawabanBenarSalahTemp.length && jawabanMenjodohkanTemp.length" :thickness="2" class="border-opacity-100 mt-3 mb-3" />
+								<h3 v-if="jawabanBenarSalahTemp.length" style="text-decoration: overline underline;">Benar Salah</h3>
 								<v-row v-if="jawabanBenarSalahTemp.length" no-gutters>
 									<v-col cols="12" lg="2" class="d-flex flex-row justify-center align-center" v-for="(data, index) in jawabanBenarSalahTemp" :key="data.kode">
 										<div class="lingkaran" :style="!data.jawaban ? 'background-color: red;' : 'background-color: green;'">{{ (index+1) + jawabanPilihanTemp.length + jawabanMenjodohkanTemp.length }}</div>
 									</v-col>
 								</v-row>
-								<v-divider v-if="jawabanEssayTemp.length" :thickness="2" class="border-opacity-100 mt-3 mb-3" />
-								<h3 style="text-decoration: overline underline;">Essay</h3>
+								<v-divider v-if="jawabanEssayTemp.length && jawabanBenarSalahTemp.length" :thickness="2" class="border-opacity-100 mt-3 mb-3" />
+								<h3 v-if="jawabanEssayTemp.length" style="text-decoration: overline underline;">Essay</h3>
 								<v-row v-if="jawabanEssayTemp.length" no-gutters>
 									<v-col cols="12" lg="2" class="d-flex flex-row justify-center align-center" v-for="(data, index) in jawabanEssayTemp" :key="data.kode">
 										<div class="lingkaran" :style="!data.jawaban ? 'background-color: red;' : 'background-color: green;'">{{ (index+1) + jawabanPilihanTemp.length + jawabanMenjodohkanTemp.length + jawabanBenarSalahTemp.length }}</div>
@@ -214,7 +214,15 @@
 					<table class="kotaksoal" v-for="(index) in soal.jmlbenarsalah" :key="index" border="0" width="100%" cellspacing="0" cellpadding="0">
 						<tr>
 							<td width="2%" style="vertical-align: top; font-weight: bold;">{{ `${index+soal.jmlpilihanganda+soal.jmlmenjodohkan}.` }}</td>
-							<td style="font-weight: 500;"><span v-html="soal.benarsalah[index-1].pertanyaan.text" /></td>
+							<td style="font-weight: 500;">
+								<div v-if="!soal.benarsalah[index-1].pertanyaan.file">
+									<span v-html="soal.benarsalah[index-1].pertanyaan.text" />
+								</div>
+								<div v-else>
+									<v-img :src="`${API_URL}berkas/${soal.benarsalah[index-1].pertanyaan.file}`" width="100" />
+									<span v-html="soal.benarsalah[index-1].pertanyaan.text" />
+								</div>
+							</td>
 						</tr>
 						<tr>
 							<td />
@@ -709,7 +717,6 @@ export default {
 	font-weight: bold;
 }
 .timer {
-  color: #000;
   text-align:center;
 	font-size: 30px;
   .day, .hour, .min, .sec {
@@ -724,6 +731,18 @@ export default {
     }
   }
   .number{
+		color: #000;
+    background: #FFF;
+    padding: 0 5px;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+		justify-content: center;
+		align-items: center;
+  }
+  .numberS{
+		color: #F00;
     background: #FFF;
     padding: 0 5px;
     border-radius: 50%;

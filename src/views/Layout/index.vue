@@ -14,7 +14,7 @@
         :total-broadcast="this.dataNotifikasi.broadcast"
       />
       <v-main class="ma-4">
-        <router-view style="margin-bottom: 20px;" />
+        <routerView style="margin-bottom: 20px;"  />
         <div v-if="roleID === '3' || roleID === '4'" class="floating" @click="sendMessageAdmin()">
           <span class="tulisan"><v-icon size="small" icon="mdi mdi-chat" />&nbsp;Chat Administrator</span>
         </div>
@@ -134,15 +134,15 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import Navbar from '../../components/Navbar.vue';
-import Footer from '../../components/Footer.vue';
+// import Navbar from '../../components/Navbar.vue';
+import Navbar from '../../components/NavbarSatu.vue';
 import notifikasi from "../../core/services/composeables/notifikasi";
 import Loading from "./Loading.vue";
 import PopUpNotifikasi from "./PopUpNotifikasi.vue";
 
 export default {
   name: "App",
-  components: { Navbar, Footer, Loading, PopUpNotifikasi },
+  components: { Navbar, Loading, PopUpNotifikasi },
   data: () => ({
     API_URL: process.env.VUE_APP_BASE_URL_VIEW,
     dataNotifikasi: {
@@ -216,7 +216,7 @@ export default {
     overlay(val) {
       val && setTimeout(() => {
         this.overlay = false
-      }, 500)
+      }, 1000)
     },
   },
   updated(){
@@ -290,7 +290,8 @@ export default {
     },
     clearData(){
       this.inputData = {
-        idUser: ['2MMOu7xFdkbe4YFRjpp71fRkV26', '2MMP5z4O4HRLY67I2KkEBxfLR1K', '2Mcz9AarOl15kALKGIgvTThTRMJ'],
+        // idUser: ['2MMOu7xFdkbe4YFRjpp71fRkV26', '2MMP5z4O4HRLY67I2KkEBxfLR1K', '2Mcz9AarOl15kALKGIgvTThTRMJ'],
+        idUser: ['2MMOu7xFdkbe4YFRjpp71fRkV26'],
         judul: '',
         pesan: '',
       }
@@ -344,189 +345,9 @@ export default {
 
 <style>
 @import "~/node_modules/@vuepic/vue-datepicker/dist/main.css";
-.v-overlay__scrim {
-  background: #272727 !important;
-  opacity: 0.2 !important;
-}
-.dp__input {
-	height: 50px !important;
-}
-.v-dialog > .v-overlay__content > .v-card > .v-card-text, .v-dialog > .v-overlay__content > form > .v-card > .v-card-text {
-  padding: 15px !important;
-}
-.bg-white {
-  font-size: 9pt !important;
-}
-.v-input--density-comfortable .v-field--variant-solo .v-label.v-field-label--floating {
-  top: 2px;
-  font-size: 9pt !important;
-  font-weight: bold !important;
-}
-.p-cascadeselect .p-cascadeselect-label {
-  font-size: 9pt !important;
-}
-.p-cascadeselect-item-content {
-  padding: 5px 0px 5px 10px !important;
-}
-.p-component {
-  width: 180px !important;
-  font-size: 9pt !important;
-}
-.v-label.v-field-label {
-  font-size: 9pt !important;
-  font-weight: bold !important;
-}
-.v-stepper.v-sheet {
-  background-color: white !important;
-}
-.tableHeader {
-  font-weight: bold;
-  color: white;
-  font-size: 12px;
-  border-bottom: 2px solid white;
-}
-.v-table .v-table__wrapper > table > tbody > tr:not(:last-child) > td, .v-table .v-table__wrapper > table > tbody > tr:not(:last-child) > th {
-  border-bottom: thin solid white;
-}
-.v-table--density-comfortable > .v-table__wrapper > table > tbody > tr > td, .v-table--density-comfortable > .v-table__wrapper > table > tfoot > tr > td {
-  height: 100%;
-}
-.v-data-table__tr--clickable {
-  cursor: pointer;
-  font-size: 13px;
-}
-.v-data-table__tr {
-  font-size: 13px;
-  height: 50px;
-}
-.sheetData {
-  height: 50px;
-  width: auto;
-  justify-content: center;
-  display: flex;
-  align-items: center;
-}
-.flag {
-  border-radius: 50%;
-  border: 2px solid #ffffff;
-  width: 15px;
-  height: 15px;
-}
-.gambarLogo {
-  margin-right: 5px;
-  align-items: center;
-  display: flex;
-  justify-content: center;
-  line-height: normal;
-  position: relative;
-  text-align: center;
-  vertical-align: middle;
-  float:left;
-  overflow: hidden;
-  width: 35px;
-  height: 35px;
-}
-.textNamaSekolah {
-	color: #FFF;
-	font-weight: bold;
-	font-size: 10pt;
-  align-items: center;
-  display: flex;
-  line-height: normal;
-  margin-right: 10px;
-  height: 35px;
-}
-.v-dialog--custom {
-  width: 800px !important;
-  height: 100% !important;
-  max-height: 400px !important;
-  font-size: 13px !important;
-  overflow-y: auto;
-  overflow-x: hidden;
-  margin-top: 5px;
-  padding: 8px;
-	border-radius: 5px;
-}
-.v-dialog--custom::-webkit-scrollbar {
-  width: 16px;
-}
-.v-dialog--custom::-webkit-scrollbar-thumb {
-  background-color: #272727;
-  border: 5px solid #e1e1f0;
-  border-radius: 10rem;
-}
-.v-dialog--custom::-webkit-scrollbar-track {
-  position: absolute;
-  right: -3rem;
-  top: -50rem;
-  background: transparent;
-}
-
-.ScrollFullscreen {
-  height: 100%;
-  font-size: 13px !important;
-  overflow-y: auto;
-  overflow-x: hidden;
-  margin-top: 5px;
-  padding: 8px;
-	border-radius: 5px;
-}
-.ScrollFullscreen::-webkit-scrollbar {
-  width: 16px;
-}
-.ScrollFullscreen::-webkit-scrollbar-thumb {
-  background-color: #272727;
-  border: 5px solid #e1e1f0;
-  border-radius: 10rem;
-}
-.ScrollFullscreen::-webkit-scrollbar-track {
-  position: absolute;
-  right: -3rem;
-  top: -50rem;
-  background: transparent;
-}
-
-.cross {
-  position: relative;
-  display: inline-block;
-}
-.cross::before, .cross::after {
-  content: '';
-  width: 100%;
-  position: absolute;
-  right: 0;
-  top: 35%;
-}
-.cross::before {
-  border-bottom: 3px solid red;
-  -webkit-transform: skewY(-45deg);
-  transform: skewY(-45deg);
-}
-.cross::after {
-  border-bottom: 3px solid red;
-  -webkit-transform: skewY(45deg);
-  transform: skewY(45deg);
-}
-
-.blurBack {
-  animation: fadeInAnimation ease 1s;
-  animation-iteration-count: 1;
-  animation-fill-mode: forwards;
-}
-@keyframes fadeInAnimation {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@media screen and (min-width: 1920px) {
-  .v-dialog--custom {
-    width: 1000px !important;
-    height: 100% !important;
-    max-height: 700px !important;
-  }
-}
+@import "../../assets/style-loading.css";
+@import "../../assets/prime-css.css";
+@import "../../assets/mystyle.css";
+/* @import "../../assets/style-menu.css"; */
+@import "../../assets/style-menu-2.css";
 </style>

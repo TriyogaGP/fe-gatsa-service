@@ -229,8 +229,9 @@ export default {
 		inputDataKelengkapan:{
 			deep: true,
 			handler(value) {
+				console.log(value.jabatan_guru);
 				if(value.jabatan_guru !== null && value.jabatan_guru.length === 0){
-					value.wali_kelas = ''
+					this.inputDataKelengkapan.wali_kelas = null
 					this.kondisiJabatan = true
 				}
 
@@ -239,6 +240,7 @@ export default {
 					if(jabatan){
 						this.kondisiJabatan = false
 					}else{
+						this.inputDataKelengkapan.wali_kelas = null
 						this.kondisiJabatan = true
 					}
 				}

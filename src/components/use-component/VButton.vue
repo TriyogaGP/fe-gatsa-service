@@ -1,20 +1,39 @@
 <template>
+  <v-tooltip v-if="BtooltipCondition" :location="BtooltipPosition">
+    <template v-slot:activator="{ props }">
+      <v-btn
+        v-bind="props"
+        v-if="Bnama === ''"
+        :color="Bcolor"
+        :size="Bsize"
+        :density="Bmodel"
+        class="ma-2 white--text text--darken-2"
+        :icon="Bicon"
+        :disabled="Bdisabled"
+        :readonly="Breadonly"
+        @click="clicked()"
+      />
+    </template>
+    <span>{{ Btooltip }}</span>
+  </v-tooltip>
   <v-btn
-    v-if="Bnama !== ''"
+    v-else-if="Bnama !== ''"
     :color="Bcolor"
     :size="Bsize"
     :density="Bmodel"
     depressed
     class="ma-2 white--text text--darken-2"
-    :prepend-icon="Bletak === 'start' ? Bicon : ''"
-    :append-icon="Bletak === 'end' ? Bicon : ''"
+    :prepend-icon="BPrependicon"
+    :append-icon="BAppendicon"
     :disabled="Bdisabled"
+    :readonly="Breadonly"
     @click="clicked()"
   >
     {{ Bnama }}
+    <!-- <v-tooltip v-if="BtooltipCondition" activator="parent" :location="BtooltipPosition">{{ Btooltip }}</v-tooltip> -->
   </v-btn>
   <v-btn
-    v-else-if="Bnama === ''"
+    v-else-if="!BtooltipCondition && Bnama === ''"
     :color="Bcolor"
     :size="Bsize"
     :density="Bmodel"
@@ -41,6 +60,14 @@ export default {
       type: String,
       default: ""
     },
+    iconPrependButton: {
+      type: String,
+      default: ""
+    },
+    iconAppendButton: {
+      type: String,
+      default: ""
+    },
     sizeButton: {
       type: String,
       default: "small"
@@ -52,6 +79,18 @@ export default {
     namaButton: {
       type: String,
       default: ""
+    },
+    tooltipButton: {
+      type: String,
+      default: ""
+    },
+    tooltipPositionButton: {
+      type: String,
+      default: "top"
+    },
+    tooltipConditionButton: {
+      type: Boolean,
+      default: false
     },
     disabledButton: {
       type: Boolean,
@@ -77,6 +116,12 @@ export default {
     Bicon() {
       return this.iconButton;
     },
+    BPrependicon() {
+      return this.iconPrependButton;
+    },
+    BAppendicon() {
+      return this.iconAppendButton;
+    },
     Bsize() {
       return this.sizeButton;
     },
@@ -85,6 +130,15 @@ export default {
     },
     Bnama() {
       return this.namaButton;
+    },
+    Btooltip() {
+      return this.tooltipButton;
+    },
+    BtooltipPosition() {
+      return this.tooltipPositionButton;
+    },
+    BtooltipCondition() {
+      return this.tooltipConditionButton;
     },
     Bdisabled() {
       return this.disabledButton;

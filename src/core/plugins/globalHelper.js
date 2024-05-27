@@ -286,7 +286,9 @@ const myPlugin = {
 			textInput = textInput.toLowerCase();
 			var stringArray = ''
 			if(cek){
-				stringArray = textInput.split(". ");
+				let hasilSplit = textInput.split(". ")
+				let textSplit = hasilSplit.join(" ");
+				stringArray = textSplit.split(/\b(\s)/)
 			}else{
 				stringArray = textInput.split(/\b(\s)/);
 			}
@@ -295,7 +297,15 @@ const myPlugin = {
 					stringArray[i].charAt(0).toUpperCase() +
 					stringArray[i].substring(1);
 			}
-			var finalText = cek ? stringArray.join(". ") : stringArray.join("");
+			let textHasil = ''
+			for (var i = 0; i < stringArray.length; i++) {
+				if(stringArray[i] === 'Kab'){
+					textHasil += `${stringArray[i]}.`
+				}else{
+					textHasil += `${stringArray[i]}`
+				}
+			}
+			var finalText = cek ? textHasil : stringArray.join("");
 			return finalText;
 		},
 		app.config.globalProperties.isNumeric = (value) => {

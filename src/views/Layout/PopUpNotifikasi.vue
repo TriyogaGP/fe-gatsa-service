@@ -151,10 +151,10 @@ export default {
 
 <style>
 .textnotif {
-  font-size: 13px !important;
-  font-weight: 400 !important;
-  color: #525252 !important;
-  letter-spacing: normal!important;
+  font-size: 9pt !important;
+  font-weight: 500 !important;
+  color: #272727 !important;
+  letter-spacing: normal !important;
   text-align: center !important;
 }
 .backgroundhijau{

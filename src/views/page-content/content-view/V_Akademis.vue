@@ -1,19 +1,37 @@
 <template>
   <div>
-    <h1 class="subheading grey--text">Data Akademis</h1>
+    <h1 class="subheading grey--text text-decoration-underline">Data Akademis</h1>
     <v-card class="pa-1 rounded" variant="outlined" elevation="4">
+      <v-row no-gutters>
+        <v-col cols="12" md="8" />
+        <v-col cols="12" md="4" class="pr-2">
+          <TextField
+            v-model="searchData"
+            icon-prepend-tf="mdi mdi-magnify"
+            label-tf="Pencarian..."
+            :clearable-tf="true"
+            @click:clear="() => {
+              searchData = ''
+              pencarianData(searchData)
+            }"
+            @keyup.enter="() => {
+              pencarianData(searchData)
+            }"
+          />
+        </v-col>
+      </v-row>
       <v-container fluid v-if="mengajarOptions.length">
         <v-row>
           <v-col
             v-for="hasil in mengajarOptions"
             :key="hasil.label"
             cols="12"
-            lg="3"
+            lg="4"
           >
-            <v-card color="white" style="border: 2px solid #000;" @click="roleID === '1' || roleID === '2' ? gotoDetail(hasil.link) : openDetail(hasil.link)">
+            <v-card color="white" style="border: 2px solid #000;" @click="roleID === '1' || roleID === '2' ? gotoDetail(hasil.link) : openDetail(hasil.kode, hasil.link)">
               <v-sheet color="green" class="sheetData" elevation="2">
                 <v-icon icon="mdi mdi-book-education" size="large" />
-                <v-card-subtitle class="text-black" style="font-weight: bold; font-size: 15px; margin-left: 5px;">Mata Pelajaran</v-card-subtitle>
+                <v-card-title class="text-white" style="font-weight: bold; font-size: 15px; margin-left: 5px;">Mata Pelajaran</v-card-title>
               </v-sheet>
               <v-card-actions>
                 <v-divider :thickness="2" class="border-opacity-75" />
@@ -264,6 +282,8 @@ export default {
     mapel: '',
     DialogSiswaSiswi: false,
     dataSiswaSiswi: '',
+    searchData: '',
+    mengajarOptions: [],
 
     //notifikasi
     dialogNotifikasi: false,
@@ -282,7 +302,7 @@ export default {
   },
   computed: {
     ...mapState({
-      mengajar: store => store.setting.mengajarOptions,
+      // mengajar: store => store.setting.mengajarOptions,
     }),
     ...mapGetters({
       cmssettings: 'setting/cmssettings',
@@ -295,13 +315,13 @@ export default {
     DataNilai(){
       return this.nilai ? this.nilai : null
     },
-    mengajarOptions(){
-      let result = []
-      this.mengajar.map(str => {
-        result.push({ label: str.label, link: str.label.replace(' ', '-') })
-      })
-			return result
-		},
+    // mengajarOptions(){
+    //   let result = []
+    //   this.mengajar.map(str => {
+    //     result.push({ label: str.label, link: str.label.replace(' ', '-') })
+    //   })
+		// 	return result
+		// },
   },
   watch: {
     siswasiswiBy: {
@@ -349,7 +369,7 @@ export default {
     this.roleID = localStorage.getItem('roleID')
     this.idLogin = localStorage.getItem('idLogin')
     this.kelas = localStorage.getItem('kelas')
-		this.getMengajar()
+    this.pencarianData(this.searchData)
 	},
 	methods: {
 		...mapActions({
@@ -358,12 +378,28 @@ export default {
       getCMSSettings: 'setting/getCMSSettings',
       getMengajar: 'setting/getMengajar',
     }),
-    openDetail(mapel) {
+    openDetail(kode, mapel) {
       this.mapel = mapel.replace('-', ' ')
       this.getCMSSettings()
-      this.getNilai({idUser: this.idLogin, kelas: this.kelas, mapel: this.mapel})
-      this.getSiswaSiswibyUID({uid: this.idLogin, mapel: this.mapel})
+      this.getNilai({idUser: this.idLogin, kelas: this.kelas, mapel: kode})
+      this.getSiswaSiswibyUID({uid: this.idLogin, mapel: kode})
       this.DialogSiswaSiswi = true
+    },
+    pencarianData(searchData){
+      this.mengajarOptions = []
+      this.getMengajar().then((res) => {
+				let result = res.data.result;
+        if(searchData === ''){
+          result.map(str => {
+            this.mengajarOptions.push({ label: str.label, link: str.label.replace(' ', '-'), kode: str.kode })
+          })
+        }else{
+          result.map(str => {
+            let search = new RegExp(searchData , 'i');
+            if(search.test(str.label)) return this.mengajarOptions.push({ label: str.label, link: str.label.replace(' ', '-'), kode: str.kode })
+          })
+        }
+			})
     },
     gotoDetail(mapel) {
       this.$router.push({name: "DataDetailAkademis", params: { mapel: mapel, jenis: 'mapel' }});

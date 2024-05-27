@@ -125,7 +125,7 @@
 				>
 					<Autocomplete
 						v-model="inputDataSekolahSebelum.kabkot_sekolah"
-						:data-a="KabKotaOnlyOptions"
+						:data-a="optionsKabKota"
 						item-title="nama"
 						item-value="kode"
 						label-a="Kabupaten / Kota Sekolah"
@@ -296,6 +296,15 @@ export default {
 			jenjangOptions: store => store.setting.jenjangOptions,
 			KabKotaOnlyOptions: store => store.setting.KabKotaOnlyOptions,
 		}),
+		optionsKabKota(){
+      let kabkota = this.KabKotaOnlyOptions.map(x => {
+        return {
+          kode: x.kode,
+          nama: `${x.jenisKabKota} ${x.nama}`
+        }
+      })
+      return kabkota
+    },
   },
 	watch: {
 		inputDataSekolahSebelum:{
@@ -336,12 +345,12 @@ export default {
 	mounted() {
 		this.inputDataSekolahSebelum.id_user = this.$route.params.uid;
 		this.getJenjangSekolah()
-		this.getWilayah({ bagian: 'kabkotaOnly', KodeWilayah: null })
+		this.getWilayah2023({ bagian: 'kabkotaOnly', KodeWilayah: null })
 	},
 	methods: {
 		...mapActions({
 			getJenjangSekolah: 'setting/getJenjangSekolah',
-			getWilayah: 'setting/getWilayah',
+			getWilayah2023: 'setting/getWilayah2023',
 		}),
 		wadahInput(){
 			let inputFormThree = {

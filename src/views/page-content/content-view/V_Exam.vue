@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="subheading grey--text">Data Ujian </h1>
+    <h1 class="subheading grey--text text-decoration-underline">Data Ujian </h1>
     <v-card class="pa-1 rounded" variant="outlined" elevation="4">
       <v-container fluid v-if="jadwal?.length">
         <v-row>
@@ -8,12 +8,12 @@
             v-for="hasil in jadwal"
             :key="hasil.mapel"
             cols="12"
-            lg="3"
+            lg="4"
           >
             <v-card color="white" style="border: 2px solid #000;">
               <v-sheet color="green" class="sheetData" elevation="2">
                 <v-icon icon="mdi mdi-book-education" size="large" />
-                <v-card-subtitle class="text-black" style="font-weight: bold; font-size: 15px; margin-left: 5px;">Mata Pelajaran</v-card-subtitle>
+                <v-card-title class="text-white" style="font-weight: bold; font-size: 15px; margin-left: 5px;">Mata Pelajaran</v-card-title>
               </v-sheet>
               <div class="d-flex flex-column justify-center" style="height: 100px; padding: 5px;">
                 <p style="font-size: 18px; font-weight: bold; text-align: center;">{{ hasil.mapel }}</p>
@@ -25,9 +25,8 @@
                 <v-row no-gutters>
                   <v-col cols="12" class="pa-0 pr-2 text-end">
                     <Button
-                      icon-button="mdi mdi-arrow-right-thick"
+                      icon-append-button="mdi mdi-arrow-right-thick"
                       nama-button="View"
-                      letak-icon-button="end"
                       :disabled-button="convertDateTime2(hasil.endDate) < convertDateTime2(now)"
                       @proses="gotoExam(hasil.idJadwalExam, hasil.kondisi)"
                     />

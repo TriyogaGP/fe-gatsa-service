@@ -1,172 +1,176 @@
 <template>
   <div>
-		<h1 class="subheading grey--text">Panel RFID Card</h1>
-		<v-row no-gutters class="pa-2">
-			<v-col cols="12" md="6" />
-			<v-col cols="12" md="6">
-				<v-row no-gutters>
-					<v-col cols="12" md="9">
-						<TextField
-							v-model="searchData"
-							icon-prepend-tf="mdi mdi-magnify"
-							label-tf="Pencarian..."
-							:clearable-tf="true"
-							@click:clear="() => {
-								page = 1
-								getDataRFID({page: 1, limit: limit, keyword: ''})
-							}"
-							@keyup.enter="() => {
-								page = 1
-								getDataRFID({page: 1, limit: limit, keyword: searchData})
-							}"
+		<h1 class="subheading grey--text text-decoration-underline">Panel RFID Card</h1>
+		<v-data-table
+			loading-text="Sedang memuat... Harap tunggu"
+			no-data-text="Tidak ada data yang tersedia"
+			no-results-text="Tidak ada catatan yang cocok ditemukan"
+			:headers="headers"
+			:loading="loadingtable"
+			:items="DataRFIDCard"
+			expand-on-click
+			item-value="rfid"
+			density="comfortable"
+			hide-default-footer
+			hide-default-header
+			class="elavation-3 rounded"
+			:items-per-page="itemsPerPage"
+			@page-count="pageCount = $event"
+			@click:row="clickrow"
+			v-model:expanded="expanded"
+		>
+			<!-- header -->
+			<template #headers="{ columns }">
+				<tr>
+					<td v-for="header in columns" :key="header.title" class="tableHeader">{{ header.title.toUpperCase() }}</td>
+				</tr>
+			</template>
+			<template #loader>
+				<LoaderDataTables />
+			</template>
+			<template #[`item.number`]="{ item }">
+				{{ page > 1 ? ((page - 1)*limit) + item.index + 1 : item.index + 1 }}
+			</template>
+			<template #[`item.nama`]="{ item }">
+				<span v-html="`${uppercaseLetterFirst2(item.raw.nama)} ${item.raw.idUser !== '-' ? item.raw.consumerType === 3 ? '(Guru)' : '(Siswa - Siswi)' : ''}`" />
+			</template>
+			<template #[`item.status`]="{ item }">
+				<v-icon size="small" v-if="item.raw.status == true" color="green" icon="mdi mdi-check" />
+				<v-icon size="small" v-else-if="item.raw.status == false" color="red" icon="mdi mdi-close" />
+			</template>
+			<template #[`item.use`]="{ item }">
+				<v-icon size="small" v-if="item.raw.use == true" color="green" icon="mdi mdi-check" />
+				<v-icon size="small" v-else-if="item.raw.use == false" color="red" icon="mdi mdi-close" />
+			</template>
+			<template #expanded-row="{ columns, item }">
+				<tr>
+					<td :colspan="columns.length">
+						<Button 
+							color-button="#0bd369"
+							icon-prepend-button="mdi mdi-pencil"
+							nama-button="Ubah"
+							@proses="bukaDialog(item.raw)"
 						/>
-					</v-col>
-					<v-col cols="12" md="3" class="pl-2 d-flex justify-end align-center">
-						<Autocomplete
-							v-model="page"
-							:data-a="pageOptions"
-							label-a="Page"
-							:disabled-a="DataRFIDCard.length ? false : true"
+						<Button 
+							color-button="#0bd369"
+							:icon-prepend-button="item.raw.status === false ? 'mdi mdi-eye' : 'mdi mdi-eye-off'"
+							:nama-button="item.raw.status === false ? 'Active' : 'Non Active'"
+							@proses="postRecord(item.raw, 'STATUSRECORD', !item.raw.status)"
 						/>
-					</v-col>
-				</v-row>
-			</v-col>
-    </v-row>
-    <div class="px-1">
-			<v-data-table
-				loading-text="Sedang memuat... Harap tunggu"
-				no-data-text="Tidak ada data yang tersedia"
-				no-results-text="Tidak ada catatan yang cocok ditemukan"
-				:headers="headers"
-				:loading="loadingtable"
-				:items="DataRFIDCard"
-				expand-on-click
-				v-model:expanded="expanded"
-				item-value="rfid"
-				density="comfortable"
-				hide-default-footer
-				hide-default-header
-				class="elavation-3 rounded"
-				:items-per-page="itemsPerPage"
-				@page-count="pageCount = $event"
-				@click:row="clickrow"
-			>
-				<!-- header -->
-				<template #headers="{ columns }">
-					<tr>
-						<td v-for="header in columns" :key="header.title" class="tableHeader">{{ header.title.toUpperCase() }}</td>
-					</tr>
-				</template>
-				<template #[`item.number`]="{ item }">
-					{{ page > 1 ? ((page - 1)*limit) + item.index + 1 : item.index + 1 }}
-				</template>
-				<template #[`item.nama`]="{ item }">
-					<span v-html="`${uppercaseLetterFirst2(item.raw.nama)} ${item.raw.idUser !== '-' ? item.raw.consumerType === 3 ? '(Guru)' : '(Siswa - Siswi)' : ''}`" /><br>
-				</template>
-				<template #[`item.status`]="{ item }">
-					<v-icon size="small" v-if="item.raw.status == true" color="green" icon="mdi mdi-check" />
-					<v-icon size="small" v-else-if="item.raw.status == false" color="red" icon="mdi mdi-close" />
-				</template>
-				<template #[`item.use`]="{ item }">
-					<v-icon size="small" v-if="item.raw.use == true" color="green" icon="mdi mdi-check" />
-					<v-icon size="small" v-else-if="item.raw.use == false" color="red" icon="mdi mdi-close" />
-				</template>
-				<template #expanded-row="{ columns, item }">
-					<tr>
-						<td :colspan="columns.length">
-							<Button 
-								color-button="#0bd369"
-								icon-button="mdi mdi-pencil"
-								nama-button="Ubah"
-								@proses="bukaDialog(item.raw)"
-							/>
-							<Button 
-								color-button="#0bd369"
-								:icon-button="item.raw.status === false ? 'mdi mdi-eye' : 'mdi mdi-eye-off'"
-								:nama-button="item.raw.status === false ? 'Active' : 'Non Active'"
-								@proses="postRecord(item.raw, 'STATUSRECORD', !item.raw.status)"
-							/>
-							<Button 
-								color-button="#0bd369"
-								:icon-button="item.raw.use === false ? 'mdi mdi-check' : 'mdi mdi-close'"
-								:nama-button="item.raw.use === false ? 'Use' : 'Not Use'"
-								:disabled-button="item.raw.idUser !== '-' ? false : true"
-								@proses="postRecord(item.raw, 'USERECORD', !item.raw.use)"
-							/>
-							<Button 
-								color-button="#bd3a07"
-								icon-button="mdi mdi-delete"
-								nama-button="Hapus"
-								@proses="postRecord(item.raw, 'DELETE', null)"
-							/>
-						</td>
-					</tr>
-					<tr v-if="inputForm">
-						<td :colspan="columns.length">
-							<v-row no-gutters>
-								<v-col
-									cols="12"
-									md="4"
-									class="pa-1 d-flex align-center font-weight-bold"
-								>
-									<Autocomplete
-										v-model="inputRFID.idUser"
-										pilihan-a="autocompleteslot"
-										:data-a="pilihanUser"
-										item-title="text"
-										item-value="value"
-										label-a="ID User"
-										:clearable-a="true"
-									/>
-									<Button 
-										color-button="light-blue darken-3"
-										nama-button="User Register"
-										@proses="postRecord(null, 'EDIT', 0)"
-									/>
-								</v-col>
-							</v-row>
-						</td>
-					</tr>
-				</template>
-				<template #bottom>
-					<v-divider :thickness="2" class="border-opacity-100" color="white" />
-					<v-row no-gutters>
-						<v-col cols="12" lg="10" class="pa-2 d-flex justify-start align-center">
-							<span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
-						</v-col>
-						<v-col cols="12" lg="2" class="pa-2 text-right">
-							<div class="d-flex justify-start align-center">
+						<Button 
+							color-button="#0bd369"
+							:icon-prepend-button="item.raw.use === false ? 'mdi mdi-check' : 'mdi mdi-close'"
+							:nama-button="item.raw.use === false ? 'Use' : 'Not Use'"
+							:disabled-button="item.raw.idUser !== '-' ? false : true"
+							@proses="postRecord(item.raw, 'USERECORD', !item.raw.use)"
+						/>
+						<Button 
+							color-button="#bd3a07"
+							icon-prepend-button="mdi mdi-delete"
+							nama-button="Hapus"
+							@proses="postRecord(item.raw, 'DELETE', null)"
+						/>
+					</td>
+				</tr>
+				<tr v-if="inputForm">
+					<td :colspan="columns.length">
+						<v-row no-gutters>
+							<v-col
+								cols="12"
+								md="4"
+								class="pa-1 d-flex align-center font-weight-bold"
+							>
 								<Autocomplete
-									v-model="limit"
-									pilihan-a="select"
-									:data-a="limitPage"
-									label-a="Limit"
+									v-model="inputRFID.idUser"
+									pilihan-a="autocompleteslot"
+									:data-a="pilihanUser"
+									item-title="text"
+									item-value="value"
+									label-a="ID User"
+									:clearable-a="true"
+								/>
+								<Button 
+									color-button="light-blue darken-3"
+									nama-button="User Register"
+									@proses="postRecord(null, 'EDIT', 0)"
+								/>
+							</v-col>
+						</v-row>
+					</td>
+				</tr>
+			</template>
+			<template #top>
+				<v-row no-gutters class="pa-2">
+					<v-col cols="12" md="6" />
+					<v-col cols="12" md="6">
+						<v-row no-gutters>
+							<v-col cols="12" md="9">
+								<TextField
+									v-model="searchData"
+									icon-prepend-tf="mdi mdi-magnify"
+									label-tf="Pencarian..."
+									:clearable-tf="true"
+									@click:clear="() => {
+										page = 1
+										getDataRFID({page: 1, limit: limit, keyword: ''})
+									}"
+									@keyup.enter="() => {
+										page = 1
+										getDataRFID({page: 1, limit: limit, keyword: searchData})
+									}"
+								/>
+							</v-col>
+							<v-col cols="12" md="3" class="pl-2 d-flex justify-end align-center">
+								<Autocomplete
+									v-model="page"
+									:data-a="pageOptions"
+									label-a="Page"
 									:disabled-a="DataRFIDCard.length ? false : true"
 								/>
-								<Button
-									variant="plain"
-									size-button="large"
-									model-button="comfortable"
-									color-button="#ffffff"
-									icon-button="mdi mdi-arrow-left-circle-outline"
-									:disabled-button="DataRFIDCard.length ? pageSummary.page != 1 ? false : true : true"
-									@proses="() => { page = pageSummary.page - 1 }"
-								/>
-								<Button
-									variant="plain"
-									size-button="large"
-									model-button="comfortable"
-									color-button="#ffffff"
-									icon-button="mdi mdi-arrow-right-circle-outline"
-									:disabled-button="DataRFIDCard.length ? pageSummary.page != pageSummary.totalPages ? false : true : true"
-									@proses="() => { page = pageSummary.page + 1 }"
-								/>
-							</div>
-						</v-col>
-					</v-row>
-				</template>
-			</v-data-table>
-		</div>
+							</v-col>
+						</v-row>
+					</v-col>
+				</v-row>
+				<v-divider :thickness="2" class="border-opacity-100" color="white" />
+			</template>
+			<template #bottom>
+				<v-divider :thickness="2" class="border-opacity-100" color="white" />
+				<v-row no-gutters>
+					<v-col cols="12" lg="10" class="pa-2 d-flex justify-start align-center">
+						<span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
+					</v-col>
+					<v-col cols="12" lg="2" class="pa-2 text-right">
+						<div class="d-flex justify-start align-center">
+							<Autocomplete
+								v-model="limit"
+								pilihan-a="select"
+								:data-a="limitPage"
+								label-a="Limit"
+								:disabled-a="DataRFIDCard.length ? false : true"
+							/>
+							<Button
+								variant="plain"
+								size-button="large"
+								model-button="comfortable"
+								color-button="#ffffff"
+								icon-button="mdi mdi-arrow-left-circle-outline"
+								:disabled-button="DataRFIDCard.length ? pageSummary.page != 1 ? false : true : true"
+								@proses="() => { page = pageSummary.page - 1 }"
+							/>
+							<Button
+								variant="plain"
+								size-button="large"
+								model-button="comfortable"
+								color-button="#ffffff"
+								icon-button="mdi mdi-arrow-right-circle-outline"
+								:disabled-button="DataRFIDCard.length ? pageSummary.page != pageSummary.totalPages ? false : true : true"
+								@proses="() => { page = pageSummary.page + 1 }"
+							/>
+						</div>
+					</v-col>
+				</v-row>
+			</template>
+		</v-data-table>
 		<v-dialog
       v-model="dialogNotifikasi"
       transition="dialog-bottom-transition"
@@ -193,7 +197,7 @@ export default {
   data: () => ({
 		expanded: [],
 		DataRFIDCard: [],
-		searchData: "",
+		searchData: '',
     page: 1,
     pageCount: 0,
     itemsPerPage: 100,
@@ -282,7 +286,9 @@ export default {
 		page: {
 			deep: true,
 			handler(value) {
-				this.getDataRFID({page: value, limit: this.limit, keyword: this.searchData})
+				if(value){
+					this.getDataRFID({page: value, limit: this.limit, keyword: this.searchData})
+				}
 			}
 		},
 		limit: {

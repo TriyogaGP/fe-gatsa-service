@@ -5,15 +5,15 @@
 			<div class="format">{{ wordString.day }}</div>
 		</div> -->
 		<div class="hour">
-			<span class="number">{{ hours }}</span>
+			<span :class="hours === 0 && minutes <= 5 ? `numberS` : `number`">{{ hours }}</span>
 			<div class="format">{{ wordString.hours }}</div>
 		</div>
 		<div class="min">
-			<span class="number">{{ minutes }}</span>
+			<span :class="hours === 0 && minutes <= 5 ? `numberS` : `number`">{{ minutes }}</span>
 			<div class="format">{{ wordString.minutes }}</div>
 		</div>
 		<div class="sec">
-			<span class="number">{{ seconds }}</span>
+			<span :class="hours === 0 && minutes <= 5 ? `numberS` : `number`">{{ seconds }}</span>
 			<div class="format">{{ wordString.seconds }}</div>
 		</div>
 	</div>
@@ -103,7 +103,7 @@ export default {
 				this.statusText = this.wordString.status.expired;
 				this.$emit("selesaiwaktu", true);
 				this.kondisiTimer = true
-				return clearInterval(this.interval);
+				return clearInterval(this.interval);				
 			}else if(this.minutes > 0 && this.seconds > 0) {
 				this.message = this.wordString.running;
 				this.statusType = "Masih Berlangsung";

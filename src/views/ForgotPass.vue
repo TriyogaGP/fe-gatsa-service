@@ -1,17 +1,13 @@
 <template>
   <div>
-    <v-app-bar
-      color="light-black darken-3"
-      style="position: fixed;"
-      density="comfortable"
-    >
-      <template v-slot:prepend>
-        <v-img class="gambarLogo" :src="logoSekolah" />
-        <span class="textNamaSekolah">{{ namaSekolah }}</span>
-      </template>
-      <v-divider vertical :thickness="2" />
-      <v-spacer></v-spacer>
-    </v-app-bar>
+    <div class="nav-header">
+			<div class="nav-logo">
+				<v-img class="gambarLogo" :src="logoSekolah" />
+				<span class="textNamaSekolah">{{ namaSekolah }}</span>
+			</div>
+			<v-divider vertical :thickness="2" color="white" />
+			<v-spacer></v-spacer>
+    </div>
     <v-row no-gutters>
       <v-col cols="12" class="d-flex flex-column justify-space-between align-center">
         <v-card class="elevation-12 tampilView" color="white">
@@ -30,7 +26,7 @@
             </v-col>
             <v-col cols="12" class="py-0 px-0 mb-3">
               <v-row no-gutters>
-                <v-col cols="6" class="d-flex flex-row justify-center align-center">
+                <v-col cols="12" sm="6" class="d-flex flex-row justify-center align-center">
                   <div class="np-captcha-container">
                     <div class="np-captcha" v-if="captchaArray && captchaArray.length">
                       <div
@@ -53,7 +49,7 @@
                     @proses="createCaptcha()"
                   />
                 </v-col>
-                <v-col cols="6" class="d-flex justify-space-between align-center">
+                <v-col cols="12" sm="6" class="d-flex justify-space-between align-center">
                   <TextField
                     v-model="captcha"
                     icon-prepend-tf="mdi mdi-unicode"
@@ -100,13 +96,9 @@
 import { mapActions, mapGetters } from "vuex";
 import { useMeta } from 'vue-meta'
 import PopUpNotifikasi from "./Layout/PopUpNotifikasi.vue";
-import Footer from '../components/Footer.vue';
 export default {
   name: 'ForgotPass',
-  components: {
-    PopUpNotifikasi,
-    Footer
-  },
+  components: { PopUpNotifikasi },
   data: () => ({
     API_URL: process.env.VUE_APP_BASE_URL_VIEW,
     email: '',
@@ -218,6 +210,10 @@ export default {
   font-size: 9pt !important;
   font-weight: bold !important;
 }
+.v-label.v-field-label {
+  font-size: 9pt !important;
+  font-weight: bold !important;
+}
 /* .v-toolbar__content > .v-toolbar-title {
 	margin-inline-start: 16px;
 	max-width: 250px !important;
@@ -252,6 +248,22 @@ export default {
 </style>
 
 <style scoped>
+.nav-header {
+	position: fixed;
+	padding: 0px 10px;
+	width: 100%;
+	height: 60px;
+	background: #272727;
+	z-index: 1;
+	border-bottom: 3px solid #4CAF50;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+.nav-logo{
+	width: 450px;
+	max-width: fit-content;
+}
 .v-btn {
   border-radius: 8px !important;
 }
@@ -276,7 +288,7 @@ export default {
   position: absolute;
   border-bottom: 2px solid black;
   width: 100px;
-  left: -130px;
+  left: -120px;
   top: 50%;
 }
 .pembungkus h4:after{
@@ -284,18 +296,20 @@ export default {
   position: absolute;
   border-bottom: 2px solid black;
   width: 100px;
-  right: -130px;	
+  right: -120px;	
   top: 50%;
 }
 .tampilView {
   margin-top: 110px;
-  width: 700px;
-  padding: 20px !important;
+  width: 90%;
+  max-width: 700px;
+  padding: 20px;
 }
 @media screen and (min-width: 1920px) {
   .tampilView {
     margin-top: 240px;
-    width: 800px;
+    max-width: 800px;
+    width: 90%;
   }
 }
 </style>

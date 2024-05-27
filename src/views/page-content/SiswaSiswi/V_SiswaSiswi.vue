@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="subheading grey--text">Data Siswa Siswi</h1>
+    <h1 class="subheading grey--text text-decoration-underline">Data Siswa Siswi</h1>
     <v-card class="pa-1 rounded" variant="outlined" elevation="4">
       <v-alert
         color="surface"
@@ -10,336 +10,368 @@
         density="compact"
         icon="mdi mdi-information"
         title="Informasi"
+        class="mb-2"
       >
         <template v-slot:text>
           <ul style="font-size: 12px;">
             <li>- Tombol Delete ada 2 (Delete Soft & Delete Hard).</li>
-            <li>- Tombol Delete Soft tidak menghapus data dari database hanya di jadikan nonaktif dengan ditandai dengan flag merah.</li>
+            <li>- Tombol Delete Soft tidak menghapus data dari database hanya di jadikan nonaktif dan ditandai dengan flag merah.</li>
             <li>- Tombol Delete Hard menghapus data dari database secara permanen.</li>
-            <li>- Mengurutkan data berdasarkan NOMOR INDUK, NAMA, KELAS.</li>
+            <li>- Mengurutkan data berdasarkan NOMOR INDUK, NAMA, KELAS, STATUS.</li>
           </ul>
         </template>
       </v-alert>
-      <v-row no-gutters class="pa-2">
-        <v-col cols="12" md="6">
-          <Button 
-            v-if="roleID === '1' || roleID === '2' || (roleID === '3' && kondisiKepalaSekolah)"
-            color-button="light-blue darken-3"
-            icon-button="mdi mdi-plus-thick"
-            nama-button="Tambah"
-            @proses="getUID"
-          />
-          <Button 
-            v-if="roleID === '1' || roleID === '2'"
-            color-button="#0bd369"
-            icon-button="mdi mdi-import"
-            nama-button="Import Data"
-            @proses="() => { dialogImport = true }"
-          />
-          <v-menu
-            open-on-click
-            rounded="t-xs b-lg"
-            offset-y
-            transition="slide-y-transition"
-            bottom
-          >
-            <template v-slot:activator="{ props }">
-              <Button 
-                v-bind="props"
+      <v-data-table
+        v-model="selectRecord"
+        loading-text="Sedang memuat... Harap tunggu"
+        no-data-text="Tidak ada data yang tersedia"
+        no-results-text="Tidak ada catatan yang cocok ditemukan"
+        :headers="headers"
+        :loading="loadingtable"
+        :items="DataSiswaSiswi"
+        expand-on-click
+        item-value="idUser"
+        :sort-by="sortBy"
+        density="comfortable"
+        hide-default-footer
+        hide-default-header
+        multi-sort
+        class="elavation-3 rounded"
+        sort-asc-icon="mdi mdi-sort-alphabetical-ascending"
+        sort-desc-icon="mdi mdi-sort-alphabetical-descending"
+        :items-per-page="itemsPerPage"
+        @page-count="pageCount = $event"
+        @click:row="clickrow"
+        @update:modelValue="(event) => { selectRecord = event; }"
+        v-model:expanded="expanded"
+        @update:sort-by="updateSort($event)"
+      >
+        <!-- header -->
+        <template #headers="{ columns, isSorted, getSortIcon, toggleSort }">
+          <tr>
+            <td v-for="header in columns" :key="header.title" class="tableHeader">
+              <span v-if="header.sortable" class="mr-2" style="cursor: pointer; width: 100%;" @click="() => toggleSort(header)">{{ header.title.toUpperCase() }}</span>
+              <span v-else>{{ header.title.toUpperCase() }}</span>
+              <v-icon v-if="isSorted(header)" :icon="getSortIcon(header)"></v-icon>
+            </td>
+          </tr>
+        </template>
+        <template #loader>
+          <LoaderDataTables />
+        </template>
+        <template #[`item.number`]="{ item }">
+          {{ page > 1 ? ((page - 1)*limit) + item.index + 1 : item.index + 1 }}
+        </template>
+        <template #[`item.nama`]="{ item }">
+          <span v-html="uppercaseLetterFirst2(item.raw.nama)" /> 
+        </template>
+        <template #[`item.statusAktif`]="{ item }">
+          <v-icon size="small" v-if="item.raw.statusAktif == true" color="green" icon="mdi mdi-check" />
+          <v-icon size="small" v-else-if="item.raw.statusAktif == false" color="red" icon="mdi mdi-close" />
+        </template>
+        <template #[`item.validasi`]="{ item }">
+          <v-icon size="small" v-if="item.raw.validasiAkun == true" color="green" icon="mdi mdi-check" />
+          <v-icon size="small" v-else-if="item.raw.validasiAkun == false" color="red" icon="mdi mdi-close" />
+        </template>
+        <template #[`item.mutasi`]="{ item }">
+          <v-icon size="small" v-if="item.raw.mutasiAkun == true" color="green" icon="mdi mdi-check" />
+          <v-icon size="small" v-else-if="item.raw.mutasiAkun == false" color="red" icon="mdi mdi-close" />
+        </template>
+        <template #[`item.flag`]="{ item }">
+          <div class="flag" :style="item.raw.flag ? 'background-color: red;' : 'background-color: green;'" />
+        </template>
+        <template #expanded-row="{ columns, item }">
+          <tr>
+            <td :colspan="columns.length">
+              <Button
+                v-if="roleID === '1' || roleID === '2' || (roleID === '3' && kondisiJabatanTertentu)"
                 color-button="#0bd369"
-                icon-button="mdi mdi-export"
-                nama-button="Export Data"
+                icon-prepend-button="mdi mdi-pencil"
+                nama-button="Ubah"
+                :disabled-button="item.raw.mutasiAkun == true || item.raw.statusAktif == false"
+                @proses="ubahData(item.raw.idUser)"
               />
-            </template>
+              <Button
+                v-if="roleID === '1' || roleID === '2' || (roleID === '3' && kondisiJabatanTertentu)"
+                color-button="#0bd369"
+                :icon-prepend-button="item.raw.statusAktif === false ? 'mdi mdi-eye' : 'mdi mdi-eye-off'"
+                :nama-button="item.raw.statusAktif === false ? 'Active' : 'Non Active'"
+                :disabled-button="item.raw.mutasiAkun == true"
+                @proses="postRecord(item.raw, 'STATUSRECORD', !item.raw.statusAktif)"
+              />
+              <v-menu
+                open-on-click
+                rounded="t-xs b-lg"
+                offset-y
+                transition="slide-y-transition"
+                bottom
+              >
+                <template v-slot:activator="{ props }">
+                  <Button 
+                    v-if="roleID === '1' || roleID === '2' || (roleID === '3' && kondisiJabatanTertentu)"
+                    v-bind="props"
+                    color-button="#bd3a07"
+                    icon-prepend-button="mdi mdi-delete"
+                    icon-append-button="mdi mdi-menu-down"
+                    nama-button="Hapus"
+                  />
+                </template>
 
-            <v-list
-              :lines="false"
-              density="comfortable"
-              nav
-              dense
-              class="listData"
-            >
-              <v-list-item
-                @click="exportExcel('full')"
-                color="nav-back"
-							  class="SelectedMenu"
-              >
-                <template v-slot:append>
-                  <v-icon size="middle" icon="mdi mdi-export" color="icon-white" />
-                </template>
-                <v-list-item-title>
-						      <span class="menufont">Export Data Full</span>
-                </v-list-item-title>
-              </v-list-item>
-              <v-list-item
-                @click="exportExcel('emis')"
-                color="nav-back"
-							  class="SelectedMenu"
-              >
-                <template v-slot:append>
-                  <v-icon size="middle" icon="mdi mdi-export" color="icon-white" />
-                </template>
-                <v-list-item-title>
-                  <span class="menufont">Export Data Emis</span>
-                </v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
-        </v-col>
-        <v-col cols="12" md="6">
-          <v-row no-gutters>
-            <v-col cols="12" md="9" class="pr-2">
-              <TextField
-                v-model="searchData"
-                icon-prepend-tf="mdi mdi-magnify"
-                label-tf="Pencarian..."
-                :clearable-tf="true"
-                @click:clear="() => {
-                  page = 1
-                  getSiswaSiswi(roleID === '1' || roleID === '2' ? {page: 1, limit: limit, keyword: ''} : {page: 1, limit: limit, keyword: '', kelas: mengajarKelas})
-                }"
-                @keyup.enter="() => {
-                  page = 1
-                  getSiswaSiswi(roleID === '1' || roleID === '2' ? {page: 1, limit: limit, keyword: searchData} : {page: 1, limit: limit, keyword: searchData, kelas: mengajarKelas})
-                }"
+                <v-list
+                  :lines="false"
+                  density="comfortable"
+                  nav
+                  dense
+                  class="listData"
+                >
+                  <v-list-item
+                    @click="postRecord(item.raw, 'DELETESOFT', null)"
+                    class="SelectedMenu"
+                    active-class="SelectedMenu-active"
+                    title="Delete Soft"
+                    :disabled="item.raw.mutasiAkun == true || item.raw.statusAktif === false"
+                  >
+                    <template v-slot:prepend>
+                      <v-icon size="middle" icon="mdi mdi-delete" color="icon-white" />
+                    </template>
+                    <template v-slot:title>
+                      <span class="menufont">Delete Soft</span>
+                    </template>
+                  </v-list-item>
+                  <v-list-item
+                    @click="postRecord(item.raw, 'DELETEHARD', null)"
+                    class="SelectedMenu"
+                    active-class="SelectedMenu-active"
+                    title="Delete Hard"
+                  >
+                    <template v-slot:prepend>
+                      <v-icon size="middle" icon="mdi mdi-delete" color="icon-white" />
+                    </template>
+                    <template v-slot:title>
+                      <span class="menufont">Delete Hard</span>
+                    </template>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+              <Button
+                v-if="roleID === '1' || roleID === '2' || (roleID === '3' && kondisiJabatanTertentu)"
+                color-button="#0bd369"
+                :icon-prepend-button="item.raw.validasiAkun === false ? 'mdi mdi-check' : 'mdi mdi-close'"
+                :nama-button="item.raw.validasiAkun === false ? 'Validate' : 'Non Validate'"
+                :disabled-button="item.raw.mutasiAkun == true || item.raw.statusAktif == false"
+                @proses="postRecord(item.raw, 'VALIDASIAKUN', !item.raw.validasiAkun)"
               />
+              <Button
+                v-if="roleID === '1' || roleID === '2' || (roleID === '3' && kondisiJabatanTertentu)"
+                color-button="#0bd369"
+                icon-prepend-button="mdi mdi-account-cancel-outline"
+                nama-button="Mutasi Akun"
+                @proses="postRecord(item.raw, 'MUTASIAKUN', !item.raw.mutasiAkun)"
+              />
+              <Button 
+                color-button="#04f7f7"
+                icon-prepend-button="mdi mdi-information"
+                nama-button="Detail"
+                @proses="openDialog(item.raw)"
+              />
+              <Button
+                v-if="roleID === '1' || roleID === '2'"
+                color-button="#0bd369"
+                icon-prepend-button="mdi mdi-upload"
+                nama-button="Upload Berkas"
+                :disabled-button="item.raw.statusAktif == false"
+                @proses="() => { dialogUploadBerkas = true; previewData.idUser = item.raw.idUser; }"
+              />
+              <Button
+                :loading="isLoadingPDFCreate"
+                color-button="#04f7f7"
+                icon-prepend-button="mdi mdi-file-pdf-box"
+                nama-button="PDF"
+                @proses="pdfCreate(item.raw.idUser, null, 'create')"
+              />
+            </td>
+          </tr>
+        </template>
+        <template #top>
+          <v-row no-gutters class="pa-2">
+            <v-col cols="12" md="6">
+              <Button 
+                v-if="roleID === '1' || roleID === '2' || (roleID === '3' && kondisiJabatanTertentu)"
+                color-button="light-blue darken-3"
+                icon-prepend-button="mdi mdi-plus-thick"
+                nama-button="Tambah"
+                @proses="getUID"
+              />
+              <Button 
+                v-if="roleID === '1' || roleID === '2'"
+                color-button="#0bd369"
+                icon-prepend-button="mdi mdi-import"
+                nama-button="Import Data"
+                @proses="() => { dialogImport = true }"
+              />
+              <v-menu
+                open-on-click
+                rounded="t-xs b-lg"
+                offset-y
+                transition="slide-y-transition"
+                bottom
+              >
+                <template v-slot:activator="{ props }">
+                  <Button 
+                    v-bind="props"
+                    color-button="#0bd369"
+                    icon-prepend-button="mdi mdi-export"
+                    icon-append-button="mdi mdi-menu-down"
+                    nama-button="Export Data"
+                  />
+                </template>
+
+                <v-list
+                  :lines="false"
+                  density="comfortable"
+                  nav
+                  dense
+                  class="listData"
+                >
+                  <v-list-item
+                    @click="exportExcel('full')"
+                    color="nav-back"
+                    class="SelectedMenu"
+                    title="Export Data Full"
+                  >
+                    <template v-slot:append>
+                      <v-icon size="middle" icon="mdi mdi-export" color="icon-white" />
+                    </template>
+                    <template v-slot:title>
+                      <span class="menufont">Export Data Full</span>
+                    </template>
+                  </v-list-item>
+                  <v-list-item
+                    @click="exportExcel('emis')"
+                    color="nav-back"
+                    class="SelectedMenu"
+                    title="Export Data Emis"
+                  >
+                    <template v-slot:append>
+                      <v-icon size="middle" icon="mdi mdi-export" color="icon-white" />
+                    </template>
+                    <template v-slot:title>
+                      <span class="menufont">Export Data Emis</span>
+                    </template>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
             </v-col>
-            <!-- <v-col cols="12" md="3" class="pr-2 d-flex justify-end align-center">
-              <Autocomplete
-                v-model="filter"
-                :data-a="filterOptions"
-                item-title="text"
-                item-value="value"
-                label-a="Filter"
+            <v-col cols="12" md="6">
+              <v-row no-gutters>
+                <v-col cols="12" md="9" class="pr-2 d-flex justify-end align-center">
+                  <TextField
+                    v-model="searchData"
+                    icon-prepend-tf="mdi mdi-magnify"
+                    label-tf="Pencarian..."
+                    :clearable-tf="true"
+                    @click:clear="() => {
+                      page = 1
+                      getSiswaSiswi(roleID === '1' || roleID === '2' ? {page: 1, limit: limit, keyword: ''} : {page: 1, limit: limit, keyword: '', kelas: mengajarKelas})
+                    }"
+                    @keyup.enter="() => {
+                      page = 1
+                      getSiswaSiswi(roleID === '1' || roleID === '2' ? {page: 1, limit: limit, keyword: searchData} : {page: 1, limit: limit, keyword: searchData, kelas: mengajarKelas})
+                    }"
+                  />
+                </v-col>
+                <v-col cols="12" md="3" class="d-flex justify-end align-center">
+                  <Autocomplete
+                    v-model="page"
+                    :data-a="pageOptions"
+                    label-a="Page"
+                    :disabled-a="DataSiswaSiswi.length ? false : true"
+                  />
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
+          <v-divider :thickness="2" class="border-opacity-100" color="white" />
+        </template>
+        <template #bottom>
+          <v-divider v-if="kondisiJabatan" :thickness="2" class="border-opacity-100" color="white" />
+          <v-row no-gutters v-if="kondisiJabatan">
+            <v-col cols="12" class="pa-2 d-flex justify-start align-center">
+              <Button
+                v-if="DataSiswaSiswi.length && selectRecord.length < DataSiswaSiswi.length"
+                color-button="#0bd369"
+                icon-prepend-button="mdi mdi-select-all"
+                :nama-button="`Choose All (${selectRecord.length})`"
+                @proses="allData(DataSiswaSiswi)"
               />
-            </v-col> -->
-            <v-col cols="12" md="3" class="d-flex justify-end align-center">
-              <Autocomplete
-                v-model="page"
-                :data-a="pageOptions"
-                label-a="Page"
-                :disabled-a="DataSiswaSiswi.length ? false : true"
+              <Button
+                v-if="selectRecord.length"
+                color-button="#0bd369"
+                icon-prepend-button="mdi mdi-select-remove"
+                :nama-button="`Remove Select`"
+                @proses="() => { selectRecord = [] }"
+              />
+              <Button 
+                color-button="#bd3a07"
+                icon-prepend-button="mdi mdi-delete"
+                nama-button="Hapus Record Selected"
+                :disabled-button="!DataSiswaSiswi.length"
+                @proses="hapusAllRecord()"
               />
             </v-col>
           </v-row>
-        </v-col>
-      </v-row>
-      <div class="px-1">
-        <v-data-table
-          loading-text="Sedang memuat... Harap tunggu"
-          no-data-text="Tidak ada data yang tersedia"
-          no-results-text="Tidak ada catatan yang cocok ditemukan"
-          :headers="headers"
-          :loading="loadingtable"
-          :items="DataSiswaSiswi"
-          expand-on-click
-          v-model:expanded="expanded"
-          item-value="idUser"
-          density="comfortable"
-          hide-default-footer
-          hide-default-header
-          class="elavation-3 rounded"
-          v-model:sort-by="sortBy"
-          sort-asc-icon="mdi mdi-sort-alphabetical-ascending"
-          sort-desc-icon="mdi mdi-sort-alphabetical-descending"
-          :items-per-page="itemsPerPage"
-          @page-count="pageCount = $event"
-          @click:row="clickrow"
-        >
-          <!-- header -->
-          <template #headers="{ columns, isSorted, getSortIcon, toggleSort }">
-            <tr>
-              <td v-for="header in columns" :key="header.title" class="tableHeader">
-                <span v-if="header.sortable" class="mr-2" style="cursor: pointer; width: 100%;" @click="() => toggleSort(header)">{{ header.title.toUpperCase() }}</span>
-                <span v-else>{{ header.title.toUpperCase() }}</span>
-                <v-icon v-if="isSorted(header)" :icon="getSortIcon(header)"></v-icon>
-              </td>
-            </tr>
-          </template>
-          <template #[`item.number`]="{ item }">
-            {{ page > 1 ? ((page - 1)*limit) + item.index + 1 : item.index + 1 }}
-          </template>
-          <template #[`item.nama`]="{ item }">
-            <span v-html="uppercaseLetterFirst2(item.raw.nama)" /> 
-          </template>
-          <template #[`item.statusAktif`]="{ item }">
-            <v-icon size="small" v-if="item.raw.statusAktif == true" color="green" icon="mdi mdi-check" />
-            <v-icon size="small" v-else-if="item.raw.statusAktif == false" color="red" icon="mdi mdi-close" />
-          </template>
-          <template #[`item.validasi`]="{ item }">
-            <v-icon size="small" v-if="item.raw.validasiAkun == true" color="green" icon="mdi mdi-check" />
-            <v-icon size="small" v-else-if="item.raw.validasiAkun == false" color="red" icon="mdi mdi-close" />
-          </template>
-          <template #[`item.mutasi`]="{ item }">
-            <v-icon size="small" v-if="item.raw.mutasiAkun == true" color="green" icon="mdi mdi-check" />
-            <v-icon size="small" v-else-if="item.raw.mutasiAkun == false" color="red" icon="mdi mdi-close" />
-          </template>
-          <template #[`item.flag`]="{ item }">
-            <div class="flag" :style="item.raw.flag ? 'background-color: red;' : 'background-color: green;'" />
-          </template>
-          <template #expanded-row="{ columns, item }">
-            <tr>
-              <td :colspan="columns.length">
-                <Button
-                  v-if="roleID === '1' || roleID === '2' || (roleID === '3' && kondisiKepalaSekolah)"
-                  color-button="#0bd369"
-                  icon-button="mdi mdi-pencil"
-                  nama-button="Ubah"
-                  :disabled-button="item.raw.mutasiAkun == true || item.raw.statusAktif == false"
-                  @proses="ubahData(item.raw.idUser)"
+          <v-divider :thickness="2" class="border-opacity-100" color="white" />
+          <v-row no-gutters>
+            <v-col cols="12" lg="10" class="pa-2 d-flex justify-start align-center">
+              <v-row no-gutters>
+                <v-col cols="12" lg="9" class="d-flex justify-start align-center">
+                  <span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
+                </v-col>
+                <v-col cols="12" lg="3" class="d-flex justify-end align-center">
+                  <span style="padding-right: 5px;">Filter</span>
+                  <CascadeSelect 
+                    v-model="selectedFilter"
+                    :options="filterOptions"
+                    optionLabel="name"
+                    optionGroupLabel="name"
+                    :optionGroupChildren="['kategori']"
+                    style="padding: 5px;"
+                    placeholder="Pilih Filter" />
+                </v-col>
+              </v-row>
+            </v-col>
+            <v-col cols="12" lg="2" class="pa-2 text-right">
+              <div class="d-flex justify-start align-center">
+                <Autocomplete
+                  v-model="limit"
+                  pilihan-a="select"
+                  :data-a="limitPage"
+                  label-a="Limit"
+                  :disabled-a="DataSiswaSiswi.length ? false : true"
                 />
                 <Button
-                  v-if="roleID === '1' || roleID === '2' || (roleID === '3' && kondisiKepalaSekolah)"
-                  color-button="#0bd369"
-                  :icon-button="item.raw.statusAktif === false ? 'mdi mdi-eye' : 'mdi mdi-eye-off'"
-                  :nama-button="item.raw.statusAktif === false ? 'Active' : 'Non Active'"
-                  :disabled-button="item.raw.mutasiAkun == true"
-                  @proses="postRecord(item.raw, 'STATUSRECORD', !item.raw.statusAktif)"
-                />
-                <v-menu
-                  open-on-click
-                  rounded="t-xs b-lg"
-                  offset-y
-                  transition="slide-y-transition"
-                  bottom
-                >
-                  <template v-slot:activator="{ props }">
-                    <Button 
-                      v-if="roleID === '1' || roleID === '2' || (roleID === '3' && kondisiKepalaSekolah)"
-                      v-bind="props"
-                      color-button="#bd3a07"
-                      icon-button="mdi mdi-delete"
-                      nama-button="Hapus"
-                    />
-                  </template>
-
-                  <v-list
-                    :lines="false"
-                    density="comfortable"
-                    nav
-                    dense
-                    class="listData"
-                  >
-                    <v-list-item
-                      @click="postRecord(item.raw, 'DELETESOFT', null)"
-                      class="SelectedMenu"
-                      active-class="SelectedMenu-active"
-                      :disabled="item.raw.mutasiAkun == true || item.raw.statusAktif === false"
-                    >
-                      <template v-slot:prepend>
-                        <v-icon size="middle" icon="mdi mdi-delete" color="icon-white" />
-                      </template>
-                      <v-list-item-title>
-                        <span class="menufont">Delete Soft</span>
-                      </v-list-item-title>
-                    </v-list-item>
-                    <v-list-item
-                      @click="postRecord(item.raw, 'DELETEHARD', null)"
-                      class="SelectedMenu"
-                      active-class="SelectedMenu-active"
-                    >
-                      <template v-slot:prepend>
-                        <v-icon size="middle" icon="mdi mdi-delete" color="icon-white" />
-                      </template>
-                      <v-list-item-title>
-                        <span class="menufont">Delete Hard</span>
-                      </v-list-item-title>
-                    </v-list-item>
-                  </v-list>
-                </v-menu>
-                <Button
-                  v-if="roleID === '1' || roleID === '2' || (roleID === '3' && kondisiKepalaSekolah)"
-                  color-button="#0bd369"
-                  :icon-button="item.raw.validasiAkun === false ? 'mdi mdi-check' : 'mdi mdi-close'"
-                  :nama-button="item.raw.validasiAkun === false ? 'Validate' : 'Non Validate'"
-                  :disabled-button="item.raw.mutasiAkun == true || item.raw.statusAktif == false"
-                  @proses="postRecord(item.raw, 'VALIDASIAKUN', !item.raw.validasiAkun)"
+                  variant="plain"
+                  size-button="large"
+                  model-button="comfortable"
+                  color-button="#ffffff"
+                  icon-button="mdi mdi-arrow-left-circle-outline"
+                  :disabled-button="DataSiswaSiswi.length ? pageSummary.page != 1 ? false : true : true"
+                  @proses="() => { page = pageSummary.page - 1 }"
                 />
                 <Button
-                  v-if="roleID === '1' || roleID === '2' || (roleID === '3' && kondisiKepalaSekolah)"
-                  color-button="#0bd369"
-                  icon-button="mdi mdi-account-cancel-outline"
-                  nama-button="Mutasi Akun"
-                  @proses="postRecord(item.raw, 'MUTASIAKUN', !item.raw.mutasiAkun)"
+                  variant="plain"
+                  size-button="large"
+                  model-button="comfortable"
+                  color-button="#ffffff"
+                  icon-button="mdi mdi-arrow-right-circle-outline"
+                  :disabled-button="DataSiswaSiswi.length ? pageSummary.page != pageSummary.totalPages ? false : true : true"
+                  @proses="() => { page = pageSummary.page + 1 }"
                 />
-                <Button 
-                  color-button="#04f7f7"
-                  icon-button="mdi mdi-information"
-                  nama-button="Detail"
-                  @proses="openDialog(item.raw)"
-                />
-                <Button
-                  v-if="roleID === '1' || roleID === '2'"
-                  color-button="#0bd369"
-                  icon-button="mdi mdi-upload"
-                  nama-button="Upload Berkas"
-                  :disabled-button="item.raw.statusAktif == false"
-                  @proses="() => { dialogUploadBerkas = true; previewData.idUser = item.raw.idUser; }"
-                />
-                <Button
-                  :loading="isLoadingPDFCreate"
-                  color-button="#04f7f7"
-                  icon-button="mdi mdi-file-pdf-box"
-                  nama-button="PDF"
-                  @proses="pdfCreate(item.raw.idUser, null, 'create')"
-                />
-              </td>
-            </tr>
-          </template>
-          <template #bottom>
-            <v-divider :thickness="2" class="border-opacity-100" color="white" />
-            <v-row no-gutters>
-              <v-col cols="12" lg="10" class="pa-2 d-flex justify-start align-center">
-                <v-row no-gutters>
-                  <v-col cols="12" lg="9" class="d-flex justify-start align-center">
-                    <span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
-                  </v-col>
-                  <v-col cols="12" lg="3" class="pa-2 d-flex justify-end align-center">
-                    <span style="padding-right: 5px;">Filter</span>
-                    <CascadeSelect 
-                      v-model="selectedFilter"
-                      :options="filterOptions"
-                      optionLabel="name"
-                      optionGroupLabel="name"
-                      :optionGroupChildren="['kategori']"
-                      style="padding: 5px;"
-                      placeholder="Pilih Filter" />
-                  </v-col>
-                </v-row>
-              </v-col>
-              <v-col cols="12" lg="2" class="pa-2 text-right">
-                <div class="d-flex justify-start align-center">
-                  <Autocomplete
-                    v-model="limit"
-                    pilihan-a="select"
-                    :data-a="limitPage"
-                    label-a="Limit"
-                    :disabled-a="DataSiswaSiswi.length ? false : true"
-                  />
-                  <Button
-                    variant="plain"
-                    size-button="large"
-                    model-button="comfortable"
-                    color-button="#ffffff"
-                    icon-button="mdi mdi-arrow-left-circle-outline"
-                    :disabled-button="DataSiswaSiswi.length ? pageSummary.page != 1 ? false : true : true"
-                    @proses="() => { page = pageSummary.page - 1 }"
-                  />
-                  <Button
-                    variant="plain"
-                    size-button="large"
-                    model-button="comfortable"
-                    color-button="#ffffff"
-                    icon-button="mdi mdi-arrow-right-circle-outline"
-                    :disabled-button="DataSiswaSiswi.length ? pageSummary.page != pageSummary.totalPages ? false : true : true"
-                    @proses="() => { page = pageSummary.page + 1 }"
-                  />
-                </div>
-              </v-col>
-            </v-row>
-          </template>
-        </v-data-table>
-      </div>
+              </div>
+            </v-col>
+          </v-row>
+        </template>
+      </v-data-table>
     </v-card>
     <v-dialog
       v-model="DialogSiswaSiswi"
@@ -369,965 +401,1008 @@
               <v-img :src="previewData.fotoProfil"></v-img>
             </v-avatar>
           </div>
-          <h2 class="subheading black--text"><u>>>Data Log In</u></h2>
-          <v-row no-gutters>
-            <v-col
+          <Fieldset
+            legend="Data Log In"
+            :toggleable="true"
+          >
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Consumer Type
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.namaRole }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Nama Lengkap
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.nama }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Username
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.username }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Email
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.email }}
+              </v-col>
+            </v-row>
+            <v-row v-if="roleID === '1' || roleID === '2'" no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="d-flex align-center font-weight-bold"
+              >
+                Kata Sandi
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+              >
+                {{ previewData.password }}
+                <Button
+                  variant="plain"
+                  color-button="#000000"
+                  :icon-button="endecryptType ? 'mdi mdi-eye-lock' : 'mdi mdi-eye-lock-open'"
+                  model-button="comfortable"
+                  size-button="large"
+                  @proses="endecryptData('endecryptType')"
+                />
+              </v-col>
+            </v-row>
+          </Fieldset>
+          <Fieldset
+            legend="Data Siswa Siswi"
+            :toggleable="true"
+            :collapsed="true"
+          >
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                NIK Siswa/i
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.nikSiswa }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Nomor Induk
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.nomorInduk }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Tempat, Tanggal Lahir
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.tempat }}, {{ convertDateForMonth(previewData.tanggalLahir) }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Jenis Kelamin
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.jenisKelamin }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Agama
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.agama }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Anak Ke
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.anakKe }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Jumlah Saudara
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.jumlahSaudara }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Hobi
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.hobi }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Cita - Cita
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.citaCita }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Kelas
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.kelas }}
+              </v-col>
+            </v-row>
+          </Fieldset>
+          <Fieldset
+            legend="Data Sekolah Sebelumnya"
+            :toggleable="true"
+            :collapsed="true"
+          >
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Jenjang Sekolah
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.jenjang }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Status Sekolah
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.statusSekolah }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Nama Sekolah
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.namaSekolah }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                NPSN
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.npsn }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Alamat Sekolah
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.alamatSekolah }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Kabupaten / Kota Sekolah
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.kabkotSekolah }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                No Peserta UN
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.noPesertaUN }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                No SKHUN
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.noSKHUN }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                No Ijazah
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.noIjazah }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Nilai UN
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.nilaiUN }}
+              </v-col>
+            </v-row>
+          </Fieldset>
+          <Fieldset
+            legend="Data Detail Orangtua"
+            :toggleable="true"
+            :collapsed="true"
+          >
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                No Kartu Keluarga
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.noKK }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Nama Kepala Keluarga
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.namaKK }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Telepon
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.telp }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Alamat
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.alamat }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Provinsi
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.provinsi }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Kabupaten / Kota
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.kabKota }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
               cols="12"
               md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Consumer Type
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.namaRole }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Nama Lengkap
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.nama }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Username
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.username }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Email
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.email }}
-            </v-col>
-          </v-row>
-          <v-row v-if="roleID === '1' || roleID === '2'" no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Kata Sandi
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.password }}
-              <Button
-                variant="plain"
-                color-button="#000000"
-                :icon-button="endecryptType ? 'mdi mdi-eye-lock' : 'mdi mdi-eye-lock-open'"
-                model-button="comfortable"
-                size-button="large"
-                @proses="endecryptData('endecryptType')"
-              />
-            </v-col>
-          </v-row>
-          <h2 class="subheading black--text"><u>>>Data Siswa Siswi</u></h2>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              NIK Siswa/i
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.nikSiswa }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Nomor Induk
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.nomorInduk }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Tempat, Tanggal Lahir
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.tempat }}, {{ convertDateForMonth(previewData.tanggalLahir) }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Jenis Kelamin
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.jenisKelamin }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Agama
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.agama }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Anak Ke
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.anakKe }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Jumlah Saudara
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.jumlahSaudara }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Hobi
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.hobi }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Cita - Cita
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.citaCita }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Kelas
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.kelas }}
-            </v-col>
-          </v-row>
-          <h2 class="subheading black--text"><u>>>Data Sekolah Sebelumnya</u></h2>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Jenjang Sekolah
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.jenjang }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Status Sekolah
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.statusSekolah }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Nama Sekolah
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.namaSekolah }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              NPSN
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.npsn }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Alamat Sekolah
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.alamatSekolah }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Kabupaten / Kota Sekolah
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.kabkotSekolah }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              No Peserta UN
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.noPesertaUN }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              No SKHUN
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.noSKHUN }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              No Ijazah
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.noIjazah }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Nilai UN
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.nilaiUN }}
-            </v-col>
-          </v-row>
-          <h2 class="subheading black--text"><u>>>Data Detail Orangtua</u></h2>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              No Kartu Keluarga
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.noKK }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Nama Kepala Keluarga
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.namaKK }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Telepon
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.telp }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Alamat
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.alamat }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Provinsi
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.provinsi }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Kabupaten / Kota
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.kabKota }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-            cols="12"
-            md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-            Kecamatan
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.kecamatan }}				
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Kelurahan
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.kelurahan }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Kode Pos
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.kodePos }}
-            </v-col>
-          </v-row>
-          <h2 class="subheading black--text"><u>>>Data Ayah</u></h2>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              NIK Ayah
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.nikAyah }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Nama Ayah
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.namaAyah }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Tahun Ayah
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.tahunAyah }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Status Ayah
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.statusAyah }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Pendidikan Ayah
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.pendidikanAyah }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Pekerjaan Ayah
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.pekerjaanAyah }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Telepon Ayah
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.telpAyah }}
-            </v-col>
-          </v-row>
-          <h2 class="subheading black--text"><u>>>Data Ibu</u></h2>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              NIK Ibu
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.nikIbu }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Nama Ibu
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.namaIbu }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Tahun Ibu
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.tahunIbu }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Status Ibu
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.statusIbu }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Pendidikan Ibu
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.pendidikanIbu }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Pekerjaan Ibu
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.pekerjaanIbu }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Telepon Ibu
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.telpIbu }}
-            </v-col>
-          </v-row>
-          <h2 class="subheading black--text"><u>>>Data Wali</u></h2>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              NIK Wali
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.nikWali }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Nama Wali
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.namaWali }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Tahun Wali
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.tahunWali }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Pendidikan Wali
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.pendidikanWali }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Pekerjaan Wali
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.pekerjaanWali }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Telepon Wali
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.telpWali }}
-            </v-col>
-          </v-row>
-          <h2 class="subheading black--text"><u>>>Data Lainnya</u></h2>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Penghasilan
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.penghasilan }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Status Tempat Tinggal
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.statusTempatTinggal }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Jarak Rumah
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.jarakRumah }}
-            </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="4"
-              class="pt-2 d-flex align-center font-weight-bold"
-            >
-              Transportasi
-            </v-col>
-            <v-col
-              cols="12"
-              md="8"
-              class="pt-3"
-            >
-              {{ previewData.transportasi }}
-            </v-col>
-          </v-row>
-          <h2 class="subheading black--text"><u>>>Berkas</u></h2>
-          <v-row no-gutters class="d-flex flex-row justify-center align-center">
-            <v-col
-              cols="12"
-              lg="3"
-              class="d-flex flex-column justify-center boxlist"
-              v-for="data in dataBerkas"
-              :key="data.kode"
-              @click="pdfCreate(previewData.idUser, data, 'berkas')">
-              <div>
-                <v-progress-circular v-if="isLoadingPDF[data.kode]" indeterminate />
-                <span v-else><v-icon icon="mdi mdi-file-pdf-box" /> {{ data.title }}</span>
-              </div>
-            </v-col>
-          </v-row>
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+              Kecamatan
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.kecamatan }}				
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Kelurahan / Desa
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.kelurahan }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Kode Pos
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.kodePos }}
+              </v-col>
+            </v-row>
+          </Fieldset>
+          <Fieldset
+            legend="Data Ayah"
+            :toggleable="true"
+            :collapsed="true"
+          >
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                NIK Ayah
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.nikAyah }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Nama Ayah
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.namaAyah }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Tahun Ayah
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.tahunAyah }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Status Ayah
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.statusAyah }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Pendidikan Ayah
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.pendidikanAyah }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Pekerjaan Ayah
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.pekerjaanAyah }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Telepon Ayah
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.telpAyah }}
+              </v-col>
+            </v-row>
+          </Fieldset>
+          <Fieldset
+            legend="Data Ibu"
+            :toggleable="true"
+            :collapsed="true"
+          >
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                NIK Ibu
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.nikIbu }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Nama Ibu
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.namaIbu }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Tahun Ibu
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.tahunIbu }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Status Ibu
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.statusIbu }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Pendidikan Ibu
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.pendidikanIbu }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Pekerjaan Ibu
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.pekerjaanIbu }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Telepon Ibu
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.telpIbu }}
+              </v-col>
+            </v-row>
+          </Fieldset>
+          <Fieldset
+            legend="Data Wali"
+            :toggleable="true"
+            :collapsed="true"
+          >
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                NIK Wali
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.nikWali }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Nama Wali
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.namaWali }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Tahun Wali
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.tahunWali }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Pendidikan Wali
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.pendidikanWali }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Pekerjaan Wali
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.pekerjaanWali }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Telepon Wali
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.telpWali }}
+              </v-col>
+            </v-row>
+          </Fieldset>
+          <Fieldset
+            legend="Data Lainnya"
+            :toggleable="true"
+            :collapsed="true"
+          >
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Penghasilan
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.penghasilan }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Status Tempat Tinggal
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.statusTempatTinggal }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Jarak Rumah
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.jarakRumah }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="4"
+                class="pt-2 d-flex align-center font-weight-bold"
+              >
+                Transportasi
+              </v-col>
+              <v-col
+                cols="12"
+                md="8"
+                class="pt-3"
+              >
+                {{ previewData.transportasi }}
+              </v-col>
+            </v-row>
+          </Fieldset>
+          <Fieldset
+            legend="Berkas"
+            :toggleable="true"
+            :collapsed="true"
+          >
+            <v-row no-gutters class="d-flex flex-row justify-center align-center">
+              <v-col
+                cols="12"
+                lg="3"
+                class="d-flex flex-column justify-center boxlist"
+                v-for="data in dataBerkas"
+                :key="data.kode"
+                @click="pdfCreate(previewData.idUser, data, 'berkas')">
+                <div>
+                  <v-progress-circular v-if="isLoadingPDF[data.kode]" indeterminate />
+                  <span v-else><v-icon icon="mdi mdi-file-pdf-box" /> {{ data.title }}</span>
+                </div>
+              </v-col>
+            </v-row>
+          </Fieldset>
         </v-card-text>
         <v-divider />
         <v-card-actions />
@@ -1368,7 +1443,7 @@
       scrollable
 			persistent
       transition="dialog-bottom-transition"
-      width="800px"
+      width="auto"
     >
       <v-card color="background-dialog-card">
         <v-toolbar color="surface">
@@ -1385,7 +1460,7 @@
             />
           </v-toolbar-items>
         </v-toolbar>
-        <v-card-text class="pt-4">
+        <v-card-text class="pt-4 v-dialog--custom">
           <v-row no-gutters>
             <v-col
               cols="12"
@@ -1610,12 +1685,12 @@
             class="mr-3"
           >
             <v-col
-              class="text-end"
+              class="text-start"
               cols="12"
             >
               <Button
                 color-button="light-blue darken-3"
-                icon-button="mdi mdi-download"
+                icon-prepend-button="mdi mdi-download"
                 nama-button="Download Template"
                 @proses="downloadTemplate()"
               />
@@ -1664,7 +1739,7 @@
                   <v-card color="white" style="border: 2px solid #000;" @click="hasil.jumlah > 0 ? exportExcelEmis(hasil.kelas) : warningNotif()">
                     <v-sheet color="green" class="sheetData" elevation="2">
                       <v-icon icon="mdi mdi-account-multiple" size="large" />
-                      <v-card-subtitle class="text-black" style="font-weight: bold; font-size: 15px; margin-left: 5px;">Kelas {{ hasil.kelas }}</v-card-subtitle>
+                      <v-card-title class="text-white" style="font-weight: bold; font-size: 15px; margin-left: 5px;">Kelas {{ hasil.kelas }}</v-card-title>
                     </v-sheet>
                     <v-card-actions>
                       <v-divider :thickness="2" />
@@ -1734,6 +1809,7 @@ export default {
     expanded: [],
 		DataSiswaSiswi: [],
     DataKelas: [],
+    selectRecord: [],
 		searchData: '',
     filter: '',
     page: 1,
@@ -1742,14 +1818,6 @@ export default {
     limit: 20,
     limitPage: [5,10,20,50,100],
     pageOptions: [],
-    // filterOptions: [
-    //   { value: 'status-true', text: 'Aktif' },
-    //   { value: 'status-false', text: 'Tidak Aktif' },
-    //   { value: 'validasi-true', text: 'Valid' },
-    //   { value: 'validasi-false', text: 'Tidak Valid' },
-    //   { value: 'mutasi-true', text: 'Mutasi' },
-    //   { value: 'mutasi-false', text: 'Tidak Mutasi' },
-    // ],
 		pageSummary: {
 			page: '',
 			limit: '',
@@ -1757,17 +1825,19 @@ export default {
 			totalPages: ''
 		},
     sortBy: [],
+    kumpulSort: '',
 		headers: [
       { title: "No", key: "number", sortable: false, width: "5%" },
       { title: "#", key: "data-table-expand", sortable: false, width: "5%" },
       { title: "NOMOR INDUK", key: "nomorInduk", sortable: true },
       { title: "NAMA", key: "nama", sortable: true },
-      { title: "EMAIL", key: "email", sortable: false },
+      // { title: "EMAIL", key: "email", sortable: false },
       { title: "KELAS", key: "kelas", sortable: true },
       { title: "VALIDASI AKUN", key: "validasi", sortable: false },
       { title: "MUTASI AKUN", key: "mutasi", sortable: false },
-      { title: "STATUS", key: "statusAktif", sortable: false },
+      { title: "STATUS", key: "statusAktif", sortable: true },
       { title: "FLAG", key: "flag", sortable: false, width: "5%" },
+      { title: "#", key: "data-table-select", sortable: false, width: "3%" },
     ],
     rowsPerPageItems: { "items-per-page-options": [5, 10, 25, 50] },
     totalItems: 0,
@@ -1858,7 +1928,7 @@ export default {
     fcKTP: '',
     fcAktaLahir: '',
     fcSKL: '',
-    kondisiKepalaSekolah: false,
+    kondisiJabatanTertentu: false,
     downloadFile: '',
     selectedFilter: '',
     filterOptions: [
@@ -1927,7 +1997,32 @@ export default {
         })
         return result
       }
-    }
+    },
+    kondisiJabatan(){
+			if(this.roleID === '3'){
+				let jabatan_guru = localStorage.getItem('jabatan_guru').split(', ')
+				let result = []
+				jabatan_guru.map(str => {
+					let hasil = this.jabatan.filter(val => { return val.kode == str })
+					result.push(hasil.length ? hasil[0].label : '')
+				})
+        let kondisi = false
+        if(result.includes('WaKaBid. Kurikulum')){
+          this.headers = this.headers.filter(el => { return el.key != "data-table-select"; })
+          kondisi = false
+        }else if(result.includes('WaKaBid. Kesiswaan')){
+          this.headers = this.headers.filter(el => { return el.key != "data-table-select"; })
+          kondisi = false
+        }else if(result.includes('Kepala Sekolah')){
+          kondisi = true
+        }else{
+          this.headers = this.headers.filter(el => { return el.key != "data-table-select"; })
+        }
+				return kondisi
+			}else if(this.roleID === '1' || this.roleID === '2'){
+				return true
+      }
+		},
   },
   watch: {
     UID: {
@@ -1968,7 +2063,7 @@ export default {
 			deep: true,
 			handler(value) {
         // let datasiswa = value.records
-        // if(this.roleID === '3' && !this.kondisiKepalaSekolah){
+        // if(this.roleID === '3' && !this.kondisiJabatanTertentu){
         //   this.DataSiswaSiswi = datasiswa.filter(val => !val.flag)
         //   return this.DataSiswaSiswi
         // }
@@ -1988,19 +2083,21 @@ export default {
     page: {
 			deep: true,
 			handler(value) {
-				this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiKepalaSekolah) ? {page: value, limit: this.limit, keyword: this.searchData, filter: this.filter} : {page: value, limit: this.limit, keyword: this.searchData, filter: this.filter, kelas: this.mengajarKelas})
+        if(value){
+          this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiJabatanTertentu) ? {page: value, limit: this.limit, keyword: this.searchData, filter: this.filter, sorting: this.kumpulSort} : {page: value, limit: this.limit, keyword: this.searchData, filter: this.filter, sorting: this.kumpulSort, kelas: this.mengajarKelas})
+        }
 			}
 		},
     limit: {
 			deep: true,
 			handler(value) {
-				this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiKepalaSekolah) ? {page: 1, limit: value, keyword: this.searchData, filter: this.filter} : {page: 1, limit: value, keyword: this.searchData, filter: this.filter, kelas: this.mengajarKelas})
+				this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiJabatanTertentu) ? {page: 1, limit: value, keyword: this.searchData, filter: this.filter, sorting: this.kumpulSort} : {page: 1, limit: value, keyword: this.searchData, filter: this.filter, sorting: this.kumpulSort, kelas: this.mengajarKelas})
 			}
 		},
     filter: {
 			deep: true,
 			handler(value) {
-				this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiKepalaSekolah) ? {page: this.page, limit: this.limit, keyword: this.searchData, filter: value} : {page: this.page, limit: this.limit, keyword: this.searchData, filter: value, kelas: this.mengajarKelas})
+				this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiJabatanTertentu) ? {page: this.page, limit: this.limit, keyword: this.searchData, filter: value, sorting: this.kumpulSort} : {page: this.page, limit: this.limit, keyword: this.searchData, filter: value, sorting: this.kumpulSort, kelas: this.mengajarKelas})
 			}
 		},
     selectedFilter: {
@@ -2013,11 +2110,15 @@ export default {
 			deep: true,
 			handler(value) {
 				if(this.roleID === '3'){
-					if(value.includes('Kepala Sekolah')){
-						this.kondisiKepalaSekolah = true
-        		this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiKepalaSekolah) ? {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter} : {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter, kelas: this.mengajarKelas});
-					}
-				}
+					if(value.includes('Kepala Sekolah') || value.includes('WaKaBid. Kesiswaan')){
+						this.kondisiJabatanTertentu = true
+					}else{
+						this.kondisiJabatanTertentu = false
+          }
+				}else if(this.roleID === '1' || this.roleID === '2'){
+          this.kondisiJabatanTertentu = false
+        }
+        this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiJabatanTertentu) ? {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter, sorting: this.kumpulSort} : {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter, sorting: this.kumpulSort, kelas: this.mengajarKelas});
 			}
 		}
   },
@@ -2026,7 +2127,7 @@ export default {
     this.BASEURL = process.env.VUE_APP_BASE_URL
     this.roleID = localStorage.getItem('roleID')
     this.mengajarKelas = localStorage.getItem('mengajar_kelas')
-		this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiKepalaSekolah) ? {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter} : {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter, kelas: this.mengajarKelas});
+		// this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiJabatanTertentu) ? {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter, sorting: this.kumpulSort} : {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter, sorting: this.kumpulSort, kelas: this.mengajarKelas});
 		this.getKelas({kondisi: 'All'});
 	},
 	methods: {
@@ -2065,7 +2166,7 @@ export default {
 					}
 					this.$store.dispatch('setting/postNotifikasi', payload)
 				}
-        this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiKepalaSekolah) ? {page: 1, limit: this.limit, keyword: this.searchData, filter: this.filter} : {page: 1, limit: this.limit, keyword: this.searchData, filter: this.filter, kelas: this.mengajarKelas})
+        this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiJabatanTertentu) ? {page: 1, limit: this.limit, keyword: this.searchData, filter: this.filter, sorting: this.kumpulSort} : {page: 1, limit: this.limit, keyword: this.searchData, filter: this.filter, sorting: this.kumpulSort, kelas: this.mengajarKelas})
         this.notifikasi("success", res.data.message, "1")
 			})
 			.catch((err) => {
@@ -2099,7 +2200,7 @@ export default {
         namaSekolah: item.dataSekolahSebelumnya.namaSekolah,
         npsn: item.dataSekolahSebelumnya.npsn ? item.dataSekolahSebelumnya.npsn : '-',
         alamatSekolah: this.uppercaseLetterFirst2(item.dataSekolahSebelumnya.alamatSekolah),
-        kabkotSekolah: this.uppercaseLetterFirst2(item.dataSekolahSebelumnya.kabkotSekolah.nama),
+        kabkotSekolah: `${item.dataSekolahSebelumnya.kabkotSekolah.jenisKabKota} ${item.dataSekolahSebelumnya.kabkotSekolah.nama}`,
         noPesertaUN: item.dataSekolahSebelumnya.noPesertaUN ? item.dataSekolahSebelumnya.noPesertaUN : '-',
         noSKHUN: item.dataSekolahSebelumnya.noSKHUN ? item.dataSekolahSebelumnya.noSKHUN : '-',
         noIjazah: item.dataSekolahSebelumnya.noIjazah ? item.dataSekolahSebelumnya.noSKHUN : '-',
@@ -2108,10 +2209,10 @@ export default {
         namaKK: this.uppercaseLetterFirst2(item.namaKK),
         telp: item.dataAlamatOrangtua.telp,
         alamat: this.uppercaseLetterFirst2(item.dataAlamatOrangtua.alamat),
-        provinsi: this.uppercaseLetterFirst2(item.dataAlamatOrangtua.provinsi.nama),
-        kabKota: this.uppercaseLetterFirst2(item.dataAlamatOrangtua.kabKota.nama),
-        kecamatan: this.uppercaseLetterFirst2(item.dataAlamatOrangtua.kecamatan.nama),
-        kelurahan: this.uppercaseLetterFirst2(item.dataAlamatOrangtua.kelurahan.nama),
+        provinsi: item.dataAlamatOrangtua.provinsi.nama,
+        kabKota: `${item.dataAlamatOrangtua.kabKota.jenisKabKota} ${item.dataAlamatOrangtua.kabKota.nama}`,
+        kecamatan: item.dataAlamatOrangtua.kecamatan.nama,
+        kelurahan: `${item.dataAlamatOrangtua.kelurahan.jenisKelDes} ${item.dataAlamatOrangtua.kelurahan.nama}`,
         kodePos: item.dataAlamatOrangtua.kodePos,
         nikAyah: item.dataOrangtua.dataAyah.nikAyah,
         namaAyah: this.uppercaseLetterFirst2(item.dataOrangtua.dataAyah.namaAyah),
@@ -2388,7 +2489,7 @@ export default {
 					this.$store.dispatch('setting/postNotifikasi', payload)
 				}
         this.clearFile(jenis)
-        this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiKepalaSekolah) ? {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter} : {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter, kelas: this.mengajarKelas});
+        this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiJabatanTertentu) ? {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter, sorting: this.kumpulSort} : {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter, sorting: this.kumpulSort, kelas: this.mengajarKelas});
         this.notifikasi("success", `Berhasil upload berkas ${jenis === 'ijazah' ? 'Ijazah' : jenis === 'skhun' ? 'SKHUN' : jenis === 'kk' ? 'Kartu Keluarga' : jenis === 'ktp' ? 'KTP Orangtua' : jenis === 'aktalahir' ? 'Akta Lahir' : 'SKL'}`, "1")
       }else{ 
         this.componentKey++;
@@ -2445,8 +2546,6 @@ export default {
 				const bodyData = {
 					jenis: "excel",
 					kategori: "datasiswa",
-					mapel: null,
-					kelas: null,
 				  createupdateBy: localStorage.getItem('idLogin'),
 					files: files,
 				};
@@ -2467,7 +2566,7 @@ export default {
                   judul: `Import data siswa/siswa`,
                   pesan: {
                     message: `data siswa/siswa telah diimport oleh <strong>${localStorage.getItem('nama')}</strong>`,
-                    payload: null,h
+                    payload: null,
                   },
                   params: null,
                   dikirim: `dikirim oleh <strong>${localStorage.getItem('nama')}</strong>`,
@@ -2480,7 +2579,7 @@ export default {
                 this.downloadFile = dataResp.path
                 return this.notifikasi("warning2", "Masih terdapat data yang sudah diinputkan !", "2");
               }
-              this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiKepalaSekolah) ? {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter} : {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter, kelas: this.mengajarKelas});
+              this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiJabatanTertentu) ? {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter, sorting: this.kumpulSort} : {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter, sorting: this.kumpulSort, kelas: this.mengajarKelas});
               this.notifikasi("success", "Berhasil import Data Siswa", "1")
             }, 5000)
           })
@@ -2498,6 +2597,33 @@ export default {
         this.$refs.inputExcel.value = null
         this.notifikasi("warning", "Ulangi lagi Import Data Siswa Siswi", "1")
       }  
+    },
+    allData(item) {
+      if(item.length === this.selectRecord.length) return this.notifikasi("warning", "Data sudah di pilih semua pada page ini!", "1")
+      item.map(val => {
+        if(!this.selectRecord.includes(val.idUser)){
+          this.selectRecord.push(val.idUser)
+        }
+      })
+    },
+    hapusAllRecord() {
+      if(!this.selectRecord.length) return this.notifikasi("warning", "Belum ada record yang di pilih!", "1")
+      let bodyData = {
+        user: {
+          jenis: 'DELETESELECTEDHARD',
+          idUser: this.selectRecord,
+        },
+        userdetail: {}
+      }
+      this.$store.dispatch('user/postSiswaSiswi', bodyData)
+      .then((res) => {
+        this.selectRecord = []
+        this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiJabatanTertentu) ? {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter, sorting: this.kumpulSort} : {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter, sorting: this.kumpulSort, kelas: this.mengajarKelas});
+        this.notifikasi("success", res.data.message, "1")
+			})
+			.catch((err) => {
+        this.notifikasi("error", err.response.data.message, "1")
+			});
     },
     warningNotif(){
       this.notifikasi("warning", "Tidak ada siswa/i dikelas ini", "1")
@@ -2518,11 +2644,21 @@ export default {
 				this.notifikasi("error", err.response.data.message, "1")
 			});
     },
+    updateSort(data) {
+      this.sortBy = data
+			this.kumpulSort = this.sortBy.map((val) => {
+        return `${val.key}-${val.order === 'asc' ? 'ASC' : 'DESC'}`
+      }).join(',')
+		  this.getSiswaSiswi(this.roleID === '1' || this.roleID === '2' || (this.roleID === '3' && this.kondisiJabatanTertentu) ? {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter, sorting: this.kumpulSort} : {page: this.page, limit: this.limit, keyword: this.searchData, filter: this.filter, sorting: this.kumpulSort, kelas: this.mengajarKelas});
+		},
     clickrow(event, data) {
       const index = this.$data.expanded.find(i => i === data?.item?.raw?.idUser);
       if(typeof index === 'undefined') return this.$data.expanded = [];
       this.$data.expanded.splice(0, 1)
       this.$data.expanded.push(data?.item?.raw?.idUser);
+    },
+    toggle(event) {
+      this.$refs.menu.toggle(event);
     },
     notifikasi(kode, text, proses){
       this.dialogNotifikasi = true
@@ -2548,8 +2684,8 @@ export default {
 	font-size: 10pt;
 	font-weight: bold;
 	background: rgba(10, 204, 117, 0.694);
-	border: 1px solid #FFFFFF;
-	color: #FFFFFF;
+	border: 1px solid #272727;
+	color: #272727;
   cursor: pointer;
 }
 .listData {

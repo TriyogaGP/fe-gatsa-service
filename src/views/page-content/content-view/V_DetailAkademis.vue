@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="subheading grey--text">Data {{ jenis === 'mapel' ? 'Akademis' : 'Koreksi Exam' }} ({{ mapelText }})</h1>
+    <h1 class="subheading grey--text text-decoration-underline">Data {{ jenis === 'mapel' ? 'Akademis' : 'Koreksi Exam' }} ({{ mapelText }})</h1>
     <div v-if="roleID === '1' || roleID === '2' || (roleID === '3' && jenis === 'koreksi')">
       <div class="text-right wadah">
         <span @click="gotolist()" class="link">Data {{ jenis === 'mapel' ? 'Akademis' : 'Koreksi Exam' }}</span>
@@ -19,12 +19,13 @@
             <v-col
               v-for="hasil in data.dataKelas"
               :key="hasil.label"
-              cols="3"
+              cols="12"
+              lg="3"
             >
               <v-card color="white" style="border: 2px solid #000;" @click="hasil.jumlah > 0 ? gotoDetail(hasil.kelas, mapelText) : warningNotif()">
                 <v-sheet color="green" class="sheetData" elevation="2">
                   <v-icon icon="mdi mdi-account-multiple" size="large" />
-                  <v-card-subtitle class="text-black" style="font-weight: bold; font-size: 15px; margin-left: 5px;">Kelas {{ hasil.kelas }}</v-card-subtitle>
+                  <v-card-title class="text-white" style="font-weight: bold; font-size: 15px; margin-left: 5px;">Kelas {{ hasil.kelas }}</v-card-title>
                 </v-sheet>
                 <v-card-actions>
                   <v-divider :thickness="2" />
@@ -161,24 +162,5 @@ export default {
   line-height: 2rem;
   text-transform: uppercase;
   font-family: "Roboto", sans-serif !important;
-}
-.wadah {
-  font-size: 15px;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-.iconstyle {
-  margin-left: 5px;
-  margin-right: 5px;
-}
-.link {
-  color: #000;
-  cursor: pointer;
-  text-decoration: none;
-}
-.link:hover {
-  color: #6fe484;
-  cursor: pointer;
-  text-decoration: underline;
 }
 </style>

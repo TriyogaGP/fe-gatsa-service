@@ -92,11 +92,6 @@ const routes = [
         component: () => import('@/views/page-content/SiswaSiswi/P_FormSiswaSiswi.vue')
       },
       {
-        path: '/data-kelas',
-        name: 'DataKelas',
-        component: () => import('@/views/page-content/content-view/V_Kelas.vue')
-      },
-      {
         path: '/data-kelas-siswa/:kelas',
         name: 'DataKelasSiswa',
         component: () => import('@/views/page-content/content-view/V_KelasSiswa.vue')
@@ -145,6 +140,12 @@ const routes = [
         path: '/koreksi-exam',
         name: 'KoreksiExam',
         component: () => import('@/views/page-content/content-view/V_KoreksiExam.vue')
+      },
+      
+      {
+        path: '/:pathMatch(.*)*',
+        name: 'UnderConstruction',
+        component: () => import('@/views/Layout/UnderConstruction.vue')
       },
     ]
   },

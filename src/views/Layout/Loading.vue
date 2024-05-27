@@ -2,8 +2,11 @@
   <div>
     <v-overlay v-model="loading" persistent class="align-center justify-center">
 			<div class="kotakLoading">
-				<v-img class="gambarLogoScreen" :src="logoSekolah" />
-				<div class="tengah">
+				<span class="loader">
+					<v-img class="gambarLogoScreen" :src="logoSekolah" />
+					<h2 style="color: black;">&nbsp;{{ namaSekolah }}&nbsp;</h2>
+				</span>
+				<!-- <div class="tengah">
 					<v-progress-circular
 						:size="40"
 						:width="3"
@@ -17,7 +20,7 @@
 						color="success"
 						indeterminate
 					/>
-				</div>
+				</div> -->
 			</div>
     </v-overlay>
   </div>

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="subheading grey--text">Data Kelas Siswa {{ kelasText }}</h1>
+    <h1 class="subheading grey--text text-decoration-underline">Data Kelas Siswa {{ kelasText }}</h1>
     <v-card class="pa-1 rounded" variant="outlined" elevation="4">
       <v-container fluid v-if="DataKelas.length">
         <v-row>
@@ -8,12 +8,12 @@
             v-for="hasil in DataKelas"
             :key="hasil.kelas"
             cols="12"
-            lg="3"
+            lg="4"
           >
             <v-card color="white" style="border: 2px solid #000;" @click="hasil.jumlah > 0 ? gotoDetail(hasil.kelas) : warningNotif()">
               <v-sheet color="green" class="sheetData" elevation="2">
                 <v-icon icon="mdi mdi-account-multiple" size="large" />
-                <v-card-subtitle class="text-black" style="font-weight: bold; font-size: 15px; margin-left: 5px;">Kelas {{ hasil.kelas }}</v-card-subtitle>
+                <v-card-title class="text-white" style="font-weight: bold; font-size: 15px; margin-left: 5px;">Kelas {{ hasil.kelas }}</v-card-title>
               </v-sheet>
               <v-card-actions>
                 <v-divider :thickness="2" class="border-opacity-75" />

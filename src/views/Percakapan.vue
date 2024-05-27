@@ -12,7 +12,7 @@
               <div v-for="(item, i) in dataMessage" :key="i">
                 <div class="message" :id="item.nama != uppercaseLetter(nama) ? `kotakchatleft` : `kotakchatright`">
                   <v-img class="gambarChat" :src="item.fotoProfil" />
-                  <span class="textName">{{ item.nama }}</span>
+                  <span class="textName">{{ item.nama != uppercaseLetter(nama) ? item.nama : `ME` }}</span>
                   <div class="mt-2">
                     <span style="white-space: pre-line" v-html="item.pesan" />
                     <div style="float: right; margin-top: 15px; font-size: 8pt; font-weight: bold;">{{ item.jam }}</div>

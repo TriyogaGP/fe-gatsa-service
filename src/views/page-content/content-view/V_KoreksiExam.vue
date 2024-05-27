@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="subheading grey--text">Data Koreksi Exam</h1>
+    <h1 class="subheading grey--text text-decoration-underline">Data Koreksi Exam</h1>
     <v-card class="pa-1 rounded" variant="outlined" elevation="4">
       <v-container fluid v-if="mengajarOptions.length">
         <v-row>
@@ -8,12 +8,12 @@
             v-for="hasil in mengajarOptions"
             :key="hasil.label"
             cols="12"
-            lg="3"
+            lg="4"
           >
             <v-card color="white" style="border: 2px solid #000;" @click="gotoDetail(hasil.link)">
               <v-sheet color="green" class="sheetData" elevation="2">
                 <v-icon icon="mdi mdi-book-education" size="large" />
-                <v-card-subtitle class="text-black" style="font-weight: bold; font-size: 15px; margin-left: 5px;">Mata Pelajaran</v-card-subtitle>
+                <v-card-title class="text-white" style="font-weight: bold; font-size: 15px; margin-left: 5px;">Mata Pelajaran</v-card-title>
               </v-sheet>
               <v-card-actions>
                 <v-divider :thickness="2" class="border-opacity-75" />

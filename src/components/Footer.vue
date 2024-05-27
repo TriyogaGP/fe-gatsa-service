@@ -1,6 +1,6 @@
 <template>
 	<v-footer dark padless app inset class="text-center d-flex flex-column" style="position: fixed;">
-		<span class="textNamaSekolah">© {{new Date().getFullYear()}} - {{ namaSekolah }}</span>
+		<span class="textNamaSekolah">{{ `© 2021 - ${new Date().getFullYear()} | ${namaSekolah}` }}</span>
 	</v-footer>
 </template>
 <script>

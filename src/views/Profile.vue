@@ -21,393 +21,401 @@
                 <div class="text-right">
                   <Button 
                     color-button="#0bd369"
-                    :icon-button="kondisiForm ? 'mdi mdi-eye' : 'mdi mdi-eye-off'"
+                    :icon-prepend-button="kondisiForm ? 'mdi mdi-pencil' : 'mdi mdi-close'"
                     nama-button="Ubah Data Diri"
                     @proses="() => { kondisiForm = !kondisiForm; }"
                   />
                 </div>
-                <h2 class="subheading black--text"><u>>>Data Log In</u></h2>
-                <v-row no-gutters>
-                  <v-col
+                <Fieldset
+                  legend="Data Log In"
+                  :toggleable="true"
+                >
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Consumer Type
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.namaRole }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Nama Lengkap
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm" v-html="previewData.nama"></span>
+                      <TextField
+                        v-else
+                        v-model="inputAdministrator.nama"
+                        label-tf="Nama Lengkap"
+                        :clearable-tf="true"
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Username
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm" v-html="previewData.username"></span>
+                      <TextField
+                        v-else
+                        v-model="inputAdministrator.username"
+                        label-tf="Username"
+                        :clearable-tf=true
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Email
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm" v-html="previewData.email"></span>
+                      <TextField
+                        v-else
+                        v-model="inputAdministrator.email"
+                        label-tf="Email"
+                        hide-details="auto"
+                        :clearable-tf="true"
+                        :rules-tf="inputAdministrator.email != '' ? true : false"
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Kata Sandi
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.password }}&nbsp;
+                      <v-icon
+                        class="mr-1"
+                        color="light-black darken-3"
+                        tabindex="-1"
+                        @click="endecryptData('endecryptType')"
+                        :icon="endecryptType ? 'mdi mdi-eye-lock' : 'mdi mdi-eye-lock-open'"
+                        size="large"
+                      />
+                    </v-col>
+                  </v-row>
+                </Fieldset>
+                <Fieldset
+                  legend="Data Alamat"
+                  :toggleable="true"
+                >
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Tempat, Tanggal Lahir
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm">{{ `${previewData.tempat}, ${convertDateForMonth(previewData.tanggalLahir)}` }}</span>
+                      <v-row v-else no-gutters>
+                        <v-col
+                          cols="12"
+                          md="6"
+                          class="d-flex justify-center align-center"
+                        >
+                          <TextField
+                            v-model="inputAdministrator.tempat"
+                            label-tf="Tempat Lahir"
+                            :clearable-tf="true"
+                          />
+                        </v-col>
+                        <v-col
+                          cols="12"
+                          md="6"
+                          class="pl-2 d-flex justify-end align-center"
+                        >
+                          <vue-date-picker
+                            v-model="inputAdministrator.tanggalLahir"
+                            placeholder="Tanggal Lahir"
+                            format="dd-MM-yyyy"
+                            :enable-time-picker="false"
+                            auto-apply
+                          />
+                        </v-col>
+                      </v-row>
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Jenis Kelamin
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm" v-html="previewData.jenisKelamin"></span>
+                      <Autocomplete
+                        v-else
+                        v-model="inputAdministrator.jenisKelamin"
+                        :data-a="jenisKelaminOptions"
+                        label-a="Jenis Kelamin"
+                        :clearable-a="true"
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Agama
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm" v-html="previewData.agama"></span>
+                      <Autocomplete
+                        v-else
+                        v-model="inputAdministrator.agama"
+                        :data-a="agamaOptions"
+                        item-title="label"
+                        item-value="kode"
+                        label-a="Agama"
+                        :clearable-a="true"
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Telepon
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm" v-html="previewData.telp"></span>
+                      <TextField
+                        v-else
+                        v-model="inputAdministrator.telp"
+                        label-tf="Telepon"
+                        :clearable-tf="true"
+                        @keypress="onlyNumber($event, 15, inputAdministrator.telp)"
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Alamat
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm" v-html="previewData.alamat"></span>
+                      <v-textarea
+                        v-else
+                        v-model="inputAdministrator.alamat"
+                        placeholder="Alamat"
+                        label="Alamat"
+                        rows="4"
+                        variant="solo"
+                        density="comfortable"
+                        color="light-black darken-3"
+                        bg-color="white"
+                        hide-details
+                        clearable
+                        no-resize
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Provinsi
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm" v-html="previewData.provinsi"></span>
+                      <Autocomplete
+                        v-else
+                        v-model="inputAdministrator.provinsi"
+                        :data-a="ProvinsiOptions"
+                        item-title="nama"
+                        item-value="kode"
+                        label-a="Provinsi"
+                        :clearable-a="true"
+                        @ubah="wilayah('provinsi', $event)"
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Kabupaten / Kota
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm" v-html="previewData.kabKota"></span>
+                      <Autocomplete
+                        v-else
+                        v-model="inputAdministrator.kabKota"
+                        :data-a="optionsKabKota"
+                        item-title="nama"
+                        item-value="kode"
+                        label-a="Kabupaten / Kota"
+                        :clearable-a="true"
+                        :disabled-a="inputAdministrator.provinsi ? false : true"
+                        @ubah="wilayah('kabkota', $event)"
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
                     cols="12"
                     md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Consumer Type
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.namaRole }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Nama Lengkap
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm" v-html="previewData.nama"></span>
-                    <TextField
-                      v-else
-                      v-model="inputAdministrator.nama"
-                      label-tf="Nama Lengkap"
-                      :clearable-tf="true"
-                    />
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Username
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm" v-html="previewData.username"></span>
-                    <TextField
-                      v-else
-                      v-model="inputAdministrator.username"
-                      label-tf="Username"
-                      :clearable-tf=true
-                    />
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Email
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm" v-html="previewData.email"></span>
-                    <TextField
-                      v-else
-                      v-model="inputAdministrator.email"
-                      label-tf="Email"
-                      :rules="this.inputAdministrator.email != '' ? [rules.emailRules] : []"
-                      hide-details="auto"
-                      :clearable-tf="true"
-                    />
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Kata Sandi
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.password }}&nbsp;
-                    <v-icon
-                      class="mr-1"
-                      color="light-black darken-3"
-                      tabindex="-1"
-                      @click="endecryptData('endecryptType')"
-                      :icon="endecryptType ? 'mdi mdi-eye-lock' : 'mdi mdi-eye-lock-open'"
-                      size="large"
-                    />
-                  </v-col>
-                </v-row>
-                <h2 class="subheading black--text"><u>>>Data Alamat</u></h2>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Tempat, Tanggal Lahir
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm">{{ `${previewData.tempat}, ${convertDateForMonth(previewData.tanggalLahir)}` }}</span>
-                    <v-row v-else no-gutters>
-                      <v-col
-                        cols="12"
-                        md="6"
-                        class="d-flex justify-center align-center"
-                      >
-                        <TextField
-                          v-model="inputAdministrator.tempat"
-                          label-tf="Tempat Lahir"
-                          :clearable-tf="true"
-                        />
-                      </v-col>
-                      <v-col
-                        cols="12"
-                        md="6"
-                        class="pl-2 d-flex justify-end align-center"
-                      >
-                        <vue-date-picker
-                          v-model="inputAdministrator.tanggalLahir"
-                          placeholder="Tanggal Lahir"
-                          format="dd-MM-yyyy"
-                          :enable-time-picker="false"
-                          auto-apply
-                        />
-                      </v-col>
-                    </v-row>
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Jenis Kelamin
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm" v-html="previewData.jenisKelamin"></span>
-                    <Autocomplete
-                      v-else
-                      v-model="inputAdministrator.jenisKelamin"
-                      :data-a="jenisKelaminOptions"
-                      label-a="Jenis Kelamin"
-                      :clearable-a="true"
-                    />
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Agama
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm" v-html="previewData.agama"></span>
-                    <Autocomplete
-                      v-else
-                      v-model="inputAdministrator.agama"
-                      :data-a="agamaOptions"
-                      item-title="label"
-                      item-value="kode"
-                      label-a="Agama"
-                      :clearable-a="true"
-                    />
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Telepon
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm" v-html="previewData.telp"></span>
-                    <TextField
-                      v-else
-                      v-model="inputAdministrator.telp"
-                      label-tf="Telepon"
-                      :clearable-tf="true"
-                      @keypress="onlyNumber($event, 15, inputAdministrator.telp)"
-                    />
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Alamat
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm" v-html="previewData.alamat"></span>
-                    <v-textarea
-                      v-else
-                      v-model="inputAdministrator.alamat"
-                      placeholder="Alamat"
-                      label="Alamat"
-                      rows="4"
-                      variant="solo"
-                      density="comfortable"
-                      color="light-black darken-3"
-                      bg-color="white"
-                      hide-details
-                      clearable
-                      no-resize
-                    />
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Provinsi
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm" v-html="previewData.provinsi"></span>
-                    <Autocomplete
-                      v-else
-                      v-model="inputAdministrator.provinsi"
-                      :data-a="ProvinsiOptions"
-                      item-title="nama"
-                      item-value="kode"
-                      label-a="Provinsi"
-                      :clearable-a="true"
-                      @ubah="wilayah('provinsi', $event)"
-                    />
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Kabupaten / Kota
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm" v-html="previewData.kabKota"></span>
-                    <Autocomplete
-                      v-else
-                      v-model="inputAdministrator.kabKota"
-                      :data-a="KabKotaOptions"
-                      item-title="nama"
-                      item-value="kode"
-                      label-a="Kabupaten / Kota"
-                      :clearable-a="true"
-                      :disabled-a="inputAdministrator.provinsi ? false : true"
-                      @ubah="wilayah('kabkota', $event)"
-                    />
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                  cols="12"
-                  md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                  Kecamatan
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm" v-html="previewData.kecamatan"></span>
-                    <Autocomplete
-                      v-else
-                      v-model="inputAdministrator.kecamatan"
-                      :data-a="KecamatanOptions"
-                      item-title="nama"
-                      item-value="kode"
-                      label-a="Kecamatan"
-                      :clearable-a="true"
-                      :disabled-a="inputAdministrator.kabKota ? false : true"
-                      @ubah="wilayah('kecamatan', $event)"
-                    />
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Kelurahan
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm" v-html="previewData.kelurahan"></span>
-                    <Autocomplete
-                      v-else
-                      v-model="inputAdministrator.kelurahan"
-                      :data-a="KelurahanOptions"
-                      item-title="nama"
-                      item-value="kode"
-                      label-a="Kelurahan"
-                      :clearable-a="true"
-                      :disabled-a="inputAdministrator.kecamatan ? false : true"
-                      @ubah="wilayah('kelurahan', $event)"
-                    />
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Kode Pos
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm" v-html="previewData.kodePos"></span>
-                    <TextField
-                      v-else
-                      v-model="inputAdministrator.kodePos"
-                      label-tf="Kode Pos"
-                      :disabled-tf="true"
-                    />
-                  </v-col>
-                </v-row>
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                    Kecamatan
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm" v-html="previewData.kecamatan"></span>
+                      <Autocomplete
+                        v-else
+                        v-model="inputAdministrator.kecamatan"
+                        :data-a="KecamatanOptions"
+                        item-title="nama"
+                        item-value="kode"
+                        label-a="Kecamatan"
+                        :clearable-a="true"
+                        :disabled-a="inputAdministrator.kabKota ? false : true"
+                        @ubah="wilayah('kecamatan', $event)"
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Kelurahan / Desa
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm" v-html="previewData.kelurahan"></span>
+                      <Autocomplete
+                        v-else
+                        v-model="inputAdministrator.kelurahan"
+                        :data-a="optionsKelurahan"
+                        item-title="nama"
+                        item-value="kode"
+                        label-a="Kelurahan / Desa"
+                        :clearable-a="true"
+                        :disabled-a="inputAdministrator.kecamatan ? false : true"
+                        @ubah="wilayah('kelurahan', $event)"
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Kode Pos
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm" v-html="previewData.kodePos"></span>
+                      <TextField
+                        v-else
+                        v-model="inputAdministrator.kodePos"
+                        label-tf="Kode Pos"
+                        :disabled-tf="true"
+                      />
+                    </v-col>
+                  </v-row>
+                </Fieldset>
                 <div class="text-right">
                   <Button
                     v-if="!kondisiForm"
@@ -421,418 +429,430 @@
                 <div class="text-right">
                   <Button 
                     color-button="#0bd369"
-                    :icon-button="kondisiForm ? 'mdi mdi-eye' : 'mdi mdi-eye-off'"
+                    :icon-button="kondisiForm ? 'mdi mdi-pencil' : 'mdi mdi-close'"
                     nama-button="Ubah Data Diri"
                     @proses="() => { kondisiForm = !kondisiForm; }"
                   />
                 </div>
-                <h2 class="subheading black--text"><u>>>Data Log In</u></h2>
-                <v-row no-gutters>
-                  <v-col
+                <Fieldset
+                  legend="Data Log In"
+                  :toggleable="true"
+                >
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Consumer Type
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.namaRole }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Nama Lengkap
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm" v-html="previewData.nama"></span>
+                      <TextField
+                        v-else
+                        v-model="inputGuru.nama"
+                        label-tf="Nama Lengkap"
+                        :clearable-tf="true"
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Username
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm" v-html="previewData.username"></span>
+                      <TextField
+                        v-else
+                        v-model="inputGuru.username"
+                        label-tf="Username"
+                        :clearable-tf="true"
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Email
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm" v-html="previewData.email"></span>
+                      <TextField
+                        v-else
+                        v-model="inputGuru.email"
+                        label-tf="Email"
+                        :rules-tf="inputGuru.email != '' ? true : false"
+                        hide-details="auto"
+                        :clearable-tf="true"
+                      />
+                    </v-col>
+                  </v-row>
+                </Fieldset>
+                <Fieldset
+                  legend="Data Alamat"
+                  :toggleable="true"
+                >
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Tempat, Tanggal Lahir
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm">{{ `${previewData.tempat}, ${convertDateForMonth(previewData.tanggalLahir)}` }}</span>
+                      <v-row v-else no-gutters>
+                        <v-col
+                          cols="12"
+                          md="6"
+                          class="d-flex justify-center align-center"
+                        >
+                          <TextField
+                            v-model="inputGuru.tempat"
+                            label-tf="Tempat Lahir"
+                            :clearable-tf="true"
+                          />
+                        </v-col>
+                        <v-col
+                          cols="12"
+                          md="6"
+                          class="pl-2 d-flex justify-end align-center"
+                        >
+                          <vue-date-picker
+                            v-model="inputGuru.tanggalLahir"
+                            placeholder="Tanggal Lahir"
+                            format="dd-MM-yyyy"
+                            :enable-time-picker="false"
+                            auto-apply
+                          />
+                        </v-col>
+                      </v-row>
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Jenis Kelamin
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm" v-html="previewData.jenisKelamin"></span>
+                      <Autocomplete
+                        v-else
+                        v-model="inputGuru.jenisKelamin"
+                        :data-a="jenisKelaminOptions"
+                        label-a="Jenis Kelamin"
+                        :clearable-a="true"
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Agama
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm" v-html="previewData.agama"></span>
+                      <Autocomplete
+                        v-else
+                        v-model="inputGuru.agama"
+                        :data-a="agamaOptions"
+                        item-title="label"
+                        item-value="kode"
+                        label-a="Agama"
+                        :clearable-a="true"
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Telepon
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm" v-html="previewData.telp"></span>
+                      <TextField
+                        v-else
+                        v-model="inputGuru.telp"
+                        label-tf="Telepon"
+                        :clearable-tf="true"
+                        @keypress="onlyNumber($event, 15, inputGuru.telp)"
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Alamat
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm" v-html="previewData.alamat"></span>
+                      <v-textarea
+                        v-else
+                        v-model="inputGuru.alamat"
+                        placeholder="Alamat"
+                        label="Alamat"
+                        rows="4"
+                        variant="solo"
+                        density="comfortable"
+                        color="light-black darken-3"
+                        bg-color="white"
+                        hide-details
+                        clearable
+                        no-resize
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Provinsi
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm" v-html="previewData.provinsi"></span>
+                      <Autocomplete
+                        v-else
+                        v-model="inputGuru.provinsi"
+                        :data-a="ProvinsiOptions"
+                        item-title="nama"
+                        item-value="kode"
+                        label-a="Provinsi"
+                        :clearable-a="true"
+                        @ubah="wilayah('provinsi', $event)"
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Kabupaten / Kota
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm" v-html="previewData.kabKota"></span>
+                      <Autocomplete
+                        v-else
+                        v-model="inputGuru.kabKota"
+                        :data-a="optionsKabKota"
+                        item-title="nama"
+                        item-value="kode"
+                        label-a="Kabupaten / Kota"
+                        :clearable-a="true"
+                        :disabled-a="inputGuru.provinsi ? false : true"
+                        @ubah="wilayah('kabkota', $event)"
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
                     cols="12"
                     md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Consumer Type
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.namaRole }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Nama Lengkap
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm" v-html="previewData.nama"></span>
-                    <TextField
-                      v-else
-                      v-model="inputGuru.nama"
-                      label-tf="Nama Lengkap"
-                      :clearable-tf="true"
-                    />
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Username
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm" v-html="previewData.username"></span>
-                    <TextField
-                      v-else
-                      v-model="inputGuru.username"
-                      label-tf="Username"
-                      :clearable-tf="true"
-                    />
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Email
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm" v-html="previewData.email"></span>
-                    <TextField
-                      v-else
-                      v-model="inputGuru.email"
-                      label-tf="Email"
-                      :rules="this.inputGuru.email != '' ? [rules.emailRules] : []"
-                      hide-details="auto"
-                      :clearable-tf="true"
-                    />
-                  </v-col>
-                </v-row>
-                <h2 class="subheading black--text"><u>>>Data Alamat</u></h2>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Tempat, Tanggal Lahir
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm">{{ `${previewData.tempat}, ${convertDateForMonth(previewData.tanggalLahir)}` }}</span>
-                    <v-row v-else no-gutters>
-                      <v-col
-                        cols="12"
-                        md="6"
-                        class="d-flex justify-center align-center"
-                      >
-                        <TextField
-                          v-model="inputGuru.tempat"
-                          label-tf="Tempat Lahir"
-                          :clearable-tf="true"
-                        />
-                      </v-col>
-                      <v-col
-                        cols="12"
-                        md="6"
-                        class="pl-2 d-flex justify-end align-center"
-                      >
-                        <vue-date-picker
-                          v-model="inputGuru.tanggalLahir"
-                          placeholder="Tanggal Lahir"
-                          format="dd-MM-yyyy"
-                          :enable-time-picker="false"
-                          auto-apply
-                        />
-                      </v-col>
-                    </v-row>
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Jenis Kelamin
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm" v-html="previewData.jenisKelamin"></span>
-                    <Autocomplete
-                      v-else
-                      v-model="inputGuru.jenisKelamin"
-                      :data-a="jenisKelaminOptions"
-                      label-a="Jenis Kelamin"
-                      :clearable-a="true"
-                    />
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Agama
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm" v-html="previewData.agama"></span>
-                    <Autocomplete
-                      v-else
-                      v-model="inputGuru.agama"
-                      :data-a="agamaOptions"
-                      item-title="label"
-                      item-value="kode"
-                      label-a="Agama"
-                      :clearable-a="true"
-                    />
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Telepon
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm" v-html="previewData.telp"></span>
-                    <TextField
-                      v-else
-                      v-model="inputGuru.telp"
-                      label-tf="Telepon"
-                      :clearable-tf="true"
-                      @keypress="onlyNumber($event, 15, inputGuru.telp)"
-                    />
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Alamat
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm" v-html="previewData.alamat"></span>
-                    <v-textarea
-                      v-else
-                      v-model="inputGuru.alamat"
-                      placeholder="Alamat"
-                      label="Alamat"
-                      rows="4"
-                      variant="solo"
-                      density="comfortable"
-                      color="light-black darken-3"
-                      bg-color="white"
-                      hide-details
-                      clearable
-                      no-resize
-                    />
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Provinsi
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm" v-html="previewData.provinsi"></span>
-                    <Autocomplete
-                      v-else
-                      v-model="inputGuru.provinsi"
-                      :data-a="ProvinsiOptions"
-                      item-title="nama"
-                      item-value="kode"
-                      label-a="Provinsi"
-                      :clearable-a="true"
-                      @ubah="wilayah('provinsi', $event)"
-                    />
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Kabupaten / Kota
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm" v-html="previewData.kabKota"></span>
-                    <Autocomplete
-                      v-else
-                      v-model="inputGuru.kabKota"
-                      :data-a="KabKotaOptions"
-                      item-title="nama"
-                      item-value="kode"
-                      label-a="Kabupaten / Kota"
-                      :clearable-a="true"
-                      :disabled-a="inputGuru.provinsi ? false : true"
-                      @ubah="wilayah('kabkota', $event)"
-                    />
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                  cols="12"
-                  md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                  Kecamatan
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm" v-html="previewData.kecamatan"></span>
-                    <Autocomplete
-                      v-else
-                      v-model="inputGuru.kecamatan"
-                      :data-a="KecamatanOptions"
-                      item-title="nama"
-                      item-value="kode"
-                      label-a="Kecamatan"
-                      :clearable-a="true"
-                      :disabled-a="inputGuru.kabKota ? false : true"
-                      @ubah="wilayah('kecamatan', $event)"
-                    />
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Kelurahan
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm" v-html="previewData.kelurahan"></span>
-                    <Autocomplete
-                      v-else
-                      v-model="inputGuru.kelurahan"
-                      :data-a="KelurahanOptions"
-                      item-title="nama"
-                      item-value="kode"
-                      label-a="Kelurahan"
-                      :clearable-a="true"
-                      :disabled-a="inputGuru.kecamatan ? false : true"
-                      @ubah="wilayah('kelurahan', $event)"
-                    />
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Kode Pos
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm" v-html="previewData.kodePos"></span>
-                    <TextField
-                      v-else
-                      v-model="inputGuru.kodePos"
-                      label-tf="Kode Pos"
-                      :disabled-tf="true"
-                    />
-                  </v-col>
-                </v-row>
-                <h2 class="subheading black--text"><u>>>Data Kelengkapan</u></h2>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Nomor Induk
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm" v-html="previewData.nomorInduk"></span>
-                    <TextField
-                      v-else
-                      v-model="inputGuru.nomorInduk"
-                      label-tf="Nomor Induk"
-                      :clearable-tf="true"
-                      @keypress="onlyNumber($event, 25, inputGuru.nomorInduk)"
-                    />
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Pendidikan Struktural
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    <span v-if="kondisiForm" v-html="previewData.pendidikanGuru"></span>
-                    <Autocomplete
-                      v-else
-                      v-model="inputGuru.pendidikanGuru"
-                      :data-a="pendidikanOptions"
-                      item-title="label"
-                      item-value="kode"
-                      label-a="Pendidikan Struktural"
-                      :clearable-a="true"
-                    />
-                  </v-col>
-                </v-row>
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                    Kecamatan
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm" v-html="previewData.kecamatan"></span>
+                      <Autocomplete
+                        v-else
+                        v-model="inputGuru.kecamatan"
+                        :data-a="KecamatanOptions"
+                        item-title="nama"
+                        item-value="kode"
+                        label-a="Kecamatan"
+                        :clearable-a="true"
+                        :disabled-a="inputGuru.kabKota ? false : true"
+                        @ubah="wilayah('kecamatan', $event)"
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Kelurahan / Desa
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm" v-html="previewData.kelurahan"></span>
+                      <Autocomplete
+                        v-else
+                        v-model="inputGuru.kelurahan"
+                        :data-a="optionsKelurahan"
+                        item-title="nama"
+                        item-value="kode"
+                        label-a="Kelurahan / Desa"
+                        :clearable-a="true"
+                        :disabled-a="inputGuru.kecamatan ? false : true"
+                        @ubah="wilayah('kelurahan', $event)"
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Kode Pos
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm" v-html="previewData.kodePos"></span>
+                      <TextField
+                        v-else
+                        v-model="inputGuru.kodePos"
+                        label-tf="Kode Pos"
+                        :disabled-tf="true"
+                      />
+                    </v-col>
+                  </v-row>
+                </Fieldset>
+                <Fieldset
+                  legend="Data Kelengkapan"
+                  :toggleable="true"
+                >
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Nomor Induk
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm" v-html="previewData.nomorInduk"></span>
+                      <TextField
+                        v-else
+                        v-model="inputGuru.nomorInduk"
+                        label-tf="Nomor Induk"
+                        :clearable-tf="true"
+                        @keypress="onlyNumber($event, 25, inputGuru.nomorInduk)"
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Pendidikan Struktural
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      <span v-if="kondisiForm" v-html="previewData.pendidikanGuru"></span>
+                      <Autocomplete
+                        v-else
+                        v-model="inputGuru.pendidikanGuru"
+                        :data-a="pendidikanOptions"
+                        item-title="label"
+                        item-value="kode"
+                        label-a="Pendidikan Struktural"
+                        :clearable-a="true"
+                      />
+                    </v-col>
+                  </v-row>
+                </Fieldset>
                 <div class="text-right">
                   <Button
                     v-if="!kondisiForm"
@@ -843,926 +863,958 @@
                 </div>
               </div>
               <div v-if="roleID === '4'" class="customScrollLeft">
-                <h2 class="subheading black--text"><u>>>Data Log In</u></h2>
-                <v-row no-gutters>
-                  <v-col
+                <Fieldset
+                  legend="Data Log In"
+                  :toggleable="true"
+                >
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Consumer Type
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.namaRole }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Nama Lengkap
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.nama }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Username
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.username }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Email
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.email }}
+                    </v-col>
+                  </v-row>
+                </Fieldset>
+                <Fieldset
+                  legend="Data Siswa Siswi"
+                  :toggleable="true"
+                >
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      NIK Siswa/i
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.nikSiswa }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Nomor Induk
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.nomorInduk }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Tempat, Tanggal Lahir
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.tempat }}, {{ convertDateForMonth(previewData.tanggalLahir) }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Jenis Kelamin
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.jenisKelamin }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Agama
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.agama }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Anak Ke
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.anakKe }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Jumlah Saudara
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.jumlahSaudara }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Hobi
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.hobi }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Cita - Cita
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.citaCita }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Kelas
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.kelas }}
+                    </v-col>
+                  </v-row>
+                </Fieldset>
+                <Fieldset
+                  legend="Data Sekolah Sebelumnya"
+                  :toggleable="true"
+                >
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Jenjang Sekolah
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.jenjang }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Status Sekolah
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.statusSekolah }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Nama Sekolah
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.namaSekolah }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      NPSN
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.npsn }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Alamat Sekolah
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.alamatSekolah }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Kabupaten / Kota Sekolah
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.kabkotSekolah }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      No Peserta UN
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.noPesertaUN }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      No SKHUN
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.noSKHUN }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      No Ijazah
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.noIjazah }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Nilai UN
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.nilaiUN }}
+                    </v-col>
+                  </v-row>
+                </Fieldset>
+                <Fieldset
+                  legend="Data Detail Orangtua"
+                  :toggleable="true"
+                >
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      No Kartu Keluarga
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.noKK }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Nama Kepala Keluarga
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.namaKK }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Telepon
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.telp }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Alamat
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.alamat }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Provinsi
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.provinsi }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Kabupaten / Kota
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.kabKota }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
                     cols="12"
                     md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Consumer Type
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.namaRole }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Nama Lengkap
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.nama }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Username
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.username }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Email
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.email }}
-                  </v-col>
-                </v-row>
-                <h2 class="subheading black--text"><u>>>Data Siswa Siswi</u></h2>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    NIK Siswa/i
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.nikSiswa }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Nomor Induk
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.nomorInduk }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Tempat, Tanggal Lahir
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.tempat }}, {{ convertDateForMonth(previewData.tanggalLahir) }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Jenis Kelamin
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.jenisKelamin }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Agama
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.agama }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Anak Ke
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.anakKe }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Jumlah Saudara
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.jumlahSaudara }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Hobi
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.hobi }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Cita - Cita
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.citaCita }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Kelas
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.kelas }}
-                  </v-col>
-                </v-row>
-                <h2 class="subheading black--text"><u>>>Data Sekolah Sebelumnya</u></h2>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Jenjang Sekolah
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.jenjang }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Status Sekolah
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.statusSekolah }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Nama Sekolah
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.namaSekolah }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    NPSN
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.npsn }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Alamat Sekolah
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.alamatSekolah }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Kabupaten / Kota Sekolah
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.kabkotSekolah }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    No Peserta UN
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.noPesertaUN }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    No SKHUN
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.noSKHUN }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    No Ijazah
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.noIjazah }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Nilai UN
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.nilaiUN }}
-                  </v-col>
-                </v-row>
-                <h2 class="subheading black--text"><u>>>Data Detail Orangtua</u></h2>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    No Kartu Keluarga
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.noKK }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Nama Kepala Keluarga
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.namaKK }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Telepon
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.telp }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Alamat
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.alamat }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Provinsi
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.provinsi }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Kabupaten / Kota
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.kabKota }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                  cols="12"
-                  md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                  Kecamatan
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.kecamatan }}				
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Kelurahan
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.kelurahan }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Kode Pos
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.kodePos }}
-                  </v-col>
-                </v-row>
-                <h2 class="subheading black--text"><u>>>Data Ayah</u></h2>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    NIK Ayah
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.nikAyah }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Nama Ayah
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.namaAyah }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Tahun Ayah
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.tahunAyah }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Status Ayah
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.statusAyah }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Pendidikan Ayah
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.pendidikanAyah }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Pekerjaan Ayah
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.pekerjaanAyah }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Telepon Ayah
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.telpAyah }}
-                  </v-col>
-                </v-row>
-                <h2 class="subheading black--text"><u>>>Data Ibu</u></h2>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    NIK Ibu
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.nikIbu }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Nama Ibu
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.namaIbu }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Tahun Ibu
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.tahunIbu }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Status Ibu
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.statusIbu }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Pendidikan Ibu
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.pendidikanIbu }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Pekerjaan Ibu
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.pekerjaanIbu }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Telepon Ibu
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.telpIbu }}
-                  </v-col>
-                </v-row>
-                <h2 class="subheading black--text"><u>>>Data Wali</u></h2>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    NIK Wali
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.nikWali }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Nama Wali
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.namaWali }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Tahun Wali
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.tahunWali }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Pendidikan Wali
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.pendidikanWali }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Pekerjaan Wali
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.pekerjaanWali }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Telepon Wali
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.telpWali }}
-                  </v-col>
-                </v-row>
-                <h2 class="subheading black--text"><u>>>Data Lainnya</u></h2>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Penghasilan
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.penghasilan }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Status Tempat Tinggal
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.statusTempatTinggal }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Jarak Rumah
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.jarakRumah }}
-                  </v-col>
-                </v-row>
-                <v-row no-gutters>
-                  <v-col
-                    cols="12"
-                    md="4"
-                    class="pt-2 d-flex align-center font-weight-bold"
-                  >
-                    Transportasi
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="8"
-                    class="pt-3"
-                  >
-                    {{ previewData.transportasi }}
-                  </v-col>
-                </v-row>
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                    Kecamatan
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.kecamatan }}				
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Kelurahan
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.kelurahan }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Kode Pos
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.kodePos }}
+                    </v-col>
+                  </v-row>
+                </Fieldset>
+                <Fieldset
+                  legend="Data Ayah"
+                  :toggleable="true"
+                >
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      NIK Ayah
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.nikAyah }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Nama Ayah
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.namaAyah }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Tahun Ayah
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.tahunAyah }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Status Ayah
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.statusAyah }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Pendidikan Ayah
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.pendidikanAyah }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Pekerjaan Ayah
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.pekerjaanAyah }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Telepon Ayah
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.telpAyah }}
+                    </v-col>
+                  </v-row>
+                </Fieldset>
+                <Fieldset
+                  legend="Data Ibu"
+                  :toggleable="true"
+                >
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      NIK Ibu
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.nikIbu }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Nama Ibu
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.namaIbu }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Tahun Ibu
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.tahunIbu }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Status Ibu
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.statusIbu }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Pendidikan Ibu
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.pendidikanIbu }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Pekerjaan Ibu
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.pekerjaanIbu }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Telepon Ibu
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.telpIbu }}
+                    </v-col>
+                  </v-row>
+                </Fieldset>
+                <Fieldset
+                  legend="Data Wali"
+                  :toggleable="true"
+                >
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      NIK Wali
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.nikWali }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Nama Wali
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.namaWali }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Tahun Wali
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.tahunWali }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Pendidikan Wali
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.pendidikanWali }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Pekerjaan Wali
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.pekerjaanWali }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Telepon Wali
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.telpWali }}
+                    </v-col>
+                  </v-row>
+                </Fieldset>
+                <Fieldset
+                  legend="Data Lainnya"
+                  :toggleable="true"
+                >
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Penghasilan
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.penghasilan }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Status Tempat Tinggal
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.statusTempatTinggal }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Jarak Rumah
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.jarakRumah }}
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      class="pt-2 d-flex align-center font-weight-bold"
+                    >
+                      Transportasi
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="8"
+                      class="pt-3"
+                    >
+                      {{ previewData.transportasi }}
+                    </v-col>
+                  </v-row>
+                </Fieldset>
               </div>
             </v-window-item>
             <v-window-item value="2">
@@ -1787,6 +1839,7 @@
                       :type-tf="passTypeLama ? 'text' : 'password'"
                       :icon-append-tf="passTypeLama ? 'mdi mdi-eye-lock' : 'mdi mdi-eye-lock-open'"
                       :clearable-tf="true"
+                      autocomplete="current-password"
                       @prosesicon="onClickVisible('passTypeLama')"
                     />
                   </v-col>
@@ -1811,6 +1864,7 @@
                       :type-tf="passTypeBaru ? 'text' : 'password'"
                       :icon-append-tf="passTypeBaru ? 'mdi mdi-eye-lock' : 'mdi mdi-eye-lock-open'"
                       :clearable-tf="true"
+                      autocomplete="new-password"
                       @prosesicon="onClickVisible('passTypeBaru')"
                     />
                   </v-col>
@@ -1835,6 +1889,7 @@
                       :type-tf="passTypeConfBaru ? 'text' : 'password'"
                       :icon-append-tf="passTypeConfBaru ? 'mdi mdi-eye-lock' : 'mdi mdi-eye-lock-open'"
                       :clearable-tf="true"
+                      autocomplete="new-password"
                       @prosesicon="onClickVisible('passTypeConfBaru')"
                     />
                   </v-col>
@@ -1868,12 +1923,12 @@
               @change="uploadFotoProfile($event)"
             >
           </div>
-          <p class="white--text subheading mt-1 text-center"><strong>{{nama}}</strong></p>
-          <p class="white--text text-center">{{namaRole}}</p>
+          <p class="white--text mt-1 text-center" style="font-size: 10pt;"><strong>{{nama}}</strong></p>
+          <p class="white--text text-center" style="font-size: 9pt;">{{namaRole}}</p>
           <v-divider :thickness="2" class="border-opacity-100" />
           <div v-if="roleID === '4'" class="customScrollRight">
             <h4 class="white--text text-center ma-4">******&nbsp;Berkas - Berkas&nbsp;******</h4>
-            <v-row no-gutters class="d-flex flex-row justify-center align-center">
+            <!-- <v-row no-gutters class="d-flex flex-row justify-center align-center">
               <v-col
                 cols="12"
                 lg="5"
@@ -1887,40 +1942,106 @@
                   <span v-else><v-icon icon="mdi mdi-file-pdf-box" /> {{ data.title }}</span>
                 </div>
               </v-col>
+            </v-row> -->
+            <div>
+              <v-chip-group class="d-flex flex-row justify-center align-center">
+                <v-chip v-for="data in dataBerkas" :key="data.kode" class="boxlistBerkas" @click="pdfCreate(data)">
+                  <v-progress-circular v-if="isLoadingPDF[data.kode]" indeterminate />
+                  <span v-else><v-icon icon="mdi mdi-file-pdf-box" /> {{ data.title }}</span>  
+                </v-chip>
+              </v-chip-group>
+            </div>
+            <div class="white--text text-center ma-4" style="font-weight: bold; font-size: 10pt">******&nbsp;Data Kelengkapan&nbsp;******</div>
+            <v-row no-gutters class="mb-2">
+              <v-col cols="12" md="12">
+                <div class="white--text text-left" style="font-weight: bold; font-size: 10pt">*Jadwal Mengajar</div>
+                <div>
+                  <v-chip-group class="d-flex flex-row justify-center align-center">
+                    <v-chip class="boxlist" @click="lookJadwal()"><strong>Jadwal Pelajaran</strong></v-chip>
+                  </v-chip-group>
+                </div>
+              </v-col>
             </v-row>
             <!-- <h4 class="white--text text-center ma-4">******&nbsp;Raport Nilai&nbsp;******</h4> -->
           </div>
           <div v-if="roleID === '3'" class="customScrollRight">
-            <h4 class="white--text text-center ma-4">******&nbsp;Data Kelengkapan&nbsp;******</h4>
+            <div class="white--text text-center ma-4" style="font-weight: bold; font-size: 10pt">******&nbsp;Signature&nbsp;******</div>
+            <div class="d-flex flex-row justify-center align-center">
+              <v-chip class="boxlist" @click="DialogSignature = true"><strong>Ubah Signature</strong></v-chip>
+            </div>
+            <div class="white--text text-center ma-4" style="font-weight: bold; font-size: 10pt">******&nbsp;Data Kelengkapan&nbsp;******</div>
             <v-row no-gutters class="mb-2">
               <v-col cols="12" md="12">
-                <div class="white--text text-left" style="font-weight: bold;">*Jabatan Struktural</div>
-                <div class="white--text text-left">
-                  <v-row no-gutters class="d-flex flex-row justify-center align-center">
+                <div class="white--text text-left" style="font-weight: bold; font-size: 10pt">*Jabatan Struktural</div>
+                <div>
+                  <v-chip-group class="d-flex flex-row justify-center align-center">
+                    <v-chip v-for="jabatan in arrayData.jabatanGuru" :key="jabatan" class="boxlist" style="cursor: default;"><strong><span v-html="jabatan" /></strong></v-chip>
+                  </v-chip-group>
+                  <!-- <v-row no-gutters class="d-flex flex-row justify-center align-center">
                     <v-col cols="3" class="d-flex flex-column justify-center boxlist" v-for="jabatan in arrayData.jabatanGuru" :key="jabatan">
                       {{ jabatan }}
                     </v-col>
-                  </v-row>
+                  </v-row> -->
                 </div>
               </v-col>
             </v-row>
             <v-row no-gutters class="mb-2">
               <v-col cols="12" md="12">
-                <div class="white--text text-left" style="font-weight: bold;">*Mangajar Bidang</div>
-                <div class="white--text text-left">
-                  <v-row no-gutters class="d-flex flex-row justify-center align-center">
+                <div class="white--text text-left" style="font-weight: bold; font-size: 10pt">*Mengajar Bidang</div>
+                <div>
+                  <v-chip-group class="d-flex flex-row justify-center align-center">
+                    <v-chip v-for="bidang in arrayData.mengajarBidang" :key="bidang" class="boxlist" style="cursor: default;"><strong><span v-html="bidang" /></strong></v-chip>
+                  </v-chip-group>
+                  <!-- <v-row no-gutters class="d-flex flex-row justify-center align-center">
                     <v-col cols="3" class="d-flex flex-column justify-center boxlist" v-for="bidang in arrayData.mengajarBidang" :key="bidang">
                       {{ bidang }}
                     </v-col>
-                  </v-row>
+                  </v-row> -->
+                </div>
+              </v-col>
+            </v-row>
+            <v-row v-if="arrayData.mengajarBidang.length" no-gutters class="mb-2">
+              <v-col cols="12" md="12">
+                <div class="white--text text-left" style="font-weight: bold; font-size: 10pt">*Jadwal Mengajar</div>
+                <div>
+                  <v-chip-group class="d-flex flex-row justify-center align-center">
+                    <v-chip class="boxlist" @click="lookJadwal()"><strong>Jadwal Pelajaran</strong></v-chip>
+                  </v-chip-group>
                 </div>
               </v-col>
             </v-row>
             <v-row no-gutters class="mb-2">
               <v-col cols="12" md="12">
-                <div class="white--text text-left" style="font-weight: bold;">*Mangajar Kelas</div>
-                <div class="white--text text-left">
-                  <v-row no-gutters class="d-flex flex-row justify-center align-center">
+                <div class="white--text text-left" style="font-weight: bold; font-size: 10pt">*Mengajar Kelas</div>
+                <div>
+                  <template v-if="DataKelas.length">
+                    <div
+                      v-for="data in DataKelas"
+                      :key="data.kategori"
+                    >
+                      <span v-if="data.dataKelas.length" class="d-flex flex-row justify-center align-center black--text ml-3" style="font-weight: bold; font-size: 10pt"><u>Kelas ({{ data.kategori }})</u></span>
+                      <v-container fluid v-if="data.dataKelas.length">
+                        <v-chip-group class="d-flex flex-row justify-center align-center">
+                          <v-chip v-for="hasil in data.dataKelas" :key="hasil.label" class="boxlist" @click="hasil.jumlah > 0 ? gotoDetail(hasil.kelas) : warningNotif()">
+                            <template v-slot:append>
+                              <span class="green-darken-4">&nbsp;({{hasil.jumlah}})</span>
+                            </template>
+                            <strong><span v-html="hasil.kelas" /></strong>
+                          </v-chip>
+                        </v-chip-group>
+                      </v-container>
+                    </div>
+                  </template>
+                  <span v-else class="d-flex flex-row justify-center align-center black--text ml-3" style="font-weight: bold; font-size: 10pt"><u>Tidak ada data</u></span>
+                  <!-- <v-chip-group class="d-flex flex-row justify-center align-center">
+                    <v-chip v-for="kelas in arrayData.mengajarKelas" :key="kelas" class="boxlist" @click="gotoDetail(kelas)">
+                      <template v-slot:append>
+                        <span class="green-darken-4">&nbsp;(25)</span>
+                      </template>
+                      <strong><span v-html="kelas" /></strong>
+                    </v-chip>
+                  </v-chip-group> -->
+                  <!-- <v-row no-gutters class="d-flex flex-row justify-center align-center">
                     <v-col
                       cols="3"
                       class="d-flex flex-column justify-center boxlist"
@@ -1931,19 +2052,22 @@
                     >
                       {{ kelas }}
                     </v-col>
-                  </v-row>
+                  </v-row> -->
                 </div>
               </v-col>
             </v-row>
             <v-row no-gutters class="mb-2">
               <v-col cols="12" md="12">
-                <div class="white--text text-left" style="font-weight: bold;">*Wali Kelas</div>
-                <div class="white--text text-left">
-                  <v-row no-gutters class="d-flex flex-row justify-center align-center">
+                <div class="white--text text-left" style="font-weight: bold; font-size: 10pt">*Wali Kelas</div>
+                <div>
+                  <v-chip-group class="d-flex flex-row justify-center align-center">
+                    <v-chip class="boxlist" style="cursor: default;"><strong><span v-html="previewData.waliKelas ? previewData.waliKelas : '-'" /></strong></v-chip>
+                  </v-chip-group>
+                  <!-- <v-row no-gutters class="d-flex flex-row justify-center align-center">
                     <v-col cols="3" class="d-flex flex-column justify-center boxlist">
                       {{ previewData.waliKelas ? previewData.waliKelas : '-' }}
                     </v-col>
-                  </v-row>
+                  </v-row> -->
                 </div>
               </v-col>
             </v-row>
@@ -2023,6 +2147,282 @@
       </v-card>
 		</v-dialog>
     <v-dialog
+      v-model="DialogSignature"
+      scrollable
+      persistent
+      transition="dialog-bottom-transition"
+      width="auto"
+    >
+      <v-card color="background-dialog-card">
+        <v-toolbar color="surface">
+          <v-toolbar-title>Signature</v-toolbar-title>
+          <v-spacer />
+          <v-toolbar-items>
+            <Button
+              variant="plain"
+              color-button="#ffffff"
+              icon-button="mdi mdi-close"
+              model-button="comfortable"
+              size-button="large"
+              @proses="() => { clearCropSignature(); clearSignature(); DialogSignature = false; }"
+            />
+          </v-toolbar-items>
+        </v-toolbar>
+        <v-card-text class="pt-4 v-dialog--custom">
+          <v-row no-gutters>
+            <v-col
+              cols="12"
+              md="6"
+              class="d-flex align-center justify-center font-weight-bold"
+            >
+              Signature
+            </v-col>
+            <v-col
+              cols="12"
+              md="6"
+              class="d-flex align-center justify-center font-weight-bold"
+            >
+              Crop Signature
+            </v-col>
+          </v-row>
+          <v-row no-gutters>
+            <v-col
+              cols="12"
+              md="6"
+              class="d-flex align-center justify-center"
+            >
+              <VueSignaturePad
+                id="signature"
+                width="300px"
+                height="300px"
+                ref="signaturePad"
+                :options="options"
+              />
+            </v-col>
+            <v-col
+              cols="12"
+              md="6"
+              class="d-flex align-center justify-center"
+            >
+              <Cropper
+                ref="cropperS"
+                class="cropper-signature"
+                :src="image.src"
+                :stencil-component="RectangleStencil"
+              />
+            </v-col>
+          </v-row>
+          <v-row no-gutters>
+            <v-col
+              cols="12"
+              md="6"
+              class="d-flex align-center justify-center"
+            >
+              <Button
+                color-button="#0bd369"
+                nama-button="Clear"
+                @proses="clearSignature()"
+              />
+              <Button
+                color-button="#0bd369"
+                nama-button="Undo"
+                @proses="undoSignature()"
+              />
+              <Button
+                color-button="#0bd369"
+                nama-button="Proses"
+                @proses="saveSignature()"
+              />
+            </v-col>
+            <v-col
+              cols="12"
+              md="6"
+              class="d-flex align-center justify-center"
+            >
+              <Button
+                color-button="#0bd369"
+                nama-button="Crop Signature"
+                @proses="cropSignature()"
+              />
+              <Button
+                color-button="#0bd369"
+                nama-button="Clear"
+                @proses="clearCropSignature()"
+              />
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <v-dialog
+      v-model="DialogJadwalPelajaran"
+      fullscreen
+      scrollable
+      hide-overlay
+      transition="dialog-bottom-transition"
+    >
+      <v-card color="background-dialog-card">
+        <v-toolbar color="surface">
+          <v-toolbar-title>Jadwal Pelajaran</v-toolbar-title>
+          <v-spacer />
+          <v-toolbar-items>
+            <Button
+              variant="plain"
+              color-button="#ffffff"
+              icon-button="mdi mdi-close"
+              model-button="comfortable"
+              size-button="large"
+              @proses="() => { DialogJadwalPelajaran = false; }"
+            />
+          </v-toolbar-items>
+        </v-toolbar>
+        <v-card-text class="ScrollFullscreen">
+          <v-row no-gutters>
+            <v-col
+              cols="12"
+              md="4"
+              class="pa-1"
+            >
+            <table dark class="tableClass mb-2">
+                <thead>
+                  <tr>
+                    <th class="thSClass">Nama Guru</th>
+                    <th class="thSClass">Jabatan</th>
+                    <th class="thSClass">Mengajar</th>
+                  </tr>
+                </thead>
+                <tbody v-for="data in dataGuru" :key="data.nomorInduk">
+                  <template v-if="!data.mengajarBidang.length">
+                    <tr>
+                      <td class="tdSClass">{{ data.nama }}</td>
+                      <td class="tdSClass">{{ data.waliKelas ? `${data.jabatanGuru.map(val => val.label).join(", ")} (${data.waliKelas})` : data.jabatanGuru.map(val => val.label).join(", ") }}</td>
+                      <td class="tdSClass">-</td>
+                    </tr>
+                  </template>
+                  <template v-else>
+                    <tr>
+                      <td :rowspan="data.mengajarBidang.length" class="tdSClass">{{ data.nama }}</td>
+                      <td :rowspan="data.mengajarBidang.length" class="tdSClass">{{ data.waliKelas ? `${data.jabatanGuru.map(val => val.label).join(", ")} (${data.waliKelas})` : data.jabatanGuru.map(val => val.label).join(", ") }}</td>
+                      <td class="tdSClass" :style="`background-color: ${data.mengajarBidang[0].color};`">{{ `${data.mengajarBidang[0].label} (${data.mengajarBidang[0].alias})` }}</td>
+                    </tr>
+                    <tr v-for="x in data.mengajarBidang.length-1" :key="x">
+                      <td class="tdSClass" :style="`background-color: ${data.mengajarBidang[x].color};`">{{ `${data.mengajarBidang[x].label} (${data.mengajarBidang[x].alias})` }}</td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </v-col>
+            <v-col
+              cols="12"
+              md="8"
+              class="pa-1"
+            >
+              <table dark class="tableClass mb-10">
+                <thead>
+                  <template v-if="roleID === '3'">
+                    <tr>
+                      <th rowspan="2" class="thClass">Hari</th>
+                      <th rowspan="2" class="thClass">Waktu</th>
+                      <th :colspan="dataKelasKumpul.length" class="thClass">Mata Pelajaran Per Kelas</th>
+                    </tr>
+                    <tr>
+                      <th v-for="(data, index) in dataKelasKumpul" :key="index" class="thClass">{{ data.kelas }}</th>
+                    </tr>
+                  </template>
+                  <template v-if="roleID === '4'">
+                    <tr>
+                      <th rowspan="2" class="thClass">Hari</th>
+                      <th rowspan="2" class="thClass">Waktu</th>
+                      <th v-for="(data, index) in dataKelasKumpul" :key="index" class="thClass">{{ `Kelas (${data.kelas})` }}</th>
+                    </tr>
+                  </template>
+                </thead>
+                <tbody v-for="(data, index) in DataJadwalPelajaran" :key="index">
+                  <tr>
+                    <td :rowspan="data.dataJadwal.length" class="tdClass textHari">{{ data.hari.toUpperCase() }}</td>
+                    <td class="tdClass">{{ data.dataJadwal[0].waktu }}</td>
+                    <td :colspan="dataKelasKumpul.length" v-for="(datas, z) in data.dataJadwal[0].jadwal" :key="z" class="tdClass" style="background-color: #FFF">{{ datas.alias }}</td>
+                  </tr>
+                  <template v-for="x in data.dataJadwal.length-1" :key="x">
+                    <tr v-if="data.dataJadwal[x].waktu === '09:30:00 - 10:00:00' || data.dataJadwal[x].waktu === '11:30:00 - 12:30:00'">
+                      <td class="tdClass">{{ data.dataJadwal[x].waktu }}</td>
+                      <td :colspan="dataKelasKumpul.length" class="tdClass" style="background-color: #FFF">{{ data.dataJadwal[x].jadwal[0].alias }}</td>
+                    </tr>
+                    <tr v-else>
+                      <td class="tdClass">{{ data.dataJadwal[x].waktu }}</td>
+                      <td v-for="(datas, z) in dataKelasKumpul" :key="z" class="tdClass" :style="`background-color: ${data.dataJadwal[x].jadwal.filter(val => val.kelas === datas.kelas).length ? data.dataJadwal[x].jadwal.filter(val => val.kelas === datas.kelas)[0].idUser === idUser && roleID === '3' ? data.dataJadwal[x].jadwal.filter(val => val.kelas === datas.kelas)[0].color : roleID === '4' ? data.dataJadwal[x].jadwal.filter(val => val.kelas === datas.kelas)[0].color : '#e1e1f0' : '#e1e1f0'};`">
+                        {{ data.dataJadwal[x].jadwal.filter(val => val.kelas === datas.kelas).length ? roleID === '4' ? `${data.dataJadwal[x].jadwal.filter(val => val.kelas === datas.kelas)[0].mapel} (${data.dataJadwal[x].jadwal.filter(val => val.kelas === datas.kelas)[0].namaGuru})` : data.dataJadwal[x].jadwal.filter(val => val.kelas === datas.kelas)[0].alias : '' }}
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+              <table border="0" width="100%" cellspacing="0" cellpadding="0" style="margin-top: 20px;">
+                <tr>
+                  <td style="width: 50%;">
+                    <table border="0" width="300px" cellspacing="0" cellpadding="0" style="float: left; margin-left: 80px;">
+                      <tr class="ttd">
+                        <td style="padding-bottom: 10px;">Mengetahui,</td>
+                      </tr>
+                      <tr class="ttd">
+                        <td>{{ `Kepala Sekolah ${dataTTD.ttd.namasekolah}` }}</td>
+                      </tr>
+                      <tr class="ttd">
+                        <td style="padding: 10px 0px;">
+                          <template v-if="dataTTD.kepalasekolah.signature !== null">
+                            <v-img
+                              :src="`${dataTTD.url}/image/${dataTTD.kepalasekolah.signature}`"
+                              width="80px"
+                              height="80px"
+                            />
+                          </template>
+                        </td>
+                      </tr>
+                      <tr class="ttd">
+                        <td style="text-decoration: underline;">{{ dataTTD.kepalasekolah.nama }}</td>
+                      </tr>
+                      <tr class="ttd">
+                        <td>{{ `NIP. ${dataTTD.kepalasekolah.nomorInduk}` }}</td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td style="width: 50%;">
+                    <table border="0" width="300px" cellspacing="0" cellpadding="0" style="float: right;">
+                      <tr class="ttd">
+                        <td style="padding-bottom: 10px;">{{ `${dataTTD.ttd.tempat}, ${dataTTD.ttd.tanggal}` }}</td>
+                      </tr>
+                      <tr class="ttd">
+                        <td>{{ `WaKaBid. Kurikulum ${dataTTD.ttd.namasekolah}` }}</td>
+                      </tr>
+                      <tr class="ttd">
+                        <td style="padding: 10px 0px;">
+                          <template v-if="dataTTD.kurikulum.signature !== null">
+                            <v-img
+                              :src="`${dataTTD.url}/image/${dataTTD.kurikulum.signature}`"
+                              width="80px"
+                              height="80px"
+                            />
+                          </template>
+                        </td>
+                      </tr>
+                      <tr class="ttd">
+                        <td style="text-decoration: underline;">{{ dataTTD.kurikulum.nama }}</td>
+                      </tr>
+                      <tr class="ttd">
+                        <td>{{ `NIP. ${dataTTD.kurikulum.nomorInduk}` }}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </v-col>
+          </v-row>
+        </v-card-text>
+        <v-divider />
+        <v-card-actions />
+      </v-card>
+    </v-dialog>
+    <v-dialog
       v-model="dialogNotifikasi"
       transition="dialog-bottom-transition"
       persistent
@@ -2045,8 +2445,7 @@ import { useMeta } from 'vue-meta'
 import PopUpNotifikasi from "./Layout/PopUpNotifikasi.vue";
 import PdfCetakan from "./Layout/PdfCetakan.vue";
 import Stencil from "./Layout/Stencil.vue";
-import { Cropper, CircleStencil } from 'vue-advanced-cropper'
-import 'vue-advanced-cropper/dist/style.css';
+import { RectangleStencil } from "vue-advanced-cropper";
 
 function getMimeType(file, fallback = null) {
 	const byteArray = (new Uint8Array(file)).subarray(0, 4);
@@ -2072,11 +2471,12 @@ function getMimeType(file, fallback = null) {
 
 export default {
   name: 'Profile',
-  components: { PopUpNotifikasi, PdfCetakan, Cropper, CircleStencil, Stencil },
+  components: { PopUpNotifikasi, PdfCetakan, RectangleStencil, Stencil  },
   data: () => ({
     roleID: '',
     nama: '',
     namaRole: '',
+    idUser: '',
     isLoadingPDF: [],
     dialogPDF: false,
     urlSk: window.location.href,
@@ -2191,7 +2591,31 @@ export default {
       fcAktaLahir: '',
       fcSKL: '',
     },
+    DataKelas: [],
     dataBerkas: [],
+    DataJadwalPelajaran: [],
+		dataKelasKumpul: [],
+		dataGuru: [],
+    dataTTD: {
+      kepalasekolah: {
+        idUser: '',
+        nama: '',
+        nomorInduk: '',
+        signature: '',
+      },
+      kurikulum: {
+        idUser: '',
+        nama: '',
+        nomorInduk: '',
+        signature: '',
+      },
+      ttd: {
+        namasekolah: '',
+        tempat: '',
+        tanggal: '',
+      },
+      url: '',
+    },
     arrayData: {
       jabatanGuru: '',
       mengajarBidang: '',
@@ -2214,12 +2638,6 @@ export default {
     passTypeBaru: '',
     passTypeConfBaru: '',
     endecryptType: '',
-    rules: {
-			emailRules: value => {
-        const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-        return pattern.test(value) || 'email tidak valid'
-			},
-		},
     itemsTab: [
 			{code: '1', text: 'Data Profile', icon: 'mdi mdi-account'},
 			{code: '2', text: 'Ubah Kata Sandi', icon: 'mdi mdi-lock'},
@@ -2227,12 +2645,17 @@ export default {
 		tab: '',
 		componentKey: 0,
     dialogCrop: false,
+    DialogSignature: false,
+    DialogJadwalPelajaran: false,
     image: {
       src: null,
       type: null,
     },
     FileFotoProfil: '',
     fotoProfil: '',
+    options: {
+      penColor: "#000",
+    },
 
     //notifikasi
     dialogNotifikasi: false,
@@ -2248,7 +2671,7 @@ export default {
         amp: true,
       }
     })
-    return { CircleStencil }
+    return { RectangleStencil }
   },
   computed: {
     ...mapState({
@@ -2261,7 +2684,27 @@ export default {
     }),
     ...mapGetters({
       dataprofile: 'auth/dataprofile',
+      kelasSiswa: 'kelas/kelasSiswa',
+      jadwalPelajaranAll: 'user/jadwalPelajaranAll',
     }),
+    optionsKabKota(){
+      let kabkota = this.KabKotaOptions.map(x => {
+        return {
+          kode: x.kode,
+          nama: `${x.jenisKabKota} ${x.nama}`
+        }
+      })
+      return kabkota
+    },
+		optionsKelurahan(){
+      let kel = this.KelurahanOptions.map(x => {
+        return {
+          kode: x.kode,
+          nama: `${x.jenisKelDes} ${x.nama}`
+        }
+      })
+      return kel
+    },
   },
   watch:{
 		dataprofile:{
@@ -2289,10 +2732,10 @@ export default {
           }
           this.getAgama()
           this.getPendidikan()
-          this.getWilayah({ bagian: 'provinsi', KodeWilayah: null })
-          this.getWilayah({ bagian: 'kabkota', KodeWilayah: this.inputGuru.provinsi })
-          this.getWilayah({ bagian: 'kecamatan', KodeWilayah: this.inputGuru.kabKota })
-          this.getWilayah({ bagian: 'kelurahan', KodeWilayah: this.inputGuru.kecamatan })
+          this.getWilayah2023({ bagian: 'provinsi', KodeWilayah: null })
+          this.getWilayah2023({ bagian: 'kabkota', KodeWilayah: this.inputGuru.provinsi })
+          this.getWilayah2023({ bagian: 'kecamatan', KodeWilayah: this.inputGuru.kabKota })
+          this.getWilayah2023({ bagian: 'kelurahan', KodeWilayah: this.inputGuru.kecamatan })
         }
         if(this.roleID === '1' || this.roleID === '2'){
           this.inputAdministrator = {
@@ -2313,10 +2756,10 @@ export default {
             kodePos: value.kodePos,
           }
           this.getAgama()
-          this.getWilayah({ bagian: 'provinsi', KodeWilayah: null })
-          this.getWilayah({ bagian: 'kabkota', KodeWilayah: this.inputAdministrator.provinsi })
-          this.getWilayah({ bagian: 'kecamatan', KodeWilayah: this.inputAdministrator.kabKota })
-          this.getWilayah({ bagian: 'kelurahan', KodeWilayah: this.inputAdministrator.kecamatan })
+          this.getWilayah2023({ bagian: 'provinsi', KodeWilayah: null })
+          this.getWilayah2023({ bagian: 'kabkota', KodeWilayah: this.inputAdministrator.provinsi })
+          this.getWilayah2023({ bagian: 'kecamatan', KodeWilayah: this.inputAdministrator.kabKota })
+          this.getWilayah2023({ bagian: 'kelurahan', KodeWilayah: this.inputAdministrator.kecamatan })
         }
         this.previewData = {
           idUser: value.idUser,
@@ -2341,7 +2784,7 @@ export default {
           namaSekolah: this.roleID === '4' ? value.dataSekolahSebelumnya.namaSekolah : null,
           npsn: this.roleID === '4' ? value.dataSekolahSebelumnya.npsn ? value.dataSekolahSebelumnya.npsn : '-' : null,
           alamatSekolah: this.roleID === '4' ? this.uppercaseLetterFirst2(value.dataSekolahSebelumnya.alamatSekolah) : null,
-          kabkotSekolah: this.roleID === '4' ? this.uppercaseLetterFirst2(value.dataSekolahSebelumnya.kabkotSekolah.nama) : null,
+          kabkotSekolah: this.roleID === '4' ? `${value.dataSekolahSebelumnya.kabkotSekolah.jenisKabKota} ${value.dataSekolahSebelumnya.kabkotSekolah.nama}` : null,
           noPesertaUN: this.roleID === '4' ? value.dataSekolahSebelumnya.noPesertaUN ? value.dataSekolahSebelumnya.noPesertaUN : '-': null,
           noSKHUN: this.roleID === '4' ? value.dataSekolahSebelumnya.noSKHUN ? value.dataSekolahSebelumnya.noSKHUN : '-' : null,
           noIjazah: this.roleID === '4' ? value.dataSekolahSebelumnya.noIjazah ? value.dataSekolahSebelumnya.noSKHUN : '-' : null,
@@ -2350,10 +2793,10 @@ export default {
           namaKK: this.roleID === '4' ? this.uppercaseLetterFirst2(value.namaKK) : null,
           telp: this.roleID === '4' ? value.dataAlamatOrangtua.telp ? value.dataAlamatOrangtua.telp : '-' : value.telp ? value.telp : '-',
           alamat: this.uppercaseLetterFirst2(this.roleID === '4' ? value.dataAlamatOrangtua.alamat ? value.dataAlamatOrangtua.alamat : '-' : value.alamat ? value.alamat : '-'),
-          provinsi: this.uppercaseLetterFirst2(this.roleID === '4' ? value.dataAlamatOrangtua.provinsi.nama : value.provinsi.nama),
-          kabKota: this.uppercaseLetterFirst2(this.roleID === '4' ? value.dataAlamatOrangtua.kabKota.nama : value.kabKota.nama),
-          kecamatan: this.uppercaseLetterFirst2(this.roleID === '4' ? value.dataAlamatOrangtua.kecamatan.nama : value.kecamatan.nama),
-          kelurahan: this.uppercaseLetterFirst2(this.roleID === '4' ? value.dataAlamatOrangtua.kelurahan.nama : value.kelurahan.nama),
+          provinsi: this.roleID === '4' ? value.dataAlamatOrangtua.provinsi.nama : value.provinsi.nama,
+          kabKota: this.roleID === '4' ? `${value.dataAlamatOrangtua.kabKota.jenisKabKota} ${value.dataAlamatOrangtua.kabKota.nama}` : `${value.kabKota.jenisKabKota} ${value.kabKota.nama}`,
+          kecamatan: this.roleID === '4' ? value.dataAlamatOrangtua.kecamatan.nama : value.kecamatan.nama,
+          kelurahan: this.roleID === '4' ? `${value.dataAlamatOrangtua.kelurahan.jenisKelDes} ${value.dataAlamatOrangtua.kelurahan.nama}` : `${value.kelurahan.jenisKelDes} ${value.kelurahan.nama}`,
           kodePos: this.roleID === '4' ? value.dataAlamatOrangtua.kodePos : value.kodePos,
           nikAyah: this.roleID === '4' ? value.dataOrangtua.dataAyah.nikAyah : null,
           namaAyah: this.roleID === '4' ? this.uppercaseLetterFirst2(value.dataOrangtua.dataAyah.namaAyah) : null,
@@ -2406,8 +2849,38 @@ export default {
           mengajarKelas: this.roleID === '3' ? value.mengajarKelas === null ? '-' : value.mengajarKelas.split(', ') : null,
         }
         localStorage.setItem('fotoProfil', this.previewData.fotoProfil)
+        this.getKelasSiswa({kelas: null, roleID: this.roleID})
 			}
 		},
+    kelasSiswa: {
+      deep: true,
+			handler(value) {
+        if(!value.length) return this.DataKelas = value
+        let result = [
+          { kategori: '7'},
+          { kategori: '8'},
+          { kategori: '9'},
+        ]
+
+        result.map(async val => {
+          let hasil = []
+          await value.map(str => {
+            let split = str.kelas.split('-')
+            if(split[0] === val.kategori){
+              hasil.push({
+                kelas: str.kelas,
+                jumlah: str.jumlah,
+              })
+            }
+            return hasil
+          })
+          this.DataKelas.push({
+            kategori: val.kategori,
+            dataKelas: hasil,
+          })
+        })
+      }
+    },
 		tab:{
       deep: true,
 			handler(value){
@@ -2455,12 +2928,41 @@ export default {
 				}
       }
     },
+    jadwalPelajaranAll: {
+			deep: true,
+			handler(value) {
+        this.DataJadwalPelajaran = value.result
+        this.dataKelasKumpul = this.roleID === '4' ? value.dataKelas.filter(val => val.kelas === localStorage.getItem("kelas")) : value.dataKelas
+        this.dataGuru = value.dataGuru
+        this.dataTTD = {
+          kepalasekolah: {
+            idUser: value.kepalaSekolah.idUser,
+            nama: value.kepalaSekolah.nama,
+            nomorInduk: value.kepalaSekolah.nomorInduk,
+            signature: value.kepalaSekolah.signature,
+          },
+          kurikulum: {
+            idUser: value.kurikulum.idUser,
+            nama: value.kurikulum.nama,
+            nomorInduk: value.kurikulum.nomorInduk,
+            signature: value.kurikulum.signature,
+          },
+          ttd: {
+            namasekolah: value.ttd.namasekolah,
+            tempat: value.ttd.tempat,
+            tanggal: value.ttd.tanggal,
+          },
+          url: value.url,
+        }
+      }
+    },
 	},
   mounted() {
     if(!localStorage.getItem('user_token')) return this.$router.push({name: 'LogIn'});
     this.roleID = localStorage.getItem("roleID")
     this.nama = localStorage.getItem("nama")
     this.namaRole = localStorage.getItem("nama_role")
+    this.idUser = localStorage.getItem("idLogin")
     this.BASE_URL = process.env.VUE_APP_BASE_URL_VIEW
     this.passType = true
     this.endecryptType = false
@@ -2474,13 +2976,15 @@ export default {
       uploadFiles: 'upload/uploadFiles',
       getAgama: 'setting/getAgama',
       getPendidikan: 'setting/getPendidikan',
-      getWilayah: 'setting/getWilayah',
+      getWilayah2023: 'setting/getWilayah2023',
+      getKelasSiswa: 'kelas/getKelasSiswa',
       getProfile: 'auth/getProfile',
+      getJadwalPelajaran: 'user/getJadwalPelajaran', 
     }),
     wilayah(kondisi, e){
 			if(kondisi === 'provinsi'){
 				if(e){
-          this.getWilayah({ bagian: 'kabkota', KodeWilayah: e })
+          this.getWilayah2023({ bagian: 'kabkota', KodeWilayah: e })
           if(this.roleID === '1' || this.roleID === '2'){
             this.inputAdministrator.kabKota = null
             this.inputAdministrator.kecamatan = null
@@ -2495,7 +2999,7 @@ export default {
 				}
 			}else if(kondisi === 'kabkota'){
 				if(e){
-					this.getWilayah({ bagian: 'kecamatan', KodeWilayah: e })
+					this.getWilayah2023({ bagian: 'kecamatan', KodeWilayah: e })
           if(this.roleID === '1' || this.roleID === '2'){
             if(e !== this.inputAdministrator.kecamatan) {
               this.inputAdministrator.kelurahan = null
@@ -2520,7 +3024,7 @@ export default {
 				}
 			}else if(kondisi === 'kecamatan'){
 				if(e){
-					this.getWilayah({ bagian: 'kelurahan', KodeWilayah: e })
+					this.getWilayah2023({ bagian: 'kelurahan', KodeWilayah: e })
           if(this.roleID === '1' || this.roleID === '2'){
             if(e !== this.inputAdministrator.kelurahan) {
               this.inputAdministrator.kodePos = ''	
@@ -2722,6 +3226,11 @@ export default {
     gotoDetail(kelas) {
       this.$router.push({name: "DataDetailKelasSiswa", params: { kondisi: 'view', kelas: kelas }});
     },
+    lookJadwal(){
+      // this.getJadwalPelajaran({ untuk: 'personal', kode })
+      this.getJadwalPelajaran()
+      this.DialogJadwalPelajaran = true
+    },
     onClickVisible(d) {
       this[d] = !this[d]
     },
@@ -2789,6 +3298,97 @@ export default {
         }
       }
     },
+    undoSignature() {
+      this.$refs.signaturePad.undoSignature();
+    },
+    clearSignature() {
+      this.$refs.signaturePad.clearSignature();
+    },
+    async saveSignature() {
+      const { isEmpty, data } = this.$refs.signaturePad.saveSignature();
+      if(isEmpty) return this.notifikasi("failed", "tidak ada Signature !", "1")
+      const block = data.split(";");
+      const contentType = block[0].split(":")[1];
+      const realData = block[1].split(",")[1];
+      const blob = this.b64toBlob(realData, contentType);
+      // console.log(blob);
+      this.loadImageSignature(blob)
+    },
+    loadImageSignature(files) {
+      const blob = URL.createObjectURL(files);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.image = {
+          src: blob,
+          type: getMimeType(e.target.result, files.type),
+        }
+      }
+      reader.readAsArrayBuffer(files);
+    },
+		cropSignature() {
+			const { canvas } = this.$refs.cropperS.getResult();
+			canvas.toBlob(async (blob) => {
+        let uploadSignature = await this.uploadSignature(localStorage.getItem("idLogin"), blob)
+        if(uploadSignature != undefined){
+          this.notifikasi("success", "Signature berhasil di buat !", "1")
+        }else{ 
+          this.notifikasi("failed", "Signature gagal di buat !", "1")
+        }
+        this.clearCropSignature();
+        this.clearSignature();
+        this.DialogSignature = false
+			}, this.image.type);
+
+		},
+    async uploadSignature(idUser, dataUpload) {
+			if(dataUpload){
+				const bodyData = {
+					idUser: idUser,
+					field: 'signature',
+					nama_folder: idUser,
+					nama_file: `${idUser}-signature`,
+					jenis: "image",
+					bagian: "berkas",
+					table: "UserDetail",
+					files: dataUpload,
+				};
+				try {
+					let response = await this.uploadFiles(bodyData);
+					return response
+				} catch (err) {
+					this.notifikasi("error", err.response.data.message, "1")
+				}
+			}else{
+        return undefined
+      }
+		},
+    clearCropSignature(){
+      this.image = {
+        src: null,
+        type: null,
+      }
+			this.$refs.cropperS.value = null
+    },
+    b64toBlob(b64Data, contentType, sliceSize) {
+      contentType = contentType || '';
+      sliceSize = sliceSize || 512;
+      var byteCharacters = atob(b64Data);
+      var byteArrays = [];
+      for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+        var slice = byteCharacters.slice(offset, offset + sliceSize);
+        var byteNumbers = new Array(slice.length);
+        for (var i = 0; i < slice.length; i++) {
+          byteNumbers[i] = slice.charCodeAt(i);
+        }
+        var byteArray = new Uint8Array(byteNumbers);
+        byteArrays.push(byteArray);
+      }
+      var blob = new Blob(byteArrays, {type: contentType});
+      return blob;
+    },
+    warningNotif(){
+      this.notifikasi("warning", "Tidak ada siswa/i dikelas ini", "1")
+    },
 		notifikasi(kode, text, proses){
       this.dialogNotifikasi = true
       this.notifikasiKode = kode
@@ -2799,19 +3399,71 @@ export default {
 }
 </script>
 <style scoped>
+.tableClass, .tdClass, .thClass {
+  border: 2px solid #FFF;
+  padding: 5px;
+  text-align: center;
+	font-size: 7.5pt;
+  font-weight: bold;
+}
+.tableClass, .tdSClass, .thSClass {
+  border: 2px solid #FFF;
+  padding: 5px;
+  text-align: center;
+	font-size: 7.5pt;
+  font-weight: bold;
+}
+.tdSClass {
+  text-align: left;
+}
+.thClass, .thSClass {
+  border: 2px solid #FFF;
+  background-color: #000;
+  color: #FFF;
+}
+.tableClass {
+  /* width: 50%; */
+  width: 100%;
+  border-collapse: collapse;
+}
+.textHari {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+}
+.ttd{ 
+  font-size: 10px; 
+  font-weight: bold;
+}
 .boxlist{
   height: 40px;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	-khtml-border-radius: 5px; 
 	border-radius: 5px;
-	padding: 2px;
+	padding: 5px 10px;
 	margin: 2px;
 	text-align: center;
   justify-content: center;
-	font-size: 10pt;
+	font-size: 9pt;
 	font-weight: bold;
-	background: rgba(10, 204, 117, 0.694);
+	background-color: #0ACC75B1;
+	border: 1px solid #FFFFFF;
+	color: #FFFFFF;
+}
+.boxlistBerkas{
+  height: 40px;
+  width: 150px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-khtml-border-radius: 5px; 
+	border-radius: 5px;
+	padding: 5px 10px;
+	margin: 2px;
+	text-align: center;
+  justify-content: center;
+	font-size: 9pt;
+	font-weight: bold;
+	background-color: #0ACC75B1;
 	border: 1px solid #FFFFFF;
 	color: #FFFFFF;
 }
@@ -2895,7 +3547,12 @@ export default {
   height: 30px;
 }
 .cropper {
-  border: solid 3px #ff0000;
+  border: double 3px transparent;
+  border-radius: 5px;
+  background-image: linear-gradient(white, white),
+    radial-gradient(circle at top left, #4bc5e8, #9f6274);
+  background-origin: border-box;
+  background-clip: content-box, border-box;
   min-height: 450px;
   width: auto;
 }

@@ -1,148 +1,152 @@
 <template>
   <div>
-    <h1 class="subheading grey--text">Data Kelas</h1>
+    <h1 class="subheading grey--text text-decoration-underline">Data Kelas</h1>
     <v-card class="pa-1 rounded" variant="outlined" elevation="4">
-      <v-row no-gutters class="pa-2">
-        <v-col cols="12" md="6">
-          <Button 
-            color-button="light-blue darken-3"
-            icon-button="mdi mdi-plus-thick"
-            nama-button="Tambah"
-            @proses="openDialog(null, 0)"
-          />
-        </v-col>
-        <v-col cols="12" md="6">
-          <v-row no-gutters>
-            <v-col cols="12" md="9" class="pr-2">
-              <TextField
-                v-model="searchData"
-                icon-prepend-tf="mdi mdi-magnify"
-                label-tf="Pencarian..."
-                :clearable-tf="true"
-                @click:clear="() => {
-                  page = 1
-                  getKelas({page: 1, limit: limit, keyword: ''})
-                }"
-                @keyup.enter="() => {
-                  page = 1
-                  getKelas({page: 1, limit: limit, keyword: searchData})
-                }"
+      <v-data-table
+        loading-text="Sedang memuat... Harap tunggu"
+        no-data-text="Tidak ada data yang tersedia"
+        no-results-text="Tidak ada catatan yang cocok ditemukan"
+        :headers="headers"
+        :loading="loadingtable"
+        :items="DataKelas"
+        expand-on-click
+        item-value="idKelas"
+        density="comfortable"
+        hide-default-footer
+        hide-default-header
+        class="elavation-3 rounded"
+        :items-per-page="itemsPerPage"
+        @page-count="pageCount = $event"
+        @click:row="clickrow"
+        v-model:expanded="expanded"
+      >
+        <!-- header -->
+        <template #headers="{ columns }">
+          <tr>
+            <td v-for="header in columns" :key="header.title" class="tableHeader">{{ header.title.toUpperCase() }}</td>
+          </tr>
+        </template>
+        <template #loader>
+          <LoaderDataTables />
+        </template>
+        <template #[`item.number`]="{ item }">
+          {{ page > 1 ? ((page - 1)*limit) + item.index + 1 : item.index + 1 }}
+        </template>
+        <template #[`item.status`]="{ item }">
+          <v-icon size="small" v-if="item.raw.status == true" color="green" icon="mdi mdi-check" />
+          <v-icon size="small" v-else-if="item.raw.status == false" color="red" icon="mdi mdi-close" />
+        </template>
+        <template #expanded-row="{ columns, item }">
+          <tr>
+            <td :colspan="columns.length">
+              <Button 
+                color-button="#0bd369"
+                icon-prepend-button="mdi mdi-pencil"
+                nama-button="Ubah"
+                :disabled-button="item.raw.status === false"
+                @proses="openDialog(item.raw, 1)"
+              />
+              <Button 
+                color-button="#0bd369"
+                :icon-prepend-button="item.raw.status === false ? 'mdi mdi-eye' : 'mdi mdi-eye-off'"
+                :nama-button="item.raw.status === false ? 'Active' : 'Non Active'"
+                @proses="postRecord('STATUSRECORD', item.raw, !item.raw.status)"
+              />
+              <!-- <Button 
+                color-button="#bd3a07"
+                icon-prepend-button="mdi mdi-delete"
+                nama-button="Hapus"
+                :disabled-button="item.raw.idUser === idLog || item.raw.status === false"
+                @proses="postRecord('DELETE', item.raw, null)"
+              />
+              <Button 
+                color-button="#04f7f7"
+                icon-prepend-button="mdi mdi-information"
+                nama-button="Detail"
+                @proses="openDialog(item.raw, 2)"
+              /> -->
+            </td>
+          </tr>
+        </template>
+        <template #top>
+          <v-row no-gutters class="pa-2">
+            <v-col cols="12" md="6">
+              <Button 
+                color-button="light-blue darken-3"
+                icon-prepend-button="mdi mdi-plus-thick"
+                nama-button="Tambah"
+                @proses="openDialog(null, 0)"
               />
             </v-col>
-            <v-col cols="12" md="3" class="d-flex justify-end align-center">
-              <Autocomplete
-                v-model="page"
-                :data-a="pageOptions"
-                label-a="Page"
-                :disabled-a="DataKelas.length ? false : true"
-              />
-            </v-col>
-          </v-row>
-        </v-col>
-      </v-row>
-      <div class="px-1">
-        <v-data-table
-          loading-text="Sedang memuat... Harap tunggu"
-          no-data-text="Tidak ada data yang tersedia"
-          no-results-text="Tidak ada catatan yang cocok ditemukan"
-          :headers="headers"
-          :loading="loadingtable"
-          :items="DataKelas"
-          expand-on-click
-          v-model:expanded="expanded"
-          item-value="idKelas"
-          density="comfortable"
-          hide-default-footer
-          hide-default-header
-          class="elavation-3 rounded"
-          :items-per-page="itemsPerPage"
-          @page-count="pageCount = $event"
-          @click:row="clickrow"
-        >
-          <!-- header -->
-          <template #headers="{ columns }">
-            <tr>
-              <td v-for="header in columns" :key="header.title" class="tableHeader">{{ header.title.toUpperCase() }}</td>
-            </tr>
-          </template>
-          <template #[`item.number`]="{ item }">
-            {{ page > 1 ? ((page - 1)*limit) + item.index + 1 : item.index + 1 }}
-          </template>
-          <template #[`item.status`]="{ item }">
-            <v-icon size="small" v-if="item.raw.status == true" color="green" icon="mdi mdi-check" />
-            <v-icon size="small" v-else-if="item.raw.status == false" color="red" icon="mdi mdi-close" />
-          </template>
-          <template #expanded-row="{ columns, item }">
-            <tr>
-              <td :colspan="columns.length">
-                <Button 
-                  color-button="#0bd369"
-                  icon-button="mdi mdi-pencil"
-                  nama-button="Ubah"
-                  :disabled-button="item.raw.status === false"
-                  @proses="openDialog(item.raw, 1)"
-                />
-                <Button 
-                  color-button="#0bd369"
-                  :icon-button="item.raw.status === false ? 'mdi mdi-eye' : 'mdi mdi-eye-off'"
-                  :nama-button="item.raw.status === false ? 'Active' : 'Non Active'"
-                  @proses="postRecord('STATUSRECORD', item.raw, !item.raw.status)"
-                />
-                <!-- <Button 
-                  color-button="#bd3a07"
-                  icon-button="mdi mdi-delete"
-                  nama-button="Hapus"
-                  :disabled-button="item.raw.idUser === idLog || item.raw.status === false"
-                  @proses="postRecord('DELETE', item.raw, null)"
-                />
-                <Button 
-                  color-button="#04f7f7"
-                  icon-button="mdi mdi-information"
-                  nama-button="Detail"
-                  @proses="openDialog(item.raw, 2)"
-                /> -->
-              </td>
-            </tr>
-          </template>
-          <template #bottom>
-            <v-divider :thickness="2" class="border-opacity-100" color="white" />
-            <v-row no-gutters>
-              <v-col cols="12" lg="10" class="pa-2 d-flex justify-start align-center">
-                <span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
-              </v-col>
-              <v-col cols="12" lg="2" class="pa-2 text-right">
-                <div class="d-flex justify-start align-center">
+            <v-col cols="12" md="6">
+              <v-row no-gutters>
+                <v-col cols="12" md="9" class="pr-2">
+                  <TextField
+                    v-model="searchData"
+                    icon-prepend-tf="mdi mdi-magnify"
+                    label-tf="Pencarian..."
+                    :clearable-tf="true"
+                    @click:clear="() => {
+                      page = 1
+                      getKelas({page: 1, limit: limit, keyword: ''})
+                    }"
+                    @keyup.enter="() => {
+                      page = 1
+                      getKelas({page: 1, limit: limit, keyword: searchData})
+                    }"
+                  />
+                </v-col>
+                <v-col cols="12" md="3" class="d-flex justify-end align-center">
                   <Autocomplete
-                    v-model="limit"
-                    pilihan-a="select"
-                    :data-a="limitPage"
-                    label-a="Limit"
+                    v-model="page"
+                    :data-a="pageOptions"
+                    label-a="Page"
                     :disabled-a="DataKelas.length ? false : true"
                   />
-                  <Button
-                    variant="plain"
-                    size-button="large"
-                    model-button="comfortable"
-                    color-button="#ffffff"
-                    icon-button="mdi mdi-arrow-left-circle-outline"
-                    :disabled-button="DataKelas.length ? pageSummary.page != 1 ? false : true : true"
-                    @proses="() => { page = pageSummary.page - 1 }"
-                  />
-                  <Button
-                    variant="plain"
-                    size-button="large"
-                    model-button="comfortable"
-                    color-button="#ffffff"
-                    icon-button="mdi mdi-arrow-right-circle-outline"
-                    :disabled-button="DataKelas.length ? pageSummary.page != pageSummary.totalPages ? false : true : true"
-                    @proses="() => { page = pageSummary.page + 1 }"
-                  />
-                </div>
-              </v-col>
-            </v-row>
-          </template>
-        </v-data-table>
-      </div>
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
+          <v-divider :thickness="2" class="border-opacity-100" color="white" />
+        </template>
+        <template #bottom>
+          <v-divider :thickness="2" class="border-opacity-100" color="white" />
+          <v-row no-gutters>
+            <v-col cols="12" lg="10" class="pa-2 d-flex justify-start align-center">
+              <span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
+            </v-col>
+            <v-col cols="12" lg="2" class="pa-2 text-right">
+              <div class="d-flex justify-start align-center">
+                <Autocomplete
+                  v-model="limit"
+                  pilihan-a="select"
+                  :data-a="limitPage"
+                  label-a="Limit"
+                  :disabled-a="DataKelas.length ? false : true"
+                />
+                <Button
+                  variant="plain"
+                  size-button="large"
+                  model-button="comfortable"
+                  color-button="#ffffff"
+                  icon-button="mdi mdi-arrow-left-circle-outline"
+                  :disabled-button="DataKelas.length ? pageSummary.page != 1 ? false : true : true"
+                  @proses="() => { page = pageSummary.page - 1 }"
+                />
+                <Button
+                  variant="plain"
+                  size-button="large"
+                  model-button="comfortable"
+                  color-button="#ffffff"
+                  icon-button="mdi mdi-arrow-right-circle-outline"
+                  :disabled-button="DataKelas.length ? pageSummary.page != pageSummary.totalPages ? false : true : true"
+                  @proses="() => { page = pageSummary.page + 1 }"
+                />
+              </div>
+            </v-col>
+          </v-row>
+        </template>
+      </v-data-table>
     </v-card>
     <v-dialog
       v-model="DialogKelas"
@@ -330,7 +334,9 @@ export default {
     page: {
 			deep: true,
 			handler(value) {
-				this.getKelas({page: value, limit: this.limit, keyword: this.searchData})
+        if(value){
+          this.getKelas({page: value, limit: this.limit, keyword: this.searchData})
+        }
 			}
 		},
     limit: {
@@ -367,7 +373,7 @@ export default {
       this.$store.dispatch('kelas/postKelas', jenis === 'ADD' || jenis === 'EDIT' ? bodyData.ADDEDIT : bodyData.DELETESTATUS)
       .then((res) => {
         this.DialogKelas = false
-        this.getKelas({page: 1, limit: this.limit, keyword: this.searchData})
+        this.getKelas({page: this.page, limit: this.limit, keyword: this.searchData})
         this.notifikasi("success", res.data.message, "1")
 			})
 			.catch((err) => {

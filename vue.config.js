@@ -7,12 +7,13 @@ module.exports = defineConfig({
   devServer: {
     client: {
       overlay: {
-        warnings: false,
         errors: false,
+        warnings: false,
+        runtimeErrors: false,
       },
 
       // or
-      overlay: true,
+      // overlay: true,
     }
   }
 })

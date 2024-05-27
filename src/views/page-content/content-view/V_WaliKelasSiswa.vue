@@ -1,11 +1,11 @@
 <template>
   <div>
-    <h1 class="subheading grey--text">{{ roleID === '1' || roleID === '2' ? 'Data Kelas Siswa' : `Kelas ${kelas}` }}</h1>
+    <h1 class="subheading grey--text text-decoration-underline">{{ roleID === '1' || roleID === '2' ? 'Data Kelas Siswa' : `Kelas ${kelas}` }}</h1>
     <v-card v-if="roleID === '1' || roleID === '2'" class="pa-1 rounded" variant="outlined" elevation="4">
       <Button 
         v-if="DataKelas.length"
         color-button="light-blue darken-3"
-        icon-button="mdi mdi-pencil"
+        icon-prepend-button="mdi mdi-pencil"
         nama-button="Update Peringkat"
         @proses="updatePeringkat(kelasJoin)"
       />
@@ -20,12 +20,12 @@
               v-for="hasil in data.dataKelas"
               :key="hasil.kelas"
               cols="12"
-              lg="3"
+              lg="4"
             >
               <v-card color="white" style="border: 2px solid #000;" @click="hasil.jumlah > 0 ? openDialog(hasil.kelas) : warningNotif()">
                 <v-sheet color="green" class="sheetData" elevation="2">
                   <v-icon icon="mdi mdi-account-multiple" size="large" />
-                  <v-card-title class="text-black">{{ hasil.jumlah }} Orang</v-card-title>
+                  <v-card-title class="text-white" style="font-weight: bold; font-size: 15px; margin-left: 5px;">{{ hasil.jumlah }} Orang</v-card-title>
                 </v-sheet>
                 <v-card-actions>
                   <v-divider :thickness="2" />
@@ -40,7 +40,7 @@
     <Button 
       v-if="roleID === '3'"
       color-button="light-blue darken-3"
-      icon-button="mdi mdi-pencil"
+      icon-prepend-button="mdi mdi-pencil"
       nama-button="Update Peringkat"
       @proses="updatePeringkat(kelas)"
     />
@@ -104,7 +104,7 @@
           <Button 
             :loading="isLoadingbtnPDF"
             color-button="light-blue darken-3"
-            icon-button="mdi mdi-export"
+            icon-prepend-button="mdi mdi-export"
             nama-button="Konversi -> PDF File"
             @proses="PDFOpen(dataSiswaSiswi.length ? dataSiswaSiswi[0].idUser : '-')"
           />
@@ -157,16 +157,16 @@
         <tbody>
           <tr v-for="v, i in dataNilai" :key="i">
             <td style="font-weight: bold;">{{ v.mapel }}</td>
-            <td>{{ v.kkm }}</td>
-            <td>{{ v.nilai }}</td>
-            <td>{{ v.hurufNilai }}</td>
+            <td style="text-align: center">{{ v.kkm }}</td>
+            <td style="text-align: center">{{ v.nilai }}</td>
+            <td style="text-align: center">{{ v.hurufNilai }}</td>
             <td>{{ v.nilai === 0 ? 'Nol' : setPembilang.pembilang(v.nilai) }}</td>
             <td :style="v.nilai > v.kkm ? 'color: green' : 'color: red'">{{ v.nilai > v.kkm ? 'KOMPETEN' : 'TIDAK KOMPETEN' }}</td>
           </tr>
           <tr style="font-weight: bold;">
             <td colspan="2" class="text-right">RATA - RATA NILAI</td>
-            <td>{{ NilaiAkhir }}</td>
-            <td>{{ penilaian.nilaiHuruf }}</td>
+            <td style="text-align: center">{{ NilaiAkhir }}</td>
+            <td style="text-align: center">{{ penilaian.nilaiHuruf }}</td>
             <td colspan="2">{{ NilaiAkhir === 0 ? 'Nol' : setPembilang.pembilang(NilaiAkhir) }}</td>
           </tr>
           <tr style="font-weight: bold;">
@@ -185,15 +185,15 @@
         <tbody>
           <tr>
             <td style="font-weight: bold;">Sakit</td>
-            <td>{{ dataSiswaSiswi.length ? dataSiswaSiswi[0].kehadiran.sakit : 0 }}</td>
+            <td style="text-align: center">{{ dataSiswaSiswi.length ? dataSiswaSiswi[0].kehadiran.sakit : 0 }}</td>
           </tr>
           <tr>
             <td style="font-weight: bold;">Ijin</td>
-            <td>{{ dataSiswaSiswi.length ? dataSiswaSiswi[0].kehadiran.ijin : 0 }}</td>
+            <td style="text-align: center">{{ dataSiswaSiswi.length ? dataSiswaSiswi[0].kehadiran.ijin : 0 }}</td>
           </tr>
           <tr>
             <td style="font-weight: bold;">Tanpa Keterangan</td>
-            <td>{{ dataSiswaSiswi.length ? dataSiswaSiswi[0].kehadiran.alfa : 0 }}</td>
+            <td style="text-align: center">{{ dataSiswaSiswi.length ? dataSiswaSiswi[0].kehadiran.alfa : 0 }}</td>
           </tr>
         </tbody>
       </table>
@@ -313,7 +313,7 @@
               <Button 
                 :loading="isLoadingbtnPDF"
                 color-button="light-blue darken-3"
-                icon-button="mdi mdi-export"
+                icon-prepend-button="mdi mdi-export"
                 nama-button="Konversi -> PDF File"
                 @proses="PDFOpen(dataSiswaSiswi.length ? dataSiswaSiswi[0].idUser : '-')"
               />
@@ -366,16 +366,16 @@
             <tbody>
               <tr v-for="v, i in dataNilai" :key="i">
                 <td style="font-weight: bold;">{{ v.mapel }}</td>
-                <td>{{ v.kkm }}</td>
-                <td>{{ v.nilai }}</td>
-                <td>{{ v.hurufNilai }}</td>
+                <td style="text-align: center">{{ v.kkm }}</td>
+                <td style="text-align: center">{{ v.nilai }}</td>
+                <td style="text-align: center">{{ v.hurufNilai }}</td>
                 <td>{{ v.nilai === 0 ? 'Nol' : setPembilang.pembilang(v.nilai) }}</td>
                 <td :style="v.nilai > v.kkm ? 'color: green' : 'color: red'">{{ v.nilai > v.kkm ? 'KOMPETEN' : 'TIDAK KOMPETEN' }}</td>
               </tr>
               <tr style="font-weight: bold;">
                 <td colspan="2" class="text-right">RATA - RATA NILAI</td>
-                <td>{{ NilaiAkhir }}</td>
-                <td>{{ penilaian.nilaiHuruf }}</td>
+                <td style="text-align: center">{{ NilaiAkhir }}</td>
+                <td style="text-align: center">{{ penilaian.nilaiHuruf }}</td>
                 <td colspan="2">{{ NilaiAkhir === 0 ? 'Nol' : setPembilang.pembilang(NilaiAkhir) }}</td>
               </tr>
               <tr style="font-weight: bold;">
@@ -394,15 +394,15 @@
             <tbody>
               <tr>
                 <td style="font-weight: bold;">Sakit</td>
-                <td>{{ dataSiswaSiswi.length ? dataSiswaSiswi[0].kehadiran.sakit : 0 }}</td>
+                <td style="text-align: center">{{ dataSiswaSiswi.length ? dataSiswaSiswi[0].kehadiran.sakit : 0 }}</td>
               </tr>
               <tr>
                 <td style="font-weight: bold;">Ijin</td>
-                <td>{{ dataSiswaSiswi.length ? dataSiswaSiswi[0].kehadiran.ijin : 0 }}</td>
+                <td style="text-align: center">{{ dataSiswaSiswi.length ? dataSiswaSiswi[0].kehadiran.ijin : 0 }}</td>
               </tr>
               <tr>
                 <td style="font-weight: bold;">Tanpa Keterangan</td>
-                <td>{{ dataSiswaSiswi.length ? dataSiswaSiswi[0].kehadiran.alfa : 0 }}</td>
+                <td style="text-align: center">{{ dataSiswaSiswi.length ? dataSiswaSiswi[0].kehadiran.alfa : 0 }}</td>
               </tr>
             </tbody>
           </table>
@@ -555,7 +555,9 @@ export default {
     page: {
 			deep: true,
 			handler(value) {
-        this.getWaliKelas({page: value, kelas: this.kelas, roleID: this.roleID})
+        if(value){
+          this.getWaliKelas({page: value, kelas: this.kelas, roleID: this.roleID})
+        }
 			}
 		},
   },

@@ -123,7 +123,7 @@
 				>
 					<Autocomplete
 						v-model="inputDataDetailOrangtua.kabkota"
-						:data-a="KabKotaOptions"
+						:data-a="optionsKabKota"
 						item-title="nama"
 						item-value="kode"
 						label-a="Kabupaten / Kota"
@@ -164,7 +164,7 @@
 					md="4"
 					class="pt-2 d-flex align-center font-weight-bold"
 				>
-					Kelurahan
+					Kelurahan / Desa
 				</v-col>
 				<v-col
 					cols="12"
@@ -173,10 +173,10 @@
 				>
 					<Autocomplete
 						v-model="inputDataDetailOrangtua.kelurahan"
-						:data-a="KelurahanOptions"
+						:data-a="optionsKelurahan"
 						item-title="nama"
 						item-value="kode"
-						label-a="Kelurahan"
+						label-a="Kelurahan / Desa"
 						:clearable-a="true"
 						:disabled-a="inputDataDetailOrangtua.kecamatan ? false : true"
 						@ubah="wilayah('kelurahan', $event)"
@@ -837,6 +837,24 @@ export default {
 			}
 			return tahunData
 		},
+		optionsKabKota(){
+      let kabkota = this.KabKotaOptions.map(x => {
+        return {
+          kode: x.kode,
+          nama: `${x.jenisKabKota} ${x.nama}`
+        }
+      })
+      return kabkota
+    },
+		optionsKelurahan(){
+      let kel = this.KelurahanOptions.map(x => {
+        return {
+          kode: x.kode,
+          nama: `${x.jenisKelDes} ${x.nama}`
+        }
+      })
+      return kel
+    },
   },
 	watch: {
 		inputDataDetailOrangtua:{
@@ -900,9 +918,9 @@ export default {
 					kelurahan: value.kelurahan ? value.kelurahan.kode : null,
 					kode_pos: value.kode_pos ? value.kode_pos : null,
 				}
-				this.getWilayah({ bagian: 'kabkota', KodeWilayah: this.inputDataDetailOrangtua.provinsi })
-				this.getWilayah({ bagian: 'kecamatan', KodeWilayah: this.inputDataDetailOrangtua.kabkota })
-				this.getWilayah({ bagian: 'kelurahan', KodeWilayah: this.inputDataDetailOrangtua.kecamatan })
+				this.getWilayah2023({ bagian: 'kabkota', KodeWilayah: this.inputDataDetailOrangtua.provinsi })
+				this.getWilayah2023({ bagian: 'kecamatan', KodeWilayah: this.inputDataDetailOrangtua.kabkota })
+				this.getWilayah2023({ bagian: 'kelurahan', KodeWilayah: this.inputDataDetailOrangtua.kecamatan })
 			}
 		},
 	},
@@ -915,7 +933,7 @@ export default {
 		this.getStatusTempatTinggal()
 		this.getJarakRumah()
 		this.getTransportasi()
-		this.getWilayah({ bagian: 'provinsi', KodeWilayah: null })
+		this.getWilayah2023({ bagian: 'provinsi', KodeWilayah: null })
 	},
 	methods: {
 		...mapActions({
@@ -926,7 +944,7 @@ export default {
 			getStatusTempatTinggal: 'setting/getStatusTempatTinggal', 
 			getJarakRumah: 'setting/getJarakRumah', 
 			getTransportasi: 'setting/getTransportasi', 
-			getWilayah: 'setting/getWilayah',
+			getWilayah2023: 'setting/getWilayah2023',
 		}),
 		wadahInput(){
 			let inputFormFour = {
@@ -970,7 +988,7 @@ export default {
 		wilayah(kondisi, e){
 			if(kondisi === 'provinsi'){
 				if(e){
-					this.getWilayah({ bagian: 'kabkota', KodeWilayah: e })
+					this.getWilayah2023({ bagian: 'kabkota', KodeWilayah: e })
 					this.inputDataDetailOrangtua.kabkota = null
 					this.inputDataDetailOrangtua.kecamatan = null
 					this.inputDataDetailOrangtua.kelurahan = null
@@ -978,7 +996,7 @@ export default {
 				}
 			}else if(kondisi === 'kabkota'){
 				if(e){
-					this.getWilayah({ bagian: 'kecamatan', KodeWilayah: e })
+					this.getWilayah2023({ bagian: 'kecamatan', KodeWilayah: e })
 					if(e !== this.inputDataDetailOrangtua.kecamatan) {
 						this.inputDataDetailOrangtua.kecamatan = null
 						this.inputDataDetailOrangtua.kelurahan = null
@@ -991,7 +1009,7 @@ export default {
 				}
 			}else if(kondisi === 'kecamatan'){
 				if(e){
-					this.getWilayah({ bagian: 'kelurahan', KodeWilayah: e })
+					this.getWilayah2023({ bagian: 'kelurahan', KodeWilayah: e })
 					if(e !== this.inputDataDetailOrangtua.kelurahan) {
 						this.inputDataDetailOrangtua.kelurahan = null
 						this.inputDataDetailOrangtua.kode_pos = ''	
