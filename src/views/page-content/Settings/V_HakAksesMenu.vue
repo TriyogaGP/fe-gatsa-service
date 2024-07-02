@@ -1,117 +1,122 @@
 <template>
   <div>
-		<h1 class="subheading grey--text">Panel Hak Akses Menu</h1>
-		<v-row no-gutters class="pa-2">
-			<v-col cols="12" md="6" />
-			<v-col cols="12" md="6">
-				<v-row no-gutters>
-					<v-col cols="12" md="9">
-						<Autocomplete
-							v-model="searchData"
-							icon-prepend-tf="mdi mdi-magnify"
-							label-tf="Pencarian..."
-							:clearable-tf="true"
-							@click:clear="() => { page = 1; getRoleMenu({page: 1, limit: limit, keyword: ''}); }"
-							@keyup.enter="(e) => { page = 1; getRoleMenu({page: 1, limit: limit, keyword: e}); }"
+		<h1 class="subheading grey--text text-decoration-underline">Panel Hak Akses Menu</h1>
+		<v-data-table
+			loading-text="Sedang memuat... Harap tunggu"
+			no-data-text="Tidak ada data yang tersedia"
+			no-results-text="Tidak ada catatan yang cocok ditemukan"
+			:headers="headers"
+			:loading="loadingtable"
+			:items="DataHakAksesMenu"
+			:expand-on-click="DetailMenu === false ? true : false"
+			item-value="idRoleMenu"
+			density="comfortable"
+			hide-default-footer
+			hide-default-header
+			class="elavation-3 rounded"
+			:items-per-page="itemsPerPage"
+			@page-count="pageCount = $event"
+			@click:row="clickrow"
+			v-model:expanded="expanded"
+		>
+			<!-- header -->
+			<template #headers="{ columns }">
+				<tr>
+					<td v-for="header in columns" :key="header.title" class="tableHeader">{{ header.title.toUpperCase() }}</td>
+				</tr>
+			</template>
+			<template #loader>
+				<LoaderDataTables />
+			</template>
+			<template #[`item.number`]="{ item }">
+				{{ page > 1 ? ((page - 1)*limit) + item.index + 1 : item.index + 1 }}
+			</template>
+			<template #[`item.menu`]="{ item }">
+				<Button 
+					color-button="#04f7f7"
+					icon-prepend-button="mdi mdi-information"
+					nama-button="Detail"
+					@proses="openDetail(item.raw.menu)"
+				/>
+			</template>
+			<template #expanded-row="{ columns, item }">
+				<tr>
+					<td :colspan="columns.length">
+						<Button 
+							color-button="#0bd369"
+							icon-prepend-button="mdi mdi-pencil"
+							nama-button="Ubah"
+							@proses="bukaDialog(item.raw)"
 						/>
-					</v-col>
-					<v-col cols="12" md="3" class="pl-2 d-flex justify-end align-center">
-						<Autocomplete
-							v-model="page"
-							:data-a="pageOptions"
-							label-a="Page"
-							:disabled-a="DataHakAksesMenu.length ? false : true"
-						/>
-					</v-col>
-				</v-row>
-			</v-col>
-    </v-row>
-    <div class="px-1">
-			<v-data-table
-				loading-text="Sedang memuat... Harap tunggu"
-				no-data-text="Tidak ada data yang tersedia"
-				no-results-text="Tidak ada catatan yang cocok ditemukan"
-				:headers="headers"
-				:loading="loadingtable"
-				:items="DataHakAksesMenu"
-				:expand-on-click="DetailMenu === false ? true : false"
-				show-expand
-				item-value="idRoleMenu"
-				density="comfortable"
-				hide-default-footer
-				hide-default-header
-				class="elavation-3 rounded"
-				:items-per-page="itemsPerPage"
-				@page-count="pageCount = $event"
-			>
-				<!-- header -->
-				<template #headers="{ columns }">
-					<tr>
-						<td v-for="header in columns" :key="header.title" class="tableHeader">{{ header.title.toUpperCase() }}</td>
-					</tr>
-				</template>
-				<template #[`item.number`]="{ item }">
-					{{ page > 1 ? ((page - 1)*limit) + item.index + 1 : item.index + 1 }}
-				</template>
-				<template #[`item.menu`]="{ item }">
-					<Button 
-						color-button="#04f7f7"
-						icon-button="mdi mdi-information"
-						nama-button="Detail"
-						@proses="openDetail(item.raw.menu)"
-					/>
-				</template>
-				<template #expanded-row="{ columns, item }">
-					<tr>
-						<td :colspan="columns.length">
-							<Button 
-								color-button="#0bd369"
-								icon-button="mdi mdi-pencil"
-								nama-button="Ubah"
-								@proses="bukaDialog(item.raw)"
-							/>
-						</td>
-					</tr>
-				</template>
-				<template #bottom>
-					<v-divider :thickness="2" class="border-opacity-100" color="white" />
-					<v-row no-gutters>
-						<v-col cols="10" class="pa-2 d-flex justify-start align-center">
-							<span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
-						</v-col>
-						<v-col cols="2" class="pa-2 text-right">
-							<div class="d-flex justify-start align-center">
+					</td>
+				</tr>
+			</template>
+			<template #top>
+				<v-row no-gutters class="pa-2">
+					<v-col cols="12" md="6" />
+					<v-col cols="12" md="6">
+						<v-row no-gutters>
+							<v-col cols="12" md="9">
+								<TextField
+									v-model="searchData"
+									icon-prepend-tf="mdi mdi-magnify"
+									label-tf="Pencarian..."
+									:clearable-tf="true"
+									@click:clear="() => { page = 1; getRoleMenu({page: 1, limit: limit, keyword: ''}); }"
+									@keyup.enter="(e) => { page = 1; getRoleMenu({page: 1, limit: limit, keyword: e}); }"
+								/>
+							</v-col>
+							<v-col cols="12" md="3" class="pl-2 d-flex justify-end align-center">
 								<Autocomplete
-									v-model="limit"
-									pilihan-a="select"
-									:data-a="limitPage"
-									label-a="Limit"
+									v-model="page"
+									:data-a="pageOptions"
+									label-a="Page"
 									:disabled-a="DataHakAksesMenu.length ? false : true"
 								/>
-								<Button
-									variant="plain"
-									size-button="large"
-									model-button="comfortable"
-									color-button="#ffffff"
-									icon-button="mdi mdi-arrow-left-circle-outline"
-									:disabled-button="DataHakAksesMenu.length ? pageSummary.page != 1 ? false : true : true"
-									@proses="() => { page = pageSummary.page - 1 }"
-								/>
-								<Button
-									variant="plain"
-									size-button="large"
-									model-button="comfortable"
-									color-button="#ffffff"
-									icon-button="mdi mdi-arrow-right-circle-outline"
-									:disabled-button="DataHakAksesMenu.length ? pageSummary.page != pageSummary.totalPages ? false : true : true"
-									@proses="() => { page = pageSummary.page + 1 }"
-								/>
-							</div>
-						</v-col>
-					</v-row>
-				</template>
-			</v-data-table>
-		</div>
+							</v-col>
+						</v-row>
+					</v-col>
+				</v-row>
+				<v-divider :thickness="2" class="border-opacity-100" color="white" />
+			</template>
+			<template #bottom>
+				<v-divider :thickness="2" class="border-opacity-100" color="white" />
+				<v-row no-gutters>
+					<v-col cols="12" lg="10" class="pa-2 d-flex justify-start align-center">
+						<span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
+					</v-col>
+					<v-col cols="12" lg="2" class="pa-2 text-right">
+						<div class="d-flex justify-start align-center">
+							<Autocomplete
+								v-model="limit"
+								pilihan-a="select"
+								:data-a="limitPage"
+								label-a="Limit"
+								:disabled-a="DataHakAksesMenu.length ? false : true"
+							/>
+							<Button
+								variant="plain"
+								size-button="large"
+								model-button="comfortable"
+								color-button="#ffffff"
+								icon-button="mdi mdi-arrow-left-circle-outline"
+								:disabled-button="DataHakAksesMenu.length ? pageSummary.page != 1 ? false : true : true"
+								@proses="() => { page = pageSummary.page - 1 }"
+							/>
+							<Button
+								variant="plain"
+								size-button="large"
+								model-button="comfortable"
+								color-button="#ffffff"
+								icon-button="mdi mdi-arrow-right-circle-outline"
+								:disabled-button="DataHakAksesMenu.length ? pageSummary.page != pageSummary.totalPages ? false : true : true"
+								@proses="() => { page = pageSummary.page + 1 }"
+							/>
+						</div>
+					</v-col>
+				</v-row>
+			</template>
+		</v-data-table>
 		<v-dialog
       v-model="DialogRoleMenu"
 			scrollable
@@ -135,22 +140,25 @@
 					</v-toolbar-items>
 				</v-toolbar>
 				<v-card-text class="pt-4 v-dialog--custom">
-					<v-card
-						color="black"
-						class="pa-2 mb-2"
+					<div
+            style="background-color: #4CAF50; border-radius: 5px; border: 2px solid #000;"
+            class="pa-2 mb-2"
 						v-for="i in (1 + jumlahMenuHakAkses)"
 						:key="i"
 					>
 						<div class="text-right">
-							<Button
-								v-if="i !== (1 + jumlahMenuHakAkses)"
-								variant="plain"
-								color-button="#ffffff"
-								icon-button="mdi mdi-close"
-								model-button="comfortable"
-								size-button="large"
-								@proses="removeMenu(i-1)"
-							/>
+							<span>
+								<Button
+									v-if="i !== (1 + jumlahMenuHakAkses)"
+									variant="plain"
+									color-button="#000"
+									icon-button="mdi mdi-close"
+									model-button="comfortable"
+									size-button="large"
+									@proses="removeMenu(i-1)"
+								/>
+								<v-tooltip activator="parent" location="left">clear card</v-tooltip>
+							</span>
 						</div>
 						<v-row no-gutters>
 							<v-col
@@ -225,7 +233,7 @@
 									<!-- @update:modelValue="changeData($event, i-1, 'kondisi')" -->
 							</v-col>
 						</v-row>
-					</v-card>
+					</div>
 				</v-card-text>
 				<v-divider />
 				<v-card-actions>
@@ -274,16 +282,18 @@
 							<v-list-item
 								v-for="val in menu"
 								:key="val.idMenu"
+								:title="val.menuText"
 							>
-								<v-list-item-title>
+								<template v-slot:title>
 									<v-icon icon="mdi mdi-square-small" />{{ `${val.menuText} (kondisi = ${val.kondisi})` }}
 									<v-list-item
 										v-for="v in val.subMenu"
 										:key="v.idMenu"
+										:title="v.menuText"
 									>
-										<v-list-item-title><v-icon icon="mdi mdi-circle-small" />{{ v.menuText }}</v-list-item-title>
+										<template v-slot:title><v-icon icon="mdi mdi-circle-small" />{{ v.menuText }}</template>
 									</v-list-item>
-								</v-list-item-title>
+								</template>
 							</v-list-item>
 						</v-list>
 						<strong>*NB: jika true submenu dari luar dan jika false submenu dari dalam</strong>
@@ -298,10 +308,10 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
-        :notifikasi-kode.sync="notifikasiKode"
-        :notifikasi-text.sync="notifikasiText"
-        :notifikasi-button.sync="notifikasiButton"
+      <PopUpNotifikasi
+        :notifikasi-kode="notifikasiKode"
+        :notifikasi-text="notifikasiText"
+        :notifikasi-button="notifikasiButton"
         @proses="gotoRefresh"
         @cancel="dialogNotifikasi = false"
       />
@@ -312,14 +322,14 @@
 <script>
 import { mapActions, mapGetters, mapState } from "vuex";
 import { useMeta } from 'vue-meta'
-import PopUpNotifikasiVue from "../../Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "../../Layout/PopUpNotifikasi.vue";
 export default {
   name: 'HakAksesMenu',
-	components: { PopUpNotifikasiVue },
+	components: { PopUpNotifikasi },
   data: () => ({
-    isLoading: false,
+		expanded: [],
 		DataHakAksesMenu: [],
-		searchData: "",
+		searchData: '',
 		page: 1,
     pageCount: 0,
     itemsPerPage: 100,
@@ -365,7 +375,7 @@ export default {
   }),
   setup() {
     useMeta({
-      title: "Settings (Hak Akses Menu) - MTsS. SIROJUL ATHFAL",
+      title: "Settings (Hak Akses Menu)",
       htmlAttrs: {
         lang: "id",
         amp: true,
@@ -413,7 +423,9 @@ export default {
 		page: {
 			deep: true,
 			handler(value) {
-				this.getRoleMenu({page: value, limit: this.limit, keyword: this.searchData})
+				if(value){
+					this.getRoleMenu({page: value, limit: this.limit, keyword: this.searchData})
+				}
 			}
 		},
 		limit: {
@@ -511,6 +523,12 @@ export default {
 			this.menu = item
 			this.DetailMenu = true
 		},
+		clickrow(event, data) {
+      const index = this.$data.expanded.find(i => i === data?.item?.raw?.idRoleMenu);
+      if(typeof index === 'undefined') return this.$data.expanded = [];
+      this.$data.expanded.splice(0, 1)
+      this.$data.expanded.push(data?.item?.raw?.idRoleMenu);
+    },
 		notifikasi(kode, text, proses){
       this.dialogNotifikasi = true
       this.notifikasiKode = kode
@@ -532,7 +550,7 @@ export default {
   width: 16px;
 }
 .customScroll::-webkit-scrollbar-thumb {
-  background-color: #4CAF50;
+  background-color: #272727;
   border: 5px solid #e1e1f0;
   border-radius: 10rem;
 }

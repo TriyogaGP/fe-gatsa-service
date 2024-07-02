@@ -37,7 +37,6 @@
 								placeholder="Tanggal Lahir"
 								format="dd-MM-yyyy"
 								:enable-time-picker="false"
-								:teleport="true"
 								auto-apply
 							/>
 						</v-col>
@@ -169,7 +168,7 @@
 				>
 					<Autocomplete
 						v-model="inputDataAlamat.kabkota"
-						:data-a="KabKotaOptions"
+						:data-a="optionsKabKota"
 						item-title="nama"
 						item-value="kode"
 						label-a="Kabupaten / Kota"
@@ -210,7 +209,7 @@
 					md="4"
 					class="pt-2 d-flex align-center font-weight-bold"
 				>
-					Kelurahan
+					Kelurahan / Desa
 				</v-col>
 				<v-col
 					cols="12"
@@ -219,10 +218,10 @@
 				>
 					<Autocomplete
 						v-model="inputDataAlamat.kelurahan"
-						:data-a="KelurahanOptions"
+						:data-a="optionsKelurahan"
 						item-title="nama"
 						item-value="kode"
-						label-a="Kelurahan"
+						label-a="Kelurahan / Desa"
 						:clearable-a="true"
 						:disabled-a="inputDataAlamat.kecamatan ? false : true"
 						@ubah="wilayah('kelurahan', $event)"
@@ -273,10 +272,10 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
-        :notifikasi-kode.sync="notifikasiKode"
-        :notifikasi-text.sync="notifikasiText"
-        :notifikasi-button.sync="notifikasiButton"
+      <PopUpNotifikasi
+        :notifikasi-kode="notifikasiKode"
+        :notifikasi-text="notifikasiText"
+        :notifikasi-button="notifikasiButton"
         @cancel="dialogNotifikasi = false"
       />
     </v-dialog>
@@ -285,10 +284,10 @@
 
 <script>
 import { mapActions, mapState } from "vuex";
-import PopUpNotifikasiVue from "../../../Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "../../../Layout/PopUpNotifikasi.vue";
 export default {
 	components: {
-    PopUpNotifikasiVue,
+    PopUpNotifikasi,
   },
 	props: {
     stepperVal: {
@@ -329,6 +328,24 @@ export default {
       KecamatanOptions: state => state.setting.KecamatanOptions,
       KelurahanOptions: state => state.setting.KelurahanOptions,
     }),
+		optionsKabKota(){
+      let kabkota = this.KabKotaOptions.map(x => {
+        return {
+          kode: x.kode,
+          nama: `${x.jenisKabKota} ${x.nama}`
+        }
+      })
+      return kabkota
+    },
+		optionsKelurahan(){
+      let kel = this.KelurahanOptions.map(x => {
+        return {
+          kode: x.kode,
+          nama: `${x.jenisKelDes} ${x.nama}`
+        }
+      })
+      return kel
+    },
   },
 	watch: {
 		inputDataAlamat:{
@@ -368,9 +385,9 @@ export default {
 					kelurahan: value.kelurahan ? value.kelurahan.kode : null,
 					kode_pos: value.kode_pos ? value.kode_pos : null,
 				}
-				this.getWilayah({ bagian: 'kabkota', KodeWilayah: this.inputDataAlamat.provinsi })
-				this.getWilayah({ bagian: 'kecamatan', KodeWilayah: this.inputDataAlamat.kabkota })
-				this.getWilayah({ bagian: 'kelurahan', KodeWilayah: this.inputDataAlamat.kecamatan })
+				this.getWilayah2023({ bagian: 'kabkota', KodeWilayah: this.inputDataAlamat.provinsi })
+				this.getWilayah2023({ bagian: 'kecamatan', KodeWilayah: this.inputDataAlamat.kabkota })
+				this.getWilayah2023({ bagian: 'kelurahan', KodeWilayah: this.inputDataAlamat.kecamatan })
 			}
 		},
 	},
@@ -378,12 +395,12 @@ export default {
 		this.inputDataAlamat.id_user = this.$route.params.uid;
 		this.kondisi = this.$route.params.kondisi;
 		this.getAgama()
-		this.getWilayah({ bagian: 'provinsi', KodeWilayah: null })
+		this.getWilayah2023({ bagian: 'provinsi', KodeWilayah: null })
 	},
 	methods: {
 		...mapActions({
 			getAgama: 'setting/getAgama',
-			getWilayah: 'setting/getWilayah',
+			getWilayah2023: 'setting/getWilayah2023',
 		}),
 		wadahInput(){
 			let inputFormTwo = {
@@ -404,7 +421,7 @@ export default {
 		wilayah(kondisi, e){
 			if(kondisi === 'provinsi'){
 				if(e){
-					this.getWilayah({ bagian: 'kabkota', KodeWilayah: e })
+					this.getWilayah2023({ bagian: 'kabkota', KodeWilayah: e })
 					this.inputDataAlamat.kabkota = null
 					this.inputDataAlamat.kecamatan = null
 					this.inputDataAlamat.kelurahan = null
@@ -412,7 +429,7 @@ export default {
 				}
 			}else if(kondisi === 'kabkota'){
 				if(e){
-					this.getWilayah({ bagian: 'kecamatan', KodeWilayah: e })
+					this.getWilayah2023({ bagian: 'kecamatan', KodeWilayah: e })
 					if(e !== this.inputDataAlamat.kecamatan) {
 						this.inputDataAlamat.kecamatan = null
 						this.inputDataAlamat.kelurahan = null
@@ -425,7 +442,7 @@ export default {
 				}
 			}else if(kondisi === 'kecamatan'){
 				if(e){
-					this.getWilayah({ bagian: 'kelurahan', KodeWilayah: e })
+					this.getWilayah2023({ bagian: 'kelurahan', KodeWilayah: e })
 					if(e !== this.inputDataAlamat.kelurahan) {
 						this.inputDataAlamat.kelurahan = null
 						this.inputDataAlamat.kode_pos = ''	

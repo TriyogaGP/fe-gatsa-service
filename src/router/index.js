@@ -14,6 +14,11 @@ const routes = [
     component: ForgotPass,
   },
   {
+    path: '/ujian/:kode',
+    name: 'Ujian',
+    component: () => import('@/views/page-content/content-view/V_Ujian.vue')
+  },
+  {
     path: '/',
     component: () => import("@/views/Layout/index.vue"),
     children: [
@@ -54,82 +59,93 @@ const routes = [
       // },
 
       {
-        path: '/dataAdministrator',
+        path: '/data-administrator',
         name: 'DataAdministrator',
         component: () => import('@/views/page-content/Administrator/V_Administrator.vue')
       },
       {
-        path: '/formulirAdministrator/:kondisi/:uid',
+        path: '/formulir-administrator/:kondisi/:uid',
         name: 'FormulirAdministrator',
         props: true,
         component: () => import('@/views/page-content/Administrator/P_FormAdministrator.vue')
       },
       {
-        path: '/dataStruktural',
+        path: '/data-struktural',
         name: 'DataStruktural',
         component: () => import('@/views/page-content/Struktural/V_Struktural.vue')
       },
       {
-        path: '/formulirStruktural/:kondisi/:uid',
+        path: '/formulir-struktural/:kondisi/:uid',
         name: 'FormulirStruktural',
         props: true,
         component: () => import('@/views/page-content/Struktural/P_FormStruktural.vue')
       },
       {
-        path: '/dataSiswaSiswi',
+        path: '/data-siswa-siswi',
         name: 'DataSiswaSiswi',
         component: () => import('@/views/page-content/SiswaSiswi/V_SiswaSiswi.vue')
       },
       {
-        path: '/formulirSiswaSiswi/:kondisi/:uid',
+        path: '/formulir-siswa-siswi/:kondisi/:uid',
         name: 'FormulirSiswaSiswi',
         props: true,
         component: () => import('@/views/page-content/SiswaSiswi/P_FormSiswaSiswi.vue')
       },
       {
-        path: '/dataKelas',
-        name: 'DataKelas',
-        component: () => import('@/views/page-content/content-view/V_Kelas.vue')
-      },
-      {
-        path: '/dataKelasSiswa/:kelas',
+        path: '/data-kelas-siswa/:kelas',
         name: 'DataKelasSiswa',
         component: () => import('@/views/page-content/content-view/V_KelasSiswa.vue')
       },
       {
-        path: '/dataJadwalMengajar',
+        path: '/data-jadwal-mengajar',
         name: 'DataJadwalMengajar',
         component: () => import('@/views/page-content/content-view/V_JadwalMengajar.vue')
       },
       {
-        path: '/dataDetailKelasSiswa/:kondisi/:kelas',
+        path: '/data-detail-kelas-siswa/:kondisi/:kelas',
         name: 'DataDetailKelasSiswa',
         component: () => import('@/views/page-content/content-view/V_DetailKelasSiswa.vue')
       },
       {
-        path: '/dataAkademis',
+        path: '/data-akademis',
         name: 'DataAkademis',
         component: () => import('@/views/page-content/content-view/V_Akademis.vue'),
       },
       {
-        path: '/dataAkademis/:mapel',
+        path: '/data-akademis/:jenis/:mapel',
         name: 'DataDetailAkademis',
         component: () => import('@/views/page-content/content-view/V_DetailAkademis.vue')
       },
       {
-        path: '/dataWaliKelas',
+        path: '/data-wali-kelas',
         name: 'DataWaliKelas',
         component: () => import('@/views/page-content/content-view/V_WaliKelasSiswa.vue'),
       },
       {
         path: '/question-exam',
-        name: 'Question-Exam',
+        name: 'QuestionExam',
         component: () => import('@/views/page-content/content-view/V_QuestionExam.vue')
       },
       {
         path: '/list-exam',
-        name: 'Jadwal-Exam',
+        name: 'JadwalExam',
         component: () => import('@/views/page-content/content-view/V_JadwalExam.vue')
+      },
+      {
+        path: '/data-exam/:jenis',
+        name: 'DataExam',
+        component: () => import('@/views/page-content/content-view/V_Exam.vue')
+      },
+      {
+        path: '/koreksi-exam',
+        name: 'KoreksiExam',
+        component: () => import('@/views/page-content/content-view/V_KoreksiExam.vue')
+      },
+      
+      {
+        path: '/:pathMatch(.*)*',
+        name: 'UnderConstruction',
+        component: () => import('@/views/Layout/UnderConstruction.vue')
       },
     ]
   },

@@ -253,6 +253,22 @@ const myPlugin = {
 			const datetime = [valueConvertDate, valueConvertTime].join(" ");
 			return datetime
 		},
+		app.config.globalProperties.convertDateTime2 = (str) => {
+			let date = new Date(str),
+			mnth = ("0" + (date.getMonth() + 1)).slice(-2),
+			day = ("0" + date.getDate()).slice(-2);
+			const valueConvertDate = [date.getFullYear(), mnth, day].join("-");
+
+			let time = new Date(str),
+			jam = ("0" + time.getHours()).slice(-2),
+			menit = ("0" + time.getMinutes()).slice(-2),
+			detik = ("0" + time.getSeconds()).slice(-2);
+			const valueConvertTime = [jam, menit, detik].join(":");
+
+			const datetime = [valueConvertDate, valueConvertTime].join(" ");
+
+			return datetime
+		},
 		app.config.globalProperties.uppercaseLetterFirst = (textInput) => {
 			textInput = textInput.toLowerCase();
 			var stringArray = textInput.split(/\b(\s)/);
@@ -270,7 +286,9 @@ const myPlugin = {
 			textInput = textInput.toLowerCase();
 			var stringArray = ''
 			if(cek){
-				stringArray = textInput.split(". ");
+				let hasilSplit = textInput.split(". ")
+				let textSplit = hasilSplit.join(" ");
+				stringArray = textSplit.split(/\b(\s)/)
 			}else{
 				stringArray = textInput.split(/\b(\s)/);
 			}
@@ -279,7 +297,15 @@ const myPlugin = {
 					stringArray[i].charAt(0).toUpperCase() +
 					stringArray[i].substring(1);
 			}
-			var finalText = cek ? stringArray.join(". ") : stringArray.join("");
+			let textHasil = ''
+			for (var i = 0; i < stringArray.length; i++) {
+				if(stringArray[i] === 'Kab'){
+					textHasil += `${stringArray[i]}.`
+				}else{
+					textHasil += `${stringArray[i]}`
+				}
+			}
+			var finalText = cek ? textHasil : stringArray.join("");
 			return finalText;
 		},
 		app.config.globalProperties.isNumeric = (value) => {

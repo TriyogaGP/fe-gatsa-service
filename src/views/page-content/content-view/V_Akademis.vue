@@ -1,18 +1,37 @@
 <template>
   <div>
-    <h1 class="subheading grey--text">Data Akademis</h1>
+    <h1 class="subheading grey--text text-decoration-underline">Data Akademis</h1>
     <v-card class="pa-1 rounded" variant="outlined" elevation="4">
+      <v-row no-gutters>
+        <v-col cols="12" md="8" />
+        <v-col cols="12" md="4" class="pr-2">
+          <TextField
+            v-model="searchData"
+            icon-prepend-tf="mdi mdi-magnify"
+            label-tf="Pencarian..."
+            :clearable-tf="true"
+            @click:clear="() => {
+              searchData = ''
+              pencarianData(searchData)
+            }"
+            @keyup.enter="() => {
+              pencarianData(searchData)
+            }"
+          />
+        </v-col>
+      </v-row>
       <v-container fluid v-if="mengajarOptions.length">
         <v-row>
           <v-col
             v-for="hasil in mengajarOptions"
             :key="hasil.label"
-            cols="3"
+            cols="12"
+            lg="4"
           >
-            <v-card color="white" @click="roleID === '1' || roleID === '2' ? gotoDetail(hasil.link) : openDetail(hasil.link)">
+            <v-card color="white" style="border: 2px solid #000;" @click="roleID === '1' || roleID === '2' ? gotoDetail(hasil.link) : openDetail(hasil.kode, hasil.link)">
               <v-sheet color="green" class="sheetData" elevation="2">
                 <v-icon icon="mdi mdi-book-education" size="large" />
-                <v-card-subtitle class="text-black" style="font-weight: bold; font-size: 15px; margin-left: 5px;">Mata Pelajaran</v-card-subtitle>
+                <v-card-title class="text-white" style="font-weight: bold; font-size: 15px; margin-left: 5px;">Mata Pelajaran</v-card-title>
               </v-sheet>
               <v-card-actions>
                 <v-divider :thickness="2" class="border-opacity-75" />
@@ -27,9 +46,9 @@
     <v-dialog
       v-model="DialogSiswaSiswi"
       scrollable
-      max-width="800px"
       persistent
       transition="dialog-bottom-transition"
+      width="auto"
     >
       <v-card color="background-dialog-card">
         <v-toolbar color="surface">
@@ -46,7 +65,7 @@
             />
           </v-toolbar-items>
         </v-toolbar>
-        <v-card-text class="pt-4" style="font-size: 13px;">
+        <v-card-text class="pt-4 v-dialog--custom">
           <h2 class="subheading black--text"><u>>>Data Siswa Siswi</u></h2>
           <v-row no-gutters>
             <v-col
@@ -204,6 +223,28 @@
               </tr>
             </tbody>
           </table>
+          <table dark class="mb-2">
+            <thead>
+              <tr>
+                <th>KEHADIRAN</th>
+                <th>TOTAL</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight: bold;">Sakit</td>
+                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataKehadiran.sakit : '' }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: bold;">Ijin</td>
+                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataKehadiran.ijin : '' }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: bold;">Tanpa Keterangan</td>
+                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataKehadiran.alfa : '' }}</td>
+              </tr>
+            </tbody>
+          </table>
         </v-card-text>
         <v-divider />
         <v-card-actions />
@@ -215,10 +256,10 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
-        :notifikasi-kode.sync="notifikasiKode"
-        :notifikasi-text.sync="notifikasiText"
-        :notifikasi-button.sync="notifikasiButton"
+      <PopUpNotifikasi
+        :notifikasi-kode="notifikasiKode"
+        :notifikasi-text="notifikasiText"
+        :notifikasi-button="notifikasiButton"
         @cancel="dialogNotifikasi = false"
       />
     </v-dialog>
@@ -228,11 +269,11 @@
 <script>
 import { mapActions, mapState, mapGetters } from "vuex";
 import { useMeta } from 'vue-meta'
-import PopUpNotifikasiVue from "../../Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "../../Layout/PopUpNotifikasi.vue";
 export default {
   name: 'DataAkademis',
   components: {
-    PopUpNotifikasiVue
+    PopUpNotifikasi
   },
   data: () => ({
     roleID: '',
@@ -241,6 +282,8 @@ export default {
     mapel: '',
     DialogSiswaSiswi: false,
     dataSiswaSiswi: '',
+    searchData: '',
+    mengajarOptions: [],
 
     //notifikasi
     dialogNotifikasi: false,
@@ -250,7 +293,7 @@ export default {
   }),
   setup() {
     useMeta({
-      title: "Data Akademis - MTsS. SIROJUL ATHFAL",
+      title: "Data Akademis",
       htmlAttrs: {
         lang: "id",
         amp: true,
@@ -259,7 +302,7 @@ export default {
   },
   computed: {
     ...mapState({
-      mengajar: store => store.setting.mengajarOptions,
+      // mengajar: store => store.setting.mengajarOptions,
     }),
     ...mapGetters({
       cmssettings: 'setting/cmssettings',
@@ -272,13 +315,13 @@ export default {
     DataNilai(){
       return this.nilai ? this.nilai : null
     },
-    mengajarOptions(){
-      let result = []
-      this.mengajar.map(str => {
-        result.push({ label: str.label, link: str.label.replace(' ', '-') })
-      })
-			return result
-		},
+    // mengajarOptions(){
+    //   let result = []
+    //   this.mengajar.map(str => {
+    //     result.push({ label: str.label, link: str.label.replace(' ', '-') })
+    //   })
+		// 	return result
+		// },
   },
   watch: {
     siswasiswiBy: {
@@ -288,12 +331,30 @@ export default {
         let nilai = this.DataNilai.dataSiswaSiswi.filter(val => val.idUser === value.idUser)[0].nilai
         let semester = this.DataNilai.dataSiswaSiswi.filter(val => val.idUser === value.idUser)[0].semester
         let kehadiran = this.DataNilai.dataSiswaSiswi.filter(val => val.idUser === value.idUser)[0].kehadiran
-        let totalNilaiTugas = Number(nilai.tugas1) + Number(nilai.tugas2) + Number(nilai.tugas3) + Number(nilai.tugas4) + Number(nilai.tugas5) + Number(nilai.tugas6) + Number(nilai.tugas7) + Number(nilai.tugas8) + Number(nilai.tugas9) + Number(nilai.tugas10)
+        let nilaiTugasSementara = Object.values(nilai)
+        // let totalNilaiTugas = Number(nilai.tugas1) + Number(nilai.tugas2) + Number(nilai.tugas3) + Number(nilai.tugas4) + Number(nilai.tugas5) + Number(nilai.tugas6) + Number(nilai.tugas7) + Number(nilai.tugas8) + Number(nilai.tugas9) + Number(nilai.tugas10)
+        let totalNilaiTugas = 0
+        for(let i=0; i<Number(jumlahTugas); i++){
+          totalNilaiTugas = totalNilaiTugas + nilaiTugasSementara[i]
+        }
         let rataRataTugas = totalNilaiTugas === 0 ? 0 : totalNilaiTugas / Number(jumlahTugas)
         let rataRataNilai = (Number(rataRataTugas) + Number(nilai.uts) + Number(nilai.uas)) / 3
         this.dataSiswaSiswi = {
           ...value,
-          dataNilai: nilai,
+          dataNilai: {
+            tugas1: Number(jumlahTugas) > 0 ? nilai.tugas1 : 0,
+            tugas2: Number(jumlahTugas) > 1 ? nilai.tugas2 : 0,
+            tugas3: Number(jumlahTugas) > 2 ? nilai.tugas3 : 0,
+            tugas4: Number(jumlahTugas) > 3 ? nilai.tugas4 : 0,
+            tugas5: Number(jumlahTugas) > 4 ? nilai.tugas5 : 0,
+            tugas6: Number(jumlahTugas) > 5 ? nilai.tugas6 : 0,
+            tugas7: Number(jumlahTugas) > 6 ? nilai.tugas7 : 0,
+            tugas8: Number(jumlahTugas) > 7 ? nilai.tugas8 : 0,
+            tugas9: Number(jumlahTugas) > 8 ? nilai.tugas9 : 0,
+            tugas10: Number(jumlahTugas) > 9 ? nilai.tugas10 : 0,
+            uts: nilai.uts,
+            uas: nilai.uas,
+          },
           semester: semester,
           dataKehadiran: kehadiran,
           totalNilaiTugas: rataRataTugas != 0 ? Math.ceil(rataRataTugas) : 0,
@@ -304,10 +365,11 @@ export default {
     }
   },
   mounted() {
+    if(!localStorage.getItem('user_token')) return this.$router.push({name: 'LogIn'});
     this.roleID = localStorage.getItem('roleID')
     this.idLogin = localStorage.getItem('idLogin')
     this.kelas = localStorage.getItem('kelas')
-		this.getMengajar()
+    this.pencarianData(this.searchData)
 	},
 	methods: {
 		...mapActions({
@@ -316,15 +378,31 @@ export default {
       getCMSSettings: 'setting/getCMSSettings',
       getMengajar: 'setting/getMengajar',
     }),
-    openDetail(mapel) {
+    openDetail(kode, mapel) {
       this.mapel = mapel.replace('-', ' ')
       this.getCMSSettings()
-      this.getNilai({idUser: this.idLogin, kelas: this.kelas, mapel: this.mapel})
-      this.getSiswaSiswibyUID({uid: this.idLogin, mapel: this.mapel})
+      this.getNilai({idUser: this.idLogin, kelas: this.kelas, mapel: kode})
+      this.getSiswaSiswibyUID({uid: this.idLogin, mapel: kode})
       this.DialogSiswaSiswi = true
     },
+    pencarianData(searchData){
+      this.mengajarOptions = []
+      this.getMengajar().then((res) => {
+				let result = res.data.result;
+        if(searchData === ''){
+          result.map(str => {
+            this.mengajarOptions.push({ label: str.label, link: str.label.replace(' ', '-'), kode: str.kode })
+          })
+        }else{
+          result.map(str => {
+            let search = new RegExp(searchData , 'i');
+            if(search.test(str.label)) return this.mengajarOptions.push({ label: str.label, link: str.label.replace(' ', '-'), kode: str.kode })
+          })
+        }
+			})
+    },
     gotoDetail(mapel) {
-      this.$router.push({name: "DataDetailAkademis", params: { mapel: mapel }});
+      this.$router.push({name: "DataDetailAkademis", params: { mapel: mapel, jenis: 'mapel' }});
     },
     notifikasi(kode, text, proses){
       this.dialogNotifikasi = true

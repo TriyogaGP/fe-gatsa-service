@@ -12,7 +12,7 @@
               <div v-for="(item, i) in dataMessage" :key="i">
                 <div class="message" :id="item.nama != uppercaseLetter(nama) ? `kotakchatleft` : `kotakchatright`">
                   <v-img class="gambarChat" :src="item.fotoProfil" />
-                  <span class="textName">{{ item.nama }}</span>
+                  <span class="textName">{{ item.nama != uppercaseLetter(nama) ? item.nama : `ME` }}</span>
                   <div class="mt-2">
                     <span style="white-space: pre-line" v-html="item.pesan" />
                     <div style="float: right; margin-top: 15px; font-size: 8pt; font-weight: bold;">{{ item.jam }}</div>
@@ -113,10 +113,10 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
-        :notifikasi-kode.sync="notifikasiKode"
-        :notifikasi-text.sync="notifikasiText"
-        :notifikasi-button.sync="notifikasiButton"
+      <PopUpNotifikasi
+        :notifikasi-kode="notifikasiKode"
+        :notifikasi-text="notifikasiText"
+        :notifikasi-button="notifikasiButton"
         @cancel="dialogNotifikasi = false"
       />
     </v-dialog>
@@ -126,12 +126,12 @@
 <script>
 import { mapActions, mapGetters, mapState } from "vuex";
 import { useMeta } from 'vue-meta'
-import PopUpNotifikasiVue from "./Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "./Layout/PopUpNotifikasi.vue";
 import io from 'socket.io-client'
 
 export default {
   name: 'Profile',
-  components: { PopUpNotifikasiVue },
+  components: { PopUpNotifikasi },
   data: () => ({
     API_URL: process.env.VUE_APP_BASE_URL_VIEW,
     idLogin: '',
@@ -168,7 +168,7 @@ export default {
   }),
   setup() {
     useMeta({
-      title: "Percakapan - MTsS. SIROJUL ATHFAL",
+      title: "Percakapan",
       htmlAttrs: {
         lang: "id",
         amp: true,
@@ -192,6 +192,7 @@ export default {
 		this.scrollToEnd()
 	},
   mounted() {
+    if(!localStorage.getItem('user_token')) return this.$router.push({name: 'LogIn'});
     this.roleID = localStorage.getItem("roleID")
     this.idLogin = localStorage.getItem("idLogin")
     this.nama = localStorage.getItem("nama")
@@ -328,12 +329,6 @@ export default {
 .v-tab {
 	font-size: 8pt !important;
 	font-weight: bold !important;
-}
-.v-input .v-label {
-  font-size: 11pt !important;
-}
-.v-text-field.v-input--dense {
-  font-size: 13px !important;
 }
 .avatar {
   border: solid 2px #FFF;

@@ -1,10 +1,10 @@
 <template>
   <div>
-		<h1 class="subheading grey--text">Panel General CMS</h1>
+		<h1 class="subheading grey--text text-decoration-underline">Panel General CMS</h1>
     <v-row>
       <v-col cols="12" md="12" class="text-right">
 				<v-menu
-					open-on-hover
+					open-on-click
 					rounded="t-xs b-lg"
 					offset-y
 					transition="slide-y-transition"
@@ -15,6 +15,7 @@
 							v-bind="props"
 							color-button="#0bd369"
 							nama-button="Upload Berkas"
+							icon-append-button="mdi mdi-menu-down"
 						/>
 					</template>
 
@@ -32,13 +33,14 @@
 							}"
 							class="SelectedMenu"
 							active-class="SelectedMenu-active"
+							title="Gambar"
 						>
-							<template v-slot:append>
+							<template v-slot:prepend>
 								<v-icon size="middle" icon="mdi mdi-upload" color="icon-white" />
 							</template>
-							<v-list-item-title>
+							<template v-slot:title>
 								<span class="menufont">Gambar</span>
-							</v-list-item-title>
+							</template>
 						</v-list-item>
 						<v-list-item
 							@click="() => {
@@ -47,25 +49,27 @@
 							}"
 							class="SelectedMenu"
 							active-class="SelectedMenu-active"
+							title="File"
 						>
-							<template v-slot:append>
+							<template v-slot:prepend>
 								<v-icon size="middle" icon="mdi mdi-upload" color="icon-white" />
 							</template>
-							<v-list-item-title>
+							<template v-slot:title>
 								<span class="menufont">File</span>
-							</v-list-item-title>
+							</template>
 						</v-list-item>
 						<v-list-item
 							@click="openDialogDataBerkas()"
 							class="SelectedMenu"
 							active-class="SelectedMenu-active"
+							title="Data Berkas"
 						>
-							<template v-slot:append>
+							<template v-slot:prepend>
 								<v-icon size="middle" icon="mdi mdi-view-list" color="icon-white" />
 							</template>
-							<v-list-item-title>
+							<template v-slot:title>
 								<span class="menufont">Data Berkas</span>
-							</v-list-item-title>
+							</template>
 						</v-list-item>
 					</v-list>
 				</v-menu>
@@ -196,7 +200,7 @@
         <v-col cols="12" md="6" class="pa-4">
           <Autocomplete
 						v-model="inputData.kabupatenkota"
-						:data-a="KabKotaOptions"
+						:data-a="optionsKabKota"
 						item-title="nama"
 						item-value="kode"
 						label-a="Kabupaten / Kota"
@@ -222,7 +226,7 @@
         <v-col cols="12" md="6" class="pa-4">
           <Autocomplete
 						v-model="inputData.kelurahan"
-						:data-a="KelurahanOptions"
+						:data-a="optionsKelurahan"
 						item-title="nama"
 						item-value="kode"
 						label-a="Kelurahan"
@@ -294,82 +298,73 @@
 							@proses="() => {
 								this.DialogUploadBerkas = false
 								this.MultipleBerkas = []
-								this.imageMultiple = []
-								this.fileMultiple = []
 								this.jenisUpload = ''
 							}"
 						/>
 					</v-toolbar-items>
 				</v-toolbar>
 				<v-card-text class="pt-4 ScrollFullscreen">
-          <div>
-						<v-row no-gutters>
-							<v-col
-								cols="12"
-								class="pt-2 d-flex align-center"
+					<v-row no-gutters>
+						<v-col
+							cols="12"
+							class="d-flex align-center"
+						>
+							<TextField
+								v-model="MultipleBerkas.files"
+								style="display: none"
+							/>
+							<input 
+								ref="inputMultipleFile"
+								:key="componentKey"
+								type="file"
+								multiple
+								style="display: none"
+								:accept="`${jenisUpload === 'Gambar' ? 'image/x-png,image/jpg,image/jpeg' : '.xlsx,.xls,.doc,.docx,.txt,.pdf'}`"
+								@change="addFiles($event)"
 							>
-								<TextField
-									v-model="MultipleBerkas"
-									style="display: none"
-								/>
-								<input 
-									ref="inputMultipleFile"
-									:key="componentKey"
-									type="file"
-									multiple
-									style="display: none"
-									:accept="`${jenisUpload === 'Gambar' ? 'image/x-png,image/jpg,image/jpeg' : '.xlsx,.xls,.doc,.docx,.txt,.pdf'}`"
-									@change="addFiles($event)"
-								>
-								<Button
-									color-button="light-blue darken-3"
-									icon-button="mdi mdi-upload"
-									nama-button="Upload Berkas"
-									@proses="() => { $refs.inputMultipleFile.click() }"
-								/>
-							</v-col>  
+						</v-col>  
+					</v-row>
+					<v-container fluid v-if="jenisUpload === 'Gambar'">
+						<v-row>
+							<v-col
+								class="d-flex flex-column justify-space-between align-center"
+								v-for="(file,f) in MultipleBerkas"
+								:key="f"
+								cols="12"
+								lg="3"
+							>
+								<v-card color="grey" class="pa-2 kotakGambar">
+									<div class="text-right"><v-icon size="large" color="black" icon="mdi mdi-delete" @click="HapusMultiple(f)" /></div>
+									<img :ref="'file'" :src="MultipleBerkas[f].url" :title="file.files.name" class="responsiveImage"/>
+									<TextField
+										v-model="MultipleBerkas[f].title"
+										label-tf="Title"
+										class="mt-1"
+										:clearable-tf="true"
+									/>
+								</v-card>
+							</v-col>
 						</v-row>
-						<v-container fluid v-if="jenisUpload === 'Gambar'">
-							<v-row>
-								<v-col
-									class="d-flex flex-column justify-space-between align-center"
-									v-for="(file,f) in MultipleBerkas"
-									:key="f"
-									cols="3"
-								>
-									<v-card color="grey" class="pa-2 kotakGambar">
-										<div class="text-right"><v-icon size="large" color="black" icon="mdi mdi-delete" @click="HapusMultiple(f)" /></div>
-										<img :ref="'file'" :src="imageMultiple[f].url" :title="file.name" class="responsiveImage"/>
-										<TextField
-											v-model="imageMultiple[f].title"
-											label-tf="Title"
-											class="mt-1"
-											:clearable-tf="true"
-										/>
-									</v-card>
-								</v-col>
-							</v-row>
-						</v-container>
-						<div v-if="jenisUpload === 'File'">
-							<div v-for="(file,f) in fileMultiple" :key="f" class="wadahFile">
-								<div class="kotakFile">
-									<v-icon v-if="file.ext === 'docx'" class="iconFile" size="x-large" icon="mdi mdi-file-word-box" />
-									<v-icon v-if="file.ext === 'xlsx'" class="iconFile" size="x-large" icon="mdi mdi-file-excel-box" />
-									<v-icon v-if="file.ext === 'pdf'" class="iconFile" size="x-large" icon="mdi mdi-file-pdf-box" />
-									<v-icon v-if="file.ext === 'txt'" class="iconFile" size="x-large" icon="mdi mdi-file-document" />
-									<span class="textFile">{{ file.name }}</span>
-									<span class="textFile" style="float: right; margin-right: 2px;">&nbsp;<v-icon size="large" color="black" icon="mdi mdi-delete" @click="HapusMultiple(f)" /></span>
-								</div>
-								<v-divider :thickness="2" color="black" class="border-opacity-75" />
-								<TextField
-									v-model="fileMultiple[f].title"
-									label-tf="Title"
-									class="ma-1"
-									:clearable-tf="true"
-								/>
+					</v-container>
+					<div v-if="jenisUpload === 'File'">
+						<div v-for="(file,f) in MultipleBerkas" :key="f" class="wadahFile">
+							<div class="kotakFile">
+								<v-icon v-if="file.ext === 'docx'" class="iconFile" size="x-large" icon="mdi mdi-file-word-box" />
+								<v-icon v-if="file.ext === 'xlsx'" class="iconFile" size="x-large" icon="mdi mdi-file-excel-box" />
+								<v-icon v-if="file.ext === 'pdf'" class="iconFile" size="x-large" icon="mdi mdi-file-pdf-box" />
+								<v-icon v-if="file.ext === 'txt'" class="iconFile" size="x-large" icon="mdi mdi-file-document" />
+								<span class="textFile">{{ file.files.name }}</span>
+								<span class="textFile" style="float: right; margin-right: 2px;">&nbsp;<v-icon size="large" color="black" icon="mdi mdi-delete" @click="HapusMultiple(f)" /></span>
 							</div>
+							<v-divider :thickness="2" color="black" class="border-opacity-75" />
+							<TextField
+								v-model="MultipleBerkas[f].title"
+								label-tf="Title"
+								class="ma-1"
+								:clearable-tf="true"
+							/>
 						</div>
-          </div>
+					</div>
         </v-card-text>
         <v-divider />
         <v-card-actions>
@@ -378,14 +373,25 @@
 						class="mt-1 mr-3"
 					>
 						<v-col
+							class="text-start"
+							cols="6"
+						>
+							<Button
+								color-button="light-blue darken-3"
+								icon-prepend-button="mdi mdi-upload"
+								:nama-button="`Upload Berkas ${jenisUpload}`"
+								@proses="() => { $refs.inputMultipleFile.click() }"
+							/>
+						</v-col>
+						<v-col
 							class="text-end"
-							cols="12"
+							cols="6"
 						>
 							<Button
 								color-button="black"
 								nama-button="Batal"
 								:disabled-button="MultipleBerkas.length ? false : true"
-								@proses="() => { this.imageMultiple = []; this.fileMultiple = []; this.MultipleBerkas = []; }"
+								@proses="() => { this.MultipleBerkas = []; }"
 							/>
 							<Button
 								color-button="black"
@@ -421,121 +427,133 @@
 					</v-toolbar-items>
 				</v-toolbar>
 				<v-card-text class="pt-4 v-dialog--custom">
-          <v-row no-gutters class="pa-2">
-						<v-col cols="12" md="6" />
-						<v-col cols="12" md="6">
-							<v-row no-gutters>
-            		<v-col cols="12" md="9">
-									<TextField
-										v-model="searchData"
-										icon-prepend-tf="mdi mdi-magnify"
-										label-tf="Pencarian..."
-										:clearable-tf="true"
-										@click:clear="() => {
-											page = 1
-											getDataBerkas({page: 1, limit: limit, keyword: ''})
-										}"
-										@keyup.enter="() => {
-											page = 1
-											getDataBerkas({page: 1, limit: limit, keyword: searchData})
-										}"
-									/>
-								</v-col>
-								<v-col cols="12" md="3" class="pl-2 d-flex justify-end align-center">
-									<Autocomplete
-										v-model="page"
-										:data-a="pageOptions"
-										label-a="Page"
-										:disabled-a="dataBerkas.length ? false : true"
-									/>
-								</v-col>
-							</v-row>
-						</v-col>
-					</v-row>
-					<div class="px-1">
-						<v-data-table
-							loading-text="Sedang memuat... Harap tunggu"
-							no-data-text="Tidak ada data yang tersedia"
-							no-results-text="Tidak ada catatan yang cocok ditemukan"
-							:headers="headers"
-							:loading="loadingtable"
-							:items="dataBerkas"
-							item-value="idBerkas"
-							density="comfortable"
-							hide-default-footer
-							hide-default-header
-							class="elavation-3 rounded"
-							:items-per-page="itemsPerPage"
-							@page-count="pageCount = $event"
-						>
-							<!-- header -->
-							<template #headers="{ columns }">
-								<tr>
-									<td v-for="header in columns" :key="header.title" class="tableHeader">{{ header.title.toUpperCase() }}</td>
-								</tr>
-							</template>
-							<template #[`item.number`]="{ item }">
-								{{ page > 1 ? ((page - 1)*limit) + item.index + 1 : item.index + 1 }}
-							</template>
-							<template #[`item.title`]="{ item }">
-								<div class="kotakFile">
-									<img v-if="item.raw.type === 'Gambar'" :ref="'file'" :src="item.raw.file" :title="item.raw.title" class="iconFile"/>
-									<v-icon v-if="item.raw.type === 'File' && item.raw.ext === 'docx'" class="iconFile" size="large" icon="mdi mdi-file-word-box" />
-									<v-icon v-if="item.raw.type === 'File' && item.raw.ext === 'xlsx'" class="iconFile" size="large" icon="mdi mdi-file-excel-box" />
-									<v-icon v-if="item.raw.type === 'File' && item.raw.ext === 'pdf'" class="iconFile" size="large" icon="mdi mdi-file-pdf-box" />
-									<v-icon v-if="item.raw.type === 'File' && item.raw.ext === 'txt'" class="iconFile" size="large" icon="mdi mdi-file-document" />
-									<span class="textFile">{{ `${item.raw.title}.${item.raw.ext}` }}</span>
-								</div>
-							</template>
-							<template #[`item.opsi`]="{ item }">
-								<v-switch color="white" v-model="item.raw.statusAktif" hide-details @click="postRecord(item.raw.idBerkas, !item.raw.statusAktif)" />
-							</template>
-							<template #[`item.statusAktif`]="{ item }">
-								<v-icon size="small" v-if="item.raw.statusAktif == true" color="green" icon="mdi mdi-check" />
-								<v-icon size="small" v-else-if="item.raw.statusAktif == false" color="red" icon="mdi mdi-close" />
-							</template>
-							<template #bottom>
-								<v-divider :thickness="2" class="border-opacity-100" color="white" />
-								<v-row no-gutters>
-									<v-col cols="9" class="pa-2 d-flex justify-start align-center">
-										<span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
-									</v-col>
-									<v-col cols="3" class="pa-2 text-right">
-										<div class="d-flex justify-start align-center">
+					<v-data-table
+						loading-text="Sedang memuat... Harap tunggu"
+						no-data-text="Tidak ada data yang tersedia"
+						no-results-text="Tidak ada catatan yang cocok ditemukan"
+						:headers="headers"
+						:loading="loadingtable"
+						:items="dataBerkas"
+						item-value="idBerkas"
+						density="comfortable"
+						hide-default-footer
+						hide-default-header
+						class="elavation-3 rounded"
+						:items-per-page="itemsPerPage"
+						@page-count="pageCount = $event"
+					>
+						<!-- header -->
+						<template #headers="{ columns }">
+							<tr>
+								<td v-for="header in columns" :key="header.title" class="tableHeader">{{ header.title.toUpperCase() }}</td>
+							</tr>
+						</template>
+						<template #loader>
+							<LoaderDataTables />
+						</template>
+						<template #[`item.number`]="{ item }">
+							{{ page > 1 ? ((page - 1)*limit) + item.index + 1 : item.index + 1 }}
+						</template>
+						<template #[`item.title`]="{ item }">
+							<div class="kotakFile">
+								<img v-if="item.raw.type === 'Gambar'" :ref="'file'" :src="item.raw.file" :title="item.raw.title" class="iconFile"/>
+								<v-icon v-if="item.raw.type === 'File' && item.raw.ext === 'docx'" class="iconFile" size="large" icon="mdi mdi-file-word-box" />
+								<v-icon v-if="item.raw.type === 'File' && item.raw.ext === 'xlsx'" class="iconFile" size="large" icon="mdi mdi-file-excel-box" />
+								<v-icon v-if="item.raw.type === 'File' && item.raw.ext === 'pdf'" class="iconFile" size="large" icon="mdi mdi-file-pdf-box" />
+								<v-icon v-if="item.raw.type === 'File' && item.raw.ext === 'txt'" class="iconFile" size="large" icon="mdi mdi-file-document" />
+								<span class="textFile">{{ `${item.raw.title}.${item.raw.ext}` }}</span>
+							</div>
+						</template>
+						<template #[`item.opsi`]="{ item }">
+							<v-switch color="white" v-model="item.raw.statusAktif" hide-details @click="postRecord(item.raw.idBerkas, 'STATUSRECORD', !item.raw.statusAktif)" />
+						</template>
+						<template #[`item.aksi`]="{ item }">
+							<Button 
+								color-button="#bd3a07"
+								icon-prepend-button="mdi mdi-delete"
+								nama-button="Hapus"
+								@proses="postRecord(item.raw.idBerkas, 'DELETE', null)"
+							/>
+						</template>
+						<template #[`item.statusAktif`]="{ item }">
+							<v-icon size="small" v-if="item.raw.statusAktif == true" color="green" icon="mdi mdi-check" />
+							<v-icon size="small" v-else-if="item.raw.statusAktif == false" color="red" icon="mdi mdi-close" />
+						</template>
+						<template #top>
+							<v-row no-gutters class="pa-2">
+								<v-col cols="12" md="6" />
+								<v-col cols="12" md="6">
+									<v-row no-gutters>
+										<v-col cols="12" md="9">
+											<TextField
+												v-model="searchData"
+												icon-prepend-tf="mdi mdi-magnify"
+												label-tf="Pencarian..."
+												:clearable-tf="true"
+												@click:clear="() => {
+													page = 1
+													getDataBerkas({page: 1, limit: limit, keyword: ''})
+												}"
+												@keyup.enter="() => {
+													page = 1
+													getDataBerkas({page: 1, limit: limit, keyword: searchData})
+												}"
+											/>
+										</v-col>
+										<v-col cols="12" md="3" class="pl-2 d-flex justify-end align-center">
 											<Autocomplete
-												v-model="limit"
-												pilihan-a="select"
-												:data-a="limitPage"
-												label-a="Limit"
+												v-model="page"
+												:data-a="pageOptions"
+												label-a="Page"
 												:disabled-a="dataBerkas.length ? false : true"
 											/>
-											<Button
-												variant="plain"
-												size-button="large"
-												model-button="comfortable"
-												color-button="#ffffff"
-												icon-button="mdi mdi-arrow-left-circle-outline"
-												:disabled-button="dataBerkas.length ? pageSummary.page != 1 ? false : true : true"
-												@proses="() => { page = pageSummary.page - 1 }"
-											/>
-											<Button
-												variant="plain"
-												size-button="large"
-												model-button="comfortable"
-												color-button="#ffffff"
-												icon-button="mdi mdi-arrow-right-circle-outline"
-												:disabled-button="dataBerkas.length ? pageSummary.page != pageSummary.totalPages ? false : true : true"
-												@proses="() => { page = pageSummary.page + 1 }"
-											/>
-										</div>
-									</v-col>
-								</v-row>
-							</template>
-						</v-data-table>
-					</div>
+										</v-col>
+									</v-row>
+								</v-col>
+							</v-row>
+							<v-divider :thickness="2" class="border-opacity-100" color="white" />
+						</template>
+						<template #bottom>
+						</template>
+					</v-data-table>
         </v-card-text>
 				<v-divider />
-        <v-card-actions />
+        <v-card-actions>
+					<v-row no-gutters>
+						<v-col cols="12" lg="9" class="d-flex justify-start align-center">
+							<span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
+						</v-col>
+						<v-col cols="12" lg="3" class="pa-2 text-right">
+							<div class="d-flex justify-start align-center">
+								<Autocomplete
+									v-model="limit"
+									pilihan-a="select"
+									:data-a="limitPage"
+									label-a="Limit"
+									:disabled-a="dataBerkas.length ? false : true"
+								/>
+								<Button
+									variant="plain"
+									size-button="large"
+									model-button="comfortable"
+									color-button="#000000"
+									icon-button="mdi mdi-arrow-left-circle-outline"
+									:disabled-button="dataBerkas.length ? pageSummary.page != 1 ? false : true : true"
+									@proses="() => { page = pageSummary.page - 1 }"
+								/>
+								<Button
+									variant="plain"
+									size-button="large"
+									model-button="comfortable"
+									color-button="#000000"
+									icon-button="mdi mdi-arrow-right-circle-outline"
+									:disabled-button="dataBerkas.length ? pageSummary.page != pageSummary.totalPages ? false : true : true"
+									@proses="() => { page = pageSummary.page + 1 }"
+								/>
+							</div>
+						</v-col>
+					</v-row>
+				</v-card-actions>
       </v-card>
     </v-dialog>
 		<v-dialog
@@ -585,10 +603,10 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
-        :notifikasi-kode.sync="notifikasiKode"
-        :notifikasi-text.sync="notifikasiText"
-        :notifikasi-button.sync="notifikasiButton"
+      <PopUpNotifikasi
+        :notifikasi-kode="notifikasiKode"
+        :notifikasi-text="notifikasiText"
+        :notifikasi-button="notifikasiButton"
 				@proses="goToProses"
         @cancel="dialogNotifikasi = false"
       />
@@ -599,10 +617,8 @@
 <script>
 import { useMeta } from 'vue-meta'
 import { mapActions, mapState, mapGetters } from "vuex";
-import PopUpNotifikasiVue from "../../Layout/PopUpNotifikasi.vue";
-import { Cropper, RectangleStencil } from 'vue-advanced-cropper'
-import 'vue-advanced-cropper/dist/style.css';
-
+import PopUpNotifikasi from "../../Layout/PopUpNotifikasi.vue";
+import { RectangleStencil } from "vue-advanced-cropper";
 function getMimeType(file, fallback = null) {
 	const byteArray = (new Uint8Array(file)).subarray(0, 4);
   let header = '';
@@ -624,10 +640,9 @@ function getMimeType(file, fallback = null) {
       return fallback;
     }
   }
-
 export default {
   name: 'GeneralCMS',
-	components: { PopUpNotifikasiVue, Cropper, RectangleStencil },
+	components: { PopUpNotifikasi, RectangleStencil },
   data: () => ({
     statusSekolahOptions: [
 			{ label: 'Negeri', kode: 1 },
@@ -670,8 +685,6 @@ export default {
     DialogBerkas: false,
     dialogCrop: false,
 		dataBerkas: [],
-		imageMultiple: [],
-		fileMultiple: [],
 		MultipleBerkas: [],
 		componentKey: 0,
 		jenisUpload: '',
@@ -694,6 +707,7 @@ export default {
       { title: "FILE NAME", key: "title", sortable: false },
       { title: "STATUS", key: "statusAktif", sortable: false },
       { title: "OPSI", key: "opsi", sortable: false },
+      { title: "ACTION", key: "aksi", sortable: false },
     ],
     rowsPerPageItems: { "items-per-page-options": [5, 10, 25, 50] },
     totalItems: 0,
@@ -713,7 +727,7 @@ export default {
   }),
 	setup() {
     useMeta({
-      title: "Settings (General CMS) - MTsS. SIROJUL ATHFAL",
+      title: "Settings (General CMS)",
       htmlAttrs: {
         lang: "id",
         amp: true,
@@ -733,6 +747,24 @@ export default {
 			KecamatanOptions: store => store.setting.KecamatanOptions,
 			KelurahanOptions: store => store.setting.KelurahanOptions,
 		}),
+		optionsKabKota(){
+      let kabkota = this.KabKotaOptions.map(x => {
+        return {
+          kode: x.kode,
+          nama: `${x.jenisKabKota} ${x.nama}`
+        }
+      })
+      return kabkota
+    },
+		optionsKelurahan(){
+      let kel = this.KelurahanOptions.map(x => {
+        return {
+          kode: x.kode,
+          nama: `${x.jenisKelDes} ${x.nama}`
+        }
+      })
+      return kel
+    },
   },
 	watch: {
 		berkasAll: {
@@ -778,9 +810,9 @@ export default {
 					kkm: value.kkm ? value.kkm : null,
 					logo: value.logo ? `${this.API_URL}bahan/${value.logo}` : null,
 				}
-				this.getWilayah({ bagian: 'kabkota', KodeWilayah: this.inputData.provinsi })
-				this.getWilayah({ bagian: 'kecamatan', KodeWilayah: this.inputData.kabupatenkota })
-				this.getWilayah({ bagian: 'kelurahan', KodeWilayah: this.inputData.kecamatan })
+				this.getWilayah2023({ bagian: 'kabkota', KodeWilayah: this.inputData.provinsi })
+				this.getWilayah2023({ bagian: 'kecamatan', KodeWilayah: this.inputData.kabupatenkota })
+				this.getWilayah2023({ bagian: 'kelurahan', KodeWilayah: this.inputData.kecamatan })
 			}
 		},
     inputData:{
@@ -797,7 +829,9 @@ export default {
 		page: {
 			deep: true,
 			handler(value) {
-				this.getDataBerkas({page: value, limit: this.limit, keyword: this.searchData})
+				if(value){
+					this.getDataBerkas({page: value, limit: this.limit, keyword: this.searchData})
+				}
 			}
 		},
 		limit: {
@@ -810,20 +844,20 @@ export default {
   },
 	mounted() {
     this.getCMSSettings()
-		this.getWilayah({ bagian: 'provinsi', KodeWilayah: null })
+		this.getWilayah2023({ bagian: 'provinsi', KodeWilayah: null })
 	},
 	methods: {
 		...mapActions({
       uploadFiles: 'upload/uploadFiles',
 			uploadBerkas: 'upload/uploadBerkas',
       getCMSSettings: 'setting/getCMSSettings',
-      getWilayah: 'setting/getWilayah',
+      getWilayah2023: 'setting/getWilayah2023',
 			getDataBerkas: 'setting/getDataBerkas',
 		}),
     wilayah(kondisi, e){
 			if(kondisi === 'provinsi'){
 				if(e){
-					this.getWilayah({ bagian: 'kabkota', KodeWilayah: e })
+					this.getWilayah2023({ bagian: 'kabkota', KodeWilayah: e })
 					this.inputData.kabupatenkota = null
 					this.inputData.kecamatan = null
 					this.inputData.kelurahan = null
@@ -831,7 +865,7 @@ export default {
 				}
 			}else if(kondisi === 'kabkota'){
 				if(e){
-					this.getWilayah({ bagian: 'kecamatan', KodeWilayah: e })
+					this.getWilayah2023({ bagian: 'kecamatan', KodeWilayah: e })
 					if(e !== this.inputData.kecamatan) {
 						this.inputData.kelurahan = null
 						this.inputData.kodepos = ''	
@@ -843,7 +877,7 @@ export default {
 				}
 			}else if(kondisi === 'kecamatan'){
 				if(e){
-					this.getWilayah({ bagian: 'kelurahan', KodeWilayah: e })
+					this.getWilayah2023({ bagian: 'kelurahan', KodeWilayah: e })
 					if(e !== this.inputData.kelurahan) {
 						this.inputData.kodepos = ''	
 					}
@@ -866,10 +900,10 @@ export default {
         let tulisan = `${tahun}/${tahun+1}`
         this.tahunOptions.push(tulisan.toString())
       }
-			this.getWilayah({ bagian: 'provinsi', KodeWilayah: null })
-			this.getWilayah({ bagian: 'kabkota', KodeWilayah: this.inputData.provinsi })
-			this.getWilayah({ bagian: 'kecamatan', KodeWilayah: this.inputData.kabupatenkota })
-			this.getWilayah({ bagian: 'kelurahan', KodeWilayah: this.inputData.kecamatan })
+			this.getWilayah2023({ bagian: 'provinsi', KodeWilayah: null })
+			this.getWilayah2023({ bagian: 'kabkota', KodeWilayah: this.inputData.provinsi })
+			this.getWilayah2023({ bagian: 'kecamatan', KodeWilayah: this.inputData.kabupatenkota })
+			this.getWilayah2023({ bagian: 'kelurahan', KodeWilayah: this.inputData.kecamatan })
       let semester = this.semesterOptions.filter(str => str.value === this.inputData.semester)[0]
       let jenisraport = this.jenisRaportOptions.filter(str => str.value === this.inputData.jenisraport)[0]
       let raport = this.raportOptions.filter(str => str.value === this.inputData.pdfraport)[0]
@@ -881,19 +915,19 @@ export default {
       let bodyData = {
         alamat: this.inputData.alamat,
 				provinsi: {
-          label: this.uppercaseLetterFirst2(provinsi.nama),
+          label: `Provinsi ${provinsi.nama}`,
           value: provinsi.kode,
         },
         kabupatenkota: {
-          label: this.uppercaseLetterFirst2(kabkota.nama),
+          label: `${kabkota.jenisKabKota === 'Kabupaten' ? 'Kab.' : 'Kota'} ${kabkota.nama}`,
           value: kabkota.kode,
         },
         kecamatan: {
-          label: kec.nama,
+          label: `Kec. ${kec.nama}`,
           value: kec.kode,
         },
         kelurahan: {
-          label: kel.nama,
+          label: `${kel.jenisKelDes === 'Kelurahan' ? 'Kel.' : 'Desa'} ${kel.nama}`,
           value: kel.kode,
         },
         kodepos: this.inputData.kodepos,
@@ -920,10 +954,11 @@ export default {
         telepon: this.inputData.telepon,
         kkm: this.inputData.kkm,
       }
+			// return console.log(bodyData);
 			this.$store.dispatch('setting/postCMSSettings', bodyData)
       .then((res) => {
         this.getCMSSettings()
-        this.getWilayah({ bagian: 'provinsi', KodeWilayah: null })
+        this.getWilayah2023({ bagian: 'provinsi', KodeWilayah: null })
         this.notifikasi("success", res.data.message, "1")
 			})
 			.catch((err) => {
@@ -934,26 +969,20 @@ export default {
       let jml_files = e.target.files.length
 			if(this.jenisUpload === 'Gambar'){
 				for(let i=0;i<jml_files;i++) {
-					this.MultipleBerkas.push(e.target.files[i])
-				} 
-				this.imageMultiple = []     
-				this.MultipleBerkas.forEach((file, f) => {
-					this.imageMultiple.push({ 
+					let file = e.target.files[i]
+					this.MultipleBerkas.push({ 
 						title: '',
 						ext: file.type === 'image/jpeg' || file.type === 'image/jpg' ? 'jpg' : 'png',
 						kategori: this.jenisUpload,
 						url: URL.createObjectURL(file),
 						files: file
 					})
-				})
+				}
 			}
 			if(this.jenisUpload === 'File'){
 				for(let i=0;i<jml_files;i++) {
-					this.MultipleBerkas.push(e.target.files[i])
-				} 
-				this.fileMultiple = []     
-				this.MultipleBerkas.forEach((file, f) => {
-					this.fileMultiple.push({ 
+					let file = e.target.files[i]
+					this.MultipleBerkas.push({ 
 						title: '',
 						ext: file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || file.type === 'application/msword'
 							? 'docx' : file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || file.type === 'application/vnd.ms-excel'
@@ -964,21 +993,19 @@ export default {
 						url: URL.createObjectURL(file),
 						files: file
 					})
-				})
+				}
 			}
     },
     HapusMultiple(index) {
 			if(this.jenisUpload === 'Gambar'){
 				this.MultipleBerkas.splice(index, 1)
-				this.imageMultiple.splice(index, 1)
 			}
 			if(this.jenisUpload === 'File'){
 				this.MultipleBerkas.splice(index, 1)
-				this.fileMultiple.splice(index, 1)
 			}
     },
 		async SimpanMultiple(){
-			let dataFile = this.jenisUpload === 'Gambar' ? this.imageMultiple : this.fileMultiple
+			let dataFile = this.jenisUpload === 'Gambar' ? this.MultipleBerkas : this.MultipleBerkas
 			let kirim = await Promise.all(dataFile.map(async (value) => {
         let status = []
         const bodyData = {
@@ -1004,8 +1031,6 @@ export default {
       }
 			this.jenisUpload = ''
 			this.MultipleBerkas = []
-			this.imageMultiple = []
-			this.fileMultiple = []
 			this.DialogUploadBerkas = false
 		},
 		openDialogDataBerkas(){
@@ -1013,9 +1038,9 @@ export default {
 			this.getDataBerkas({page: this.page, limit: this.limit, keyword: this.searchData})
 			this.DialogBerkas = true
 		},
-		postRecord(idBerkas, statusAktif){
+		postRecord(idBerkas, jenis, statusAktif){
 			let bodyData = {
-				jenis: 'STATUSRECORD',
+				jenis: jenis,
 				idBerkas: idBerkas,
 				statusAktif: statusAktif,
       }
@@ -1056,7 +1081,7 @@ export default {
 			canvas.toBlob(async (blob) => {
         this.FileLogoSekolah = blob
         let uploadLogoSekolah = await this.uploadLampiran(this.FileLogoSekolah)
-        if(uploadLogoSekolah != undefined){ 
+        if(uploadLogoSekolah === 'success'){ 
           this.tutupDialogCrop()
           this.notifikasi("success", "Berhasil ubah Logo Sekolah", "2")
         }else{ 
@@ -1065,7 +1090,6 @@ export default {
           this.notifikasi("error", 'Gagal ubah Logo Sekolah', "1")
         }
 			}, this.image.type);
-
 		},
 		async uploadLampiran(dataUpload) {
 			if(dataUpload){
@@ -1078,10 +1102,10 @@ export default {
 					files: dataUpload,
 				};
 				try {
-					let response = await this.uploadFiles(bodyData);
-					return response
+					await this.uploadFiles(bodyData);
+					return 'success'
 				} catch (err) {
-					this.notifikasi("error", err.response.data.message, "1")
+					return 'failed'
 				}
 			}else{
         return undefined
@@ -1220,7 +1244,7 @@ export default {
 	float:left;
 	height: 60px;
 	width: auto;
-	font-size: 10pt !important;
+	font-size: 9pt !important;
   font-weight: bold;
 }
 .kotakGambar {

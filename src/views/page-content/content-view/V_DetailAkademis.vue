@@ -1,10 +1,12 @@
 <template>
   <div>
-    <h1 class="subheading grey--text">Data Akademis ({{ mapelText }})</h1>
-    <div v-if="roleID === '1' || roleID === '2'" class="text-right wadah">
-      <span @click="gotolist()" class="link">Data Akademis</span>
-      <v-icon size="small" class="iconstyle" icon="mdi mdi-menu-right" />
-      <span>Data Akademis ({{ mapelText }})</span>
+    <h1 class="subheading grey--text text-decoration-underline">Data {{ jenis === 'mapel' ? 'Akademis' : 'Koreksi Exam' }} ({{ mapelText }})</h1>
+    <div v-if="roleID === '1' || roleID === '2' || (roleID === '3' && jenis === 'koreksi')">
+      <div class="text-right wadah">
+        <span @click="gotolist()" class="link">Data {{ jenis === 'mapel' ? 'Akademis' : 'Koreksi Exam' }}</span>
+        <v-icon size="small" class="iconstyle" icon="mdi mdi-menu-right" />
+        <span>Data {{ jenis === 'mapel' ? 'Akademis' : 'Koreksi Exam' }} ({{ mapelText }})</span>
+      </div>
     </div>
     <v-card class="pa-1 rounded" variant="outlined" elevation="4">
       <div
@@ -17,12 +19,13 @@
             <v-col
               v-for="hasil in data.dataKelas"
               :key="hasil.label"
-              cols="3"
+              cols="12"
+              lg="3"
             >
-              <v-card color="white" @click="hasil.jumlah > 0 ? gotoDetail(hasil.kelas, mapelText) : warningNotif()">
+              <v-card color="white" style="border: 2px solid #000;" @click="hasil.jumlah > 0 ? gotoDetail(hasil.kelas, mapelText) : warningNotif()">
                 <v-sheet color="green" class="sheetData" elevation="2">
                   <v-icon icon="mdi mdi-account-multiple" size="large" />
-                  <v-card-subtitle class="text-black" style="font-weight: bold; font-size: 15px; margin-left: 5px;">Kelas {{ hasil.kelas }}</v-card-subtitle>
+                  <v-card-title class="text-white" style="font-weight: bold; font-size: 15px; margin-left: 5px;">Kelas {{ hasil.kelas }}</v-card-title>
                 </v-sheet>
                 <v-card-actions>
                   <v-divider :thickness="2" />
@@ -40,10 +43,10 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
-        :notifikasi-kode.sync="notifikasiKode"
-        :notifikasi-text.sync="notifikasiText"
-        :notifikasi-button.sync="notifikasiButton"
+      <PopUpNotifikasi
+        :notifikasi-kode="notifikasiKode"
+        :notifikasi-text="notifikasiText"
+        :notifikasi-button="notifikasiButton"
         @cancel="dialogNotifikasi = false"
       />
     </v-dialog>
@@ -53,11 +56,11 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import { useMeta } from 'vue-meta'
-import PopUpNotifikasiVue from "../../Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "../../Layout/PopUpNotifikasi.vue";
 export default {
   name: 'DataDetailAkademis',
   components: {
-    PopUpNotifikasiVue
+    PopUpNotifikasi
   },
   data: () => ({
     roleID: '',
@@ -72,7 +75,7 @@ export default {
   }),
   setup() {
     useMeta({
-      title: "Data Detail Akademis - MTsS. SIROJUL ATHFAL",
+      title: "Data Detail Akademis",
       htmlAttrs: {
         lang: "id",
         amp: true,
@@ -87,6 +90,10 @@ export default {
       let pelajaran = this.$route.params.mapel
       this.mapel = pelajaran.replace('-', ' ')
       return this.mapel
+    },
+    jenis() {
+      let jenis = this.$route.params.jenis
+      return jenis
     }
   },
   watch: {
@@ -120,6 +127,7 @@ export default {
     },
   },
   mounted() {
+    if(!localStorage.getItem('user_token')) return this.$router.push({name: 'LogIn'});
     this.roleID = localStorage.getItem('roleID')
     this.getKelasSiswa({kelas: null, roleID: this.roleID})
 	},
@@ -128,10 +136,10 @@ export default {
       getKelasSiswa: 'kelas/getKelasSiswa',
     }),
     gotoDetail(kelas, mapel) {
-      this.$router.push({name: "DataDetailKelasSiswa", params: { kondisi: 'penilaian', kelas: kelas }, query: { mapel: mapel }});
+      this.$router.push({name: "DataDetailKelasSiswa", params: { kondisi: this.jenis === 'mapel' ? 'penilaian' : 'koreksi', kelas: kelas }, query: { mapel: mapel }});
     },
     gotolist() {
-      this.$router.push({name: "DataAkademis"});
+      this.$router.push(this.jenis === 'mapel' ? {name: "DataAkademis"} : {name: "KoreksiExam"});
     },
     warningNotif(){
       this.notifikasi("warning", "Tidak ada siswa/i dikelas ini", "1")
@@ -154,24 +162,5 @@ export default {
   line-height: 2rem;
   text-transform: uppercase;
   font-family: "Roboto", sans-serif !important;
-}
-.wadah {
-  font-size: 15px;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-.iconstyle {
-  margin-left: 5px;
-  margin-right: 5px;
-}
-.link {
-  color: #000;
-  cursor: pointer;
-  text-decoration: none;
-}
-.link:hover {
-  color: #6fe484;
-  cursor: pointer;
-  text-decoration: underline;
 }
 </style>

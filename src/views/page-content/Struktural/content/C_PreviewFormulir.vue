@@ -177,7 +177,7 @@
 					md="8"
 					class="pt-3"
 				>
-					{{ uppercaseLetterFirst2(provinsiText) }}
+					{{ provinsiText }}
 				</v-col>
 			</v-row>
 			<v-row no-gutters>
@@ -193,7 +193,7 @@
 					md="8"
 					class="pt-3"
 				>
-          {{ uppercaseLetterFirst2(kabkotaText) }}
+          {{ kabkotaText }}
 				</v-col>
 			</v-row>
 			<v-row no-gutters>
@@ -209,7 +209,7 @@
 					md="8"
 					class="pt-3"
 				>
-          {{ uppercaseLetterFirst2(kecamatanText) }}				
+          {{ kecamatanText }}				
 				</v-col>
 			</v-row>
 			<v-row no-gutters>
@@ -218,14 +218,14 @@
 					md="4"
 					class="pt-2 d-flex align-center font-weight-bold"
 				>
-					Kelurahan
+					Kelurahan / Desa
 				</v-col>
 				<v-col
 					cols="12"
 					md="8"
 					class="pt-3"
 				>
-					{{ uppercaseLetterFirst2(kelurahanText) }}
+					{{ kelurahanText }}
 				</v-col>
 			</v-row>
 			<v-row no-gutters>
@@ -364,10 +364,10 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
-        :notifikasi-kode.sync="notifikasiKode"
-        :notifikasi-text.sync="notifikasiText"
-        :notifikasi-button.sync="notifikasiButton"
+      <PopUpNotifikasi
+        :notifikasi-kode="notifikasiKode"
+        :notifikasi-text="notifikasiText"
+        :notifikasi-button="notifikasiButton"
         @proses="goToProses"
         @cancel="dialogNotifikasi = false"
       />
@@ -377,10 +377,10 @@
 
 <script>
 import { mapActions, mapState } from "vuex";
-import PopUpNotifikasiVue from "../../../Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "../../../Layout/PopUpNotifikasi.vue";
 export default {
   components: {
-    PopUpNotifikasiVue
+    PopUpNotifikasi
   },
 	props: {
     stepperVal: {
@@ -396,7 +396,6 @@ export default {
 		preview: true,
     kondisi: '',
     passText: '',
-    kelasText: '',
 
     //notifikasi
     dialogNotifikasi: false,
@@ -429,31 +428,48 @@ export default {
 		},
 		jabatanText(){
 			let kumpul = []
-			this.DataStepThree.jabatan_guru.map(str => {
-				let hasil = this.jabatanOptions.filter(val => val.kode === str)[0].label
-				kumpul.push(hasil)
-			})
-			return kumpul.sort().join(', ')
+			if(this.DataStepThree.jabatan_guru === null || !this.DataStepThree.jabatan_guru.length) {
+				return '-'
+			}else{
+				this.DataStepThree.jabatan_guru.map(str => {
+					let hasil = this.jabatanOptions.filter(val => val.kode === str)[0].label
+					kumpul.push(hasil)
+				})
+				return kumpul.sort().join(', ')
+			}
 		},
 		mengajatText(){
 			let kumpul = []
-			this.DataStepThree.mengajar_bidang.map(str => {
-				let hasil = this.mengajarOptions.filter(val => val.kode === str)[0].label
-				kumpul.push(hasil) 
-			})
-			return kumpul.sort().join(', ')
+			if(this.DataStepThree.mengajar_bidang === null || !this.DataStepThree.mengajar_bidang.length) {
+				return '-'
+			}else{
+				this.DataStepThree.mengajar_bidang.map(str => {
+					let hasil = this.mengajarOptions.filter(val => val.kode === str)[0].label
+					kumpul.push(hasil) 
+				})
+				return kumpul.sort().join(', ')
+			}
+		},
+		kelasText(){
+			if(this.DataStepThree.mengajar_kelas === null || !this.DataStepThree.mengajar_kelas.length) {
+				return '-'
+			}else{
+				return this.DataStepThree.mengajar_kelas.sort().join(', ')
+			}
 		},
 		provinsiText(){
 			return this.ProvinsiOptions.filter(str => str.kode === this.DataStepTwo.provinsi)[0].nama
 		},
 		kabkotaText(){
-			return this.KabKotaOptions.filter(str => str.kode === this.DataStepTwo.kabkota)[0].nama
+			let kabkota = this.KabKotaOptions.filter(str => str.kode === this.DataStepTwo.kabkota)[0]
+			return `${kabkota.jenisKabKota} ${kabkota.nama}`
 		},
 		kecamatanText(){
 			return this.KecamatanOptions.filter(str => str.kode === this.DataStepTwo.kecamatan)[0].nama
 		},
 		kelurahanText(){
-			return this.KelurahanOptions.filter(str => str.kode === this.DataStepTwo.kelurahan)[0].nama
+			let keldes = this.KelurahanOptions.filter(str => str.kode === this.DataStepTwo.kelurahan)[0]
+			return `${keldes.jenisKelDes} ${keldes.nama}`
 		},
   },
 	watch: {
@@ -467,15 +483,14 @@ export default {
 	},
 	mounted() {
     this.kondisi = this.$route.params.kondisi
-		this.kelasText = this.DataStepThree.mengajar_kelas.sort().join(', ')
 		this.getAgama()
 		this.getPendidikan()
 		this.getJabatan()
 		this.getMengajar()
-		this.getWilayah({ bagian: 'provinsi', KodeWilayah: null })
-		this.getWilayah({ bagian: 'kabkota', KodeWilayah: this.DataStepTwo.provinsi })
-		this.getWilayah({ bagian: 'kecamatan', KodeWilayah: this.DataStepTwo.kabkota })
-		this.getWilayah({ bagian: 'kelurahan', KodeWilayah: this.DataStepTwo.kecamatan })
+		this.getWilayah2023({ bagian: 'provinsi', KodeWilayah: null })
+		this.getWilayah2023({ bagian: 'kabkota', KodeWilayah: this.DataStepTwo.provinsi })
+		this.getWilayah2023({ bagian: 'kecamatan', KodeWilayah: this.DataStepTwo.kabkota })
+		this.getWilayah2023({ bagian: 'kelurahan', KodeWilayah: this.DataStepTwo.kecamatan })
 	},
 	methods: {
 		...mapActions({
@@ -484,7 +499,7 @@ export default {
 			getPendidikan: "setting/getPendidikan",
 			getJabatan: "setting/getJabatan",
 			getMengajar: "setting/getMengajar",
-			getWilayah: "setting/getWilayah",
+			getWilayah2023: "setting/getWilayah2023",
 		}),
 		simpanData() {
       let bodyData = {
@@ -511,12 +526,13 @@ export default {
           kelurahan: this.DataStepTwo.kelurahan,
           kodePos: this.DataStepTwo.kode_pos,
           pendidikanGuru: this.DataStepThree.pendidikan_guru,
-          jabatanGuru: this.DataStepThree.jabatan_guru.sort().join(', '),
-          mengajarBidang: this.DataStepThree.mengajar_bidang.sort().join(', '),
-          mengajarKelas: this.DataStepThree.mengajar_kelas.sort().join(', '),
+          jabatanGuru: this.DataStepThree.jabatan_guru === null || !this.DataStepThree.jabatan_guru.length ? null : this.DataStepThree.jabatan_guru.sort().join(', '),
+          mengajarBidang: this.DataStepThree.mengajar_bidang === null || !this.DataStepThree.mengajar_bidang.length ? null : this.DataStepThree.mengajar_bidang.sort().join(', '),
+          mengajarKelas: this.DataStepThree.mengajar_kelas === null || !this.DataStepThree.mengajar_kelas.length ? null : this.DataStepThree.mengajar_kelas.sort().join(', '),
           waliKelas: this.DataStepThree.wali_kelas ? this.DataStepThree.wali_kelas : null,
         }
       }
+			// return console.log(bodyData);
       this.$store.dispatch('user/postStruktural', bodyData)
       .then((res) => {
 				if(localStorage.getItem('roleID') !== '1'){
@@ -579,10 +595,4 @@ export default {
 </script>
 
 <style>
-.v-input .v-label {
-  font-size: 11pt !important;
-}
-.v-text-field.v-input--dense {
-  font-size: 13px !important;
-}
 </style>

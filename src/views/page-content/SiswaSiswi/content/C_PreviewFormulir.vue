@@ -338,7 +338,7 @@
 					md="8"
 					class="pt-3"
 				>
-					{{ uppercaseLetterFirst2(kabkotaOnlyText) }}
+					{{ kabkotaOnlyText }}
 				</v-col>
 			</v-row>
 			<v-row no-gutters>
@@ -483,7 +483,7 @@
 					md="8"
 					class="pt-3"
 				>
-					{{ uppercaseLetterFirst2(provinsiText) }}
+					{{ provinsiText }}
 				</v-col>
 			</v-row>
 			<v-row no-gutters>
@@ -499,7 +499,7 @@
 					md="8"
 					class="pt-3"
 				>
-          {{ uppercaseLetterFirst2(kabkotaText) }}
+          {{ kabkotaText }}
 				</v-col>
 			</v-row>
 			<v-row no-gutters>
@@ -515,7 +515,7 @@
 					md="8"
 					class="pt-3"
 				>
-          {{ uppercaseLetterFirst2(kecamatanText) }}				
+          {{ kecamatanText }}				
 				</v-col>
 			</v-row>
 			<v-row no-gutters>
@@ -524,14 +524,14 @@
 					md="4"
 					class="pt-2 d-flex align-center font-weight-bold"
 				>
-					Kelurahan
+					Kelurahan / Desa
 				</v-col>
 				<v-col
 					cols="12"
 					md="8"
 					class="pt-3"
 				>
-					{{ uppercaseLetterFirst2(kelurahanText) }}
+					{{ kelurahanText }}
 				</v-col>
 			</v-row>
 			<v-row no-gutters>
@@ -961,10 +961,10 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
-        :notifikasi-kode.sync="notifikasiKode"
-        :notifikasi-text.sync="notifikasiText"
-        :notifikasi-button.sync="notifikasiButton"
+      <PopUpNotifikasi
+        :notifikasi-kode="notifikasiKode"
+        :notifikasi-text="notifikasiText"
+        :notifikasi-button="notifikasiButton"
         @proses="goToProses"
         @cancel="dialogNotifikasi = false"
       />
@@ -974,10 +974,10 @@
 
 <script>
 import { mapActions, mapState } from "vuex";
-import PopUpNotifikasiVue from "../../../Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "../../../Layout/PopUpNotifikasi.vue";
 export default {
   components: {
-    PopUpNotifikasiVue
+    PopUpNotifikasi
   },
 	props: {
     stepperVal: {
@@ -1086,16 +1086,19 @@ export default {
 			return this.ProvinsiOptions.filter(str => str.kode === this.DataStepFour.provinsi)[0].nama
 		},
 		kabkotaText(){
-			return this.KabKotaOptions.filter(str => str.kode === this.DataStepFour.kabkota)[0].nama
+			let kabkota = this.KabKotaOptions.filter(str => str.kode === this.DataStepFour.kabkota)[0]
+			return `${kabkota.jenisKabKota} ${kabkota.nama}`
 		},
 		kecamatanText(){
 			return this.KecamatanOptions.filter(str => str.kode === this.DataStepFour.kecamatan)[0].nama
 		},
 		kelurahanText(){
-			return this.KelurahanOptions.filter(str => str.kode === this.DataStepFour.kelurahan)[0].nama
+			let keldes = this.KelurahanOptions.filter(str => str.kode === this.DataStepFour.kelurahan)[0]
+			return `${keldes.jenisKelDes} ${keldes.nama}`
 		},
 		kabkotaOnlyText(){
-			return this.KabKotaOptions.filter(str => str.kode === this.DataStepThree.kabkot_sekolah)[0].nama
+			let kabkota = this.KabKotaOnlyOptions.filter(str => str.kode === this.DataStepThree.kabkot_sekolah)[0]
+			return `${kabkota.jenisKabKota} ${kabkota.nama}`
 		},
   },
 	watch: {
@@ -1120,11 +1123,11 @@ export default {
 		this.getStatusTempatTinggal()
 		this.getJarakRumah()
 		this.getTransportasi()
-		this.getWilayah({ bagian: 'kabkotaOnly', KodeWilayah: null })
-		this.getWilayah({ bagian: 'provinsi', KodeWilayah: null })
-		this.getWilayah({ bagian: 'kabkota', KodeWilayah: this.DataStepFour.provinsi })
-		this.getWilayah({ bagian: 'kecamatan', KodeWilayah: this.DataStepFour.kabkota })
-		this.getWilayah({ bagian: 'kelurahan', KodeWilayah: this.DataStepFour.kecamatan })
+		this.getWilayah2023({ bagian: 'kabkotaOnly', KodeWilayah: null })
+		this.getWilayah2023({ bagian: 'provinsi', KodeWilayah: null })
+		this.getWilayah2023({ bagian: 'kabkota', KodeWilayah: this.DataStepFour.provinsi })
+		this.getWilayah2023({ bagian: 'kecamatan', KodeWilayah: this.DataStepFour.kabkota })
+		this.getWilayah2023({ bagian: 'kelurahan', KodeWilayah: this.DataStepFour.kecamatan })
 	},
 	methods: {
 		...mapActions({
@@ -1140,7 +1143,7 @@ export default {
 			getStatusTempatTinggal: "setting/getStatusTempatTinggal", 
 			getJarakRumah: "setting/getJarakRumah", 
 			getTransportasi: "setting/getTransportasi", 
-			getWilayah: "setting/getWilayah",
+			getWilayah2023: "setting/getWilayah2023",
 		}),
 		simpanData() {
       let bodyData = {
@@ -1287,10 +1290,4 @@ export default {
 </script>
 
 <style>
-.v-input .v-label {
-  font-size: 11pt !important;
-}
-.v-text-field.v-input--dense {
-  font-size: 13px !important;
-}
 </style>

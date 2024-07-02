@@ -12,7 +12,17 @@
     :disabled="ADisable"
     :readonly="AReadonly"
     @update:modelValue="changed($event)"
-  />
+  >
+    <template v-slot:item="{ props, item }">
+      <v-list :lines="false" density="comfortable" nav class="list-menu">
+        <v-list-item v-bind="props" style="width: 100%;">
+          <template v-slot:title>
+            <span class="textPilihan" v-html="item.title" />
+          </template>
+        </v-list-item>
+      </v-list>
+    </template>
+  </v-select>
   <v-autocomplete
     v-else-if="pilihanA === 'autocomplete'"
     :items="AData"
@@ -26,7 +36,19 @@
     :disabled="ADisable"
     :readonly="AReadonly"
     @update:modelValue="changed($event)"
-  />
+  >
+    <template v-slot:item="{ props, item }">
+      <div class="scroll-select">
+        <v-list :lines="false" density="comfortable" nav class="list-menu">
+          <v-list-item v-bind="props" style="width: 100%;">
+            <template v-slot:title>
+              <span class="textPilihan" v-html="item.title" />
+            </template>
+          </v-list-item>
+        </v-list>
+      </div>
+    </template>
+  </v-autocomplete>
   <v-autocomplete
     v-else-if="pilihanA === 'autocompleteslot'"
     :items="AData"
@@ -69,9 +91,11 @@
 
     <template v-slot:item="{ props, item }">
       <v-list v-if="slotA === 'first'" density="compact">
+        <v-list-subheader v-if="item.raw.type === 'subheader'">{{ item.raw.title }}</v-list-subheader>
+    		<v-divider v-if="item.raw.divider" :thickness="2" color="white" class="border-opacity-100" />
         <v-list-item
+          v-if="item.raw.type !== 'subheader' && !item.raw.divider"
           v-bind="props"
-          :subtitle="item.raw.group"
         >
           <template v-slot:prepend>
             <v-avatar size="30">
@@ -80,6 +104,9 @@
           </template>
           <template v-slot:title>
             <span class="textPilihan" v-html="item.raw.text" />
+          </template>
+          <template v-slot:subtitle>
+            <span class="textPilihan" v-html="item.raw.group" />
           </template>
         </v-list-item>
       </v-list>
@@ -176,13 +203,50 @@ export default {
 }
 </script>
 
+<style>
+.scroll-select {
+  width: auto !important;
+  height: 100% !important;
+  max-height: 100px !important;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.scroll-select::-webkit-scrollbar {
+  width: 16px;
+}
+.scroll-select::-webkit-scrollbar-thumb {
+  background-color: #272727;
+  border: 5px solid #e1e1f0;
+  border-radius: 10rem;
+}
+.scroll-select::-webkit-scrollbar-track {
+  position: absolute;
+  right: -3rem;
+  top: -50rem;
+  background: transparent;
+}
+</style>
+
 <style scoped>
 .textPilihan {
-	font-size: 0.8125rem;
+	font-size: 10pt;
   font-weight: 500;
-  align-items: center;
+  align-items: center;  
   display: flex;
   line-height: normal;
   margin-bottom: 5px;
+}
+.list-menu {
+  height: 30px;
+  overflow: hidden;
+  border-radius: 5px;
+	background-color: #272727;
+  margin: 5px;
+  justify-content: left;
+  display: flex;
+  align-items: center;
+}
+.list-menu:hover {
+	background-color: #4CAF50;
 }
 </style>

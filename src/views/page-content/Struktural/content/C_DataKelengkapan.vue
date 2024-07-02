@@ -173,10 +173,10 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
-        :notifikasi-kode.sync="notifikasiKode"
-        :notifikasi-text.sync="notifikasiText"
-        :notifikasi-button.sync="notifikasiButton"
+      <PopUpNotifikasi
+        :notifikasi-kode="notifikasiKode"
+        :notifikasi-text="notifikasiText"
+        :notifikasi-button="notifikasiButton"
         @cancel="dialogNotifikasi = false"
       />
     </v-dialog>
@@ -185,10 +185,10 @@
 
 <script>
 import { mapActions, mapState } from "vuex";
-import PopUpNotifikasiVue from "../../../Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "../../../Layout/PopUpNotifikasi.vue";
 export default {
 	components: {
-    PopUpNotifikasiVue
+    PopUpNotifikasi
   },
 	props: {
     stepperVal: {
@@ -229,8 +229,9 @@ export default {
 		inputDataKelengkapan:{
 			deep: true,
 			handler(value) {
+				console.log(value.jabatan_guru);
 				if(value.jabatan_guru !== null && value.jabatan_guru.length === 0){
-					value.wali_kelas = ''
+					this.inputDataKelengkapan.wali_kelas = null
 					this.kondisiJabatan = true
 				}
 
@@ -239,11 +240,12 @@ export default {
 					if(jabatan){
 						this.kondisiJabatan = false
 					}else{
+						this.inputDataKelengkapan.wali_kelas = null
 						this.kondisiJabatan = true
 					}
 				}
-
-				if(value.nomor_induk != '' && value.pendidikan_guru != null && value.jabatan_guru != null && value.mengajar_bidang != null && value.mengajar_kelas != null){
+				// && value.jabatan_guru != null && value.mengajar_bidang != null && value.mengajar_kelas != null
+				if(value.nomor_induk != '' && value.pendidikan_guru != null){
 					this.kondisiTombol = false
 				}else{
 					this.kondisiTombol = true

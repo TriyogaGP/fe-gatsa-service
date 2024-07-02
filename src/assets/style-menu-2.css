@@ -1,0 +1,127 @@
+.navbar {
+  width: 100%;
+  max-width: 900px;
+	margin-left: 5px;
+	white-space: nowrap;
+	overflow-x: auto;
+	overflow-y: hidden;
+}
+.navbar::-webkit-scrollbar {
+  display: none; 
+}
+
+.left {
+	cursor: pointer;
+	font-size: 24px;
+	position: absolute;
+	left: 215px;
+	padding: 10px;
+	background-color: #272727;
+	z-index: 100;
+	display: none;
+}
+.right {
+	cursor: pointer;
+	font-size: 24px;
+	position: absolute;
+	right: 215px;
+	padding: 10px;
+	background-color: #272727;
+	z-index: 100;
+	display: none;
+}
+
+.navbar .nav{
+	font-size: 9pt;
+	border-radius: 3px;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  /* height: 300px; */
+  height: 250px;
+}	
+
+.nav li{
+	list-style: none;
+	display: block;
+	float: left;
+	/* height: 60px; */
+	position: relative;
+	/* border-right: 1px solid #4CAF50; */
+  border: 1px solid #FFF;
+  border-radius: 5px;
+  padding: 3px;
+  margin: 0 2px;
+  cursor: pointer;
+}
+
+.nav li a{
+	padding: 0px 2px;
+	/* line-height: 60px; */
+	text-decoration: none;
+	/* border-right: 1px solid #4CAF50; */
+	/* height: 60px; */
+	color: #FFF;
+}
+
+.nav ul{
+	width: auto;
+	background: #272727; 
+  margin-top: 4px;
+  padding: 5px;
+	border-radius: 0px 0px 5px 5px;
+	box-shadow: 2px 2px 3px #272727;
+	-webkit-box-shadow: 2px 2px 3px #272727;
+  -moz-box-shadow: 2px 2px 3px #272727;
+  position: relative;
+}
+
+.nav li:hover{
+	background: #4CAF50;
+}
+.nav li a{
+	display: block;
+  padding-bottom: 2px;
+}
+.nav ul li {
+	border: 1px solid #FFF;
+	width:100%;
+	border-radius: 5px;
+  margin: 3px 0;
+}
+.nav ul li a {
+	/* padding: 5px 15px 5px 2px; */
+	padding: 0px 15px 0px 2px;
+	color:#FFF;
+}
+.nav ul li:hover{background:#4CAF50;}
+/* .nav ul li:last-child { border-bottom: none;}
+.nav ul li:last-child a{ border-bottom: none;} */
+/* Sub menus */
+.nav ul{
+	display: none;
+	visibility: hidden;
+	position: absolute;
+}
+
+.expand-btn:after {
+  content: ' \25BE';
+  padding-left: 5px;
+  color: #FFF;
+}
+
+.nav ul li{
+	display: block;
+	visibility: visible;
+}
+.nav li:hover > ul{
+	display: block;
+	visibility: visible;
+}
+
+@media screen and (min-width: 1920px) {
+  .navbar {
+    width: 100%;
+    max-width: 1500px;
+  }
+}

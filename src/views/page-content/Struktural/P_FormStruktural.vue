@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="subheading grey--text">Formulir Struktural</h1>
+    <h1 class="subheading grey--text text-decoration-underline">Formulir Struktural</h1>
     <div class="text-right wadah">
       <span class="link" @click="gotolist()">Data Struktural</span>
       <v-icon size="small" class="iconstyle" icon="mdi mdi-menu-right" />
@@ -131,7 +131,7 @@ export default {
   }),
   setup() {
     useMeta({
-      title: "Formulir Struktural - MTsS. SIROJUL ATHFAL",
+      title: "Formulir Struktural",
       htmlAttrs: {
         lang: "id",
         amp: true,
@@ -222,25 +222,3 @@ export default {
 	}
 }
 </script>
-
-<style scoped>
-.wadah {
-  font-size: 15px;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-.iconstyle {
-  margin-left: 5px;
-  margin-right: 5px;
-}
-.link {
-  color: #000;
-  cursor: pointer;
-  text-decoration: none;
-}
-.link:hover {
-  color: #6fe484;
-  cursor: pointer;
-  text-decoration: underline;
-}
-</style>

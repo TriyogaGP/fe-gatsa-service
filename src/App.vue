@@ -1,9 +1,9 @@
 <template>
   <v-app>
     <metainfo>
-      <template v-slot:title="{ content }">{{ content ? `${content} | SITE_NAME` : `SITE_NAME` }}</template>
+      <template v-slot:title="{ content }">{{ content ? `${content} | ${site_name}` : site_name }}</template>
     </metainfo>
-    <router-view />
+    <routerView />
   </v-app>
 </template>
 
@@ -11,7 +11,18 @@
 export default {
   name: "App",
   data: () => ({
+    site_name: 'MTsS. SIROJUL ATHFAL',
   }),
+  watch: {
+    overlay(val) {
+      val && setTimeout(() => {
+        this.overlay = false
+      }, 3000)
+    },
+  },
+  beforeMount(){
+    this.overlay = true
+  },
 }
 </script>
 <style>

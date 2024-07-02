@@ -1,18 +1,19 @@
 <template>
   <div>
-    <h1 class="subheading grey--text">Data Kelas Siswa {{ kelasText }}</h1>
+    <h1 class="subheading grey--text text-decoration-underline">Data Kelas Siswa {{ kelasText }}</h1>
     <v-card class="pa-1 rounded" variant="outlined" elevation="4">
       <v-container fluid v-if="DataKelas.length">
         <v-row>
           <v-col
             v-for="hasil in DataKelas"
             :key="hasil.kelas"
-            cols="3"
+            cols="12"
+            lg="4"
           >
-            <v-card color="white" @click="hasil.jumlah > 0 ? gotoDetail(hasil.kelas) : warningNotif()">
+            <v-card color="white" style="border: 2px solid #000;" @click="hasil.jumlah > 0 ? gotoDetail(hasil.kelas) : warningNotif()">
               <v-sheet color="green" class="sheetData" elevation="2">
                 <v-icon icon="mdi mdi-account-multiple" size="large" />
-                <v-card-subtitle class="text-black" style="font-weight: bold; font-size: 15px; margin-left: 5px;">Kelas {{ hasil.kelas }}</v-card-subtitle>
+                <v-card-title class="text-white" style="font-weight: bold; font-size: 15px; margin-left: 5px;">Kelas {{ hasil.kelas }}</v-card-title>
               </v-sheet>
               <v-card-actions>
                 <v-divider :thickness="2" class="border-opacity-75" />
@@ -30,10 +31,10 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
-        :notifikasi-kode.sync="notifikasiKode"
-        :notifikasi-text.sync="notifikasiText"
-        :notifikasi-button.sync="notifikasiButton"
+      <PopUpNotifikasi
+        :notifikasi-kode="notifikasiKode"
+        :notifikasi-text="notifikasiText"
+        :notifikasi-button="notifikasiButton"
         @cancel="dialogNotifikasi = false"
       />
     </v-dialog>
@@ -43,11 +44,11 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import { useMeta } from 'vue-meta'
-import PopUpNotifikasiVue from "../../Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "../../Layout/PopUpNotifikasi.vue";
 export default {
   name: 'DataKelasSiswa',
   components: {
-    PopUpNotifikasiVue
+    PopUpNotifikasi
   },
   data: () => ({
     kelas: '',
@@ -60,7 +61,7 @@ export default {
   }),
   setup() {
     useMeta({
-      title: "Data Kelas Siswa - MTsS. SIROJUL ATHFAL",
+      title: "Data Kelas Siswa",
       htmlAttrs: {
         lang: "id",
         amp: true,

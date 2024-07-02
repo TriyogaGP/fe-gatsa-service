@@ -81,7 +81,7 @@
 					<TextField
 						v-model="inputDataLogIn.email"
 						label-tf="Email"
-						:rules="this.inputDataLogIn.email != '' ? [rules.emailRules] : []"
+						:rules-tf="inputDataLogIn.email != '' ? true : false"
 						hide-details="auto"
 						:clearable-tf="true"
 					/>
@@ -135,10 +135,10 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
-        :notifikasi-kode.sync="notifikasiKode"
-        :notifikasi-text.sync="notifikasiText"
-        :notifikasi-button.sync="notifikasiButton"
+      <PopUpNotifikasi
+        :notifikasi-kode="notifikasiKode"
+        :notifikasi-text="notifikasiText"
+        :notifikasi-button="notifikasiButton"
         @cancel="dialogNotifikasi = false"
       />
     </v-dialog>
@@ -147,10 +147,10 @@
 
 <script>
 import { mapActions } from "vuex";
-import PopUpNotifikasiVue from "../../../Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "../../../Layout/PopUpNotifikasi.vue";
 export default {
 	components: {
-    PopUpNotifikasiVue
+    PopUpNotifikasi
   },
 	props: {
     stepperVal: {
@@ -176,12 +176,6 @@ export default {
     endecryptType: '',
     kondisi: '',
     kondisiTombol: true,
-    rules: {
-			emailRules: value => {
-        const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-        return pattern.test(value) || 'email tidak valid'
-			},
-		},
 
 		//notifikasi
     dialogNotifikasi: false,
@@ -271,10 +265,5 @@ export default {
 </script>
 
 <style>
-.v-input .v-label {
-  font-size: 11pt !important;
-}
-.v-text-field.v-input--dense {
-  font-size: 13px !important;
-}
+
 </style>

@@ -177,7 +177,7 @@
 					md="8"
 					class="pt-3"
 				>
-					{{ uppercaseLetterFirst2(provinsiText) }}
+					{{ provinsiText }}
 				</v-col>
 			</v-row>
 			<v-row no-gutters>
@@ -193,7 +193,7 @@
 					md="8"
 					class="pt-3"
 				>
-          {{ uppercaseLetterFirst2(kabkotaText) }}
+          {{ kabkotaText }}
 				</v-col>
 			</v-row>
 			<v-row no-gutters>
@@ -209,7 +209,7 @@
 					md="8"
 					class="pt-3"
 				>
-          {{ uppercaseLetterFirst2(kecamatanText) }}				
+          {{ kecamatanText }}				
 				</v-col>
 			</v-row>
 			<v-row no-gutters>
@@ -218,14 +218,14 @@
 					md="4"
 					class="pt-2 d-flex align-center font-weight-bold"
 				>
-					Kelurahan
+					Kelurahan / Desa
 				</v-col>
 				<v-col
 					cols="12"
 					md="8"
 					class="pt-3"
 				>
-					{{ uppercaseLetterFirst2(kelurahanText) }}
+					{{ kelurahanText }}
 				</v-col>
 			</v-row>
 			<v-row no-gutters>
@@ -267,10 +267,10 @@
       persistent
       width="500px"
     >
-      <PopUpNotifikasiVue
-        :notifikasi-kode.sync="notifikasiKode"
-        :notifikasi-text.sync="notifikasiText"
-        :notifikasi-button.sync="notifikasiButton"
+      <PopUpNotifikasi
+        :notifikasi-kode="notifikasiKode"
+        :notifikasi-text="notifikasiText"
+        :notifikasi-button="notifikasiButton"
         @proses="goToProses"
         @cancel="dialogNotifikasi = false"
       />
@@ -280,10 +280,10 @@
 
 <script>
 import { mapActions, mapState } from "vuex";
-import PopUpNotifikasiVue from "../../../Layout/PopUpNotifikasi.vue";
+import PopUpNotifikasi from "../../../Layout/PopUpNotifikasi.vue";
 export default {
   components: {
-    PopUpNotifikasiVue
+    PopUpNotifikasi
   },
 	props: {
     stepperVal: {
@@ -329,13 +329,15 @@ export default {
 			return this.ProvinsiOptions.filter(str => str.kode === this.DataStepTwo.provinsi)[0].nama
 		},
 		kabkotaText(){
-			return this.KabKotaOptions.filter(str => str.kode === this.DataStepTwo.kabkota)[0].nama
+			let kabkota = this.KabKotaOptions.filter(str => str.kode === this.DataStepTwo.kabkota)[0]
+			return `${kabkota.jenisKabKota} ${kabkota.nama}`
 		},
 		kecamatanText(){
 			return this.KecamatanOptions.filter(str => str.kode === this.DataStepTwo.kecamatan)[0].nama
 		},
 		kelurahanText(){
-			return this.KelurahanOptions.filter(str => str.kode === this.DataStepTwo.kelurahan)[0].nama
+			let keldes = this.KelurahanOptions.filter(str => str.kode === this.DataStepTwo.kelurahan)[0]
+			return `${keldes.jenisKelDes} ${keldes.nama}`
 		},
   },
 	watch: {
@@ -350,16 +352,16 @@ export default {
 	mounted() {
     this.kondisi = this.$route.params.kondisi
 		this.getAgama()
-		this.getWilayah({ bagian: 'provinsi', KodeWilayah: null })
-		this.getWilayah({ bagian: 'kabkota', KodeWilayah: this.DataStepTwo.provinsi })
-		this.getWilayah({ bagian: 'kecamatan', KodeWilayah: this.DataStepTwo.kabkota })
-		this.getWilayah({ bagian: 'kelurahan', KodeWilayah: this.DataStepTwo.kecamatan })
+		this.getWilayah2023({ bagian: 'provinsi', KodeWilayah: null })
+		this.getWilayah2023({ bagian: 'kabkota', KodeWilayah: this.DataStepTwo.provinsi })
+		this.getWilayah2023({ bagian: 'kecamatan', KodeWilayah: this.DataStepTwo.kabkota })
+		this.getWilayah2023({ bagian: 'kelurahan', KodeWilayah: this.DataStepTwo.kecamatan })
 	},
 	methods: {
 		...mapActions({
 			fetchData: 'fetchData',
 			getAgama: 'setting/getAgama',
-			getWilayah: 'setting/getWilayah',
+			getWilayah2023: 'setting/getWilayah2023',
 		}),
 		simpanData() {
       let bodyData = {
@@ -416,10 +418,4 @@ export default {
 </script>
 
 <style>
-.v-input .v-label {
-  font-size: 11pt !important;
-}
-.v-text-field.v-input--dense {
-  font-size: 13px !important;
-}
 </style>

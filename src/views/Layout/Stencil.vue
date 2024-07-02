@@ -33,18 +33,11 @@
 
 <script>
 import {
-  DraggableElement,
-  DraggableArea,
-  StencilPreview,
   ResizeEvent,
 } from "vue-advanced-cropper";
 
 export default {
-  components: {
-    StencilPreview,
-    DraggableArea,
-    DraggableElement,
-  },
+  components: [ ResizeEvent ],
   props: {
     image: {
       type: Object,

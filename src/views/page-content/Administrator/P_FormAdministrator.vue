@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="subheading grey--text">Formulir Administrator</h1>
+    <h1 class="subheading grey--text text-decoration-underline">Formulir Administrator</h1>
     <div class="text-right wadah">
       <span class="link" @click="gotolist()">Data Administrator</span>
       <v-icon size="small" class="iconstyle" icon="mdi mdi-menu-right" />
@@ -104,7 +104,7 @@ export default {
   }),
   setup() {
     useMeta({
-      title: "Formulir Administrator - MTsS. SIROJUL ATHFAL",
+      title: "Formulir Administrator",
       htmlAttrs: {
         lang: "id",
         amp: true,
@@ -186,24 +186,3 @@ export default {
 	}
 }
 </script>
-
-<style scoped>
-.wadah {
-  font-size: 15px;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-.iconstyle {
-  margin-left: 5px;
-  margin-right: 5px;
-}
-.link {
-  color: #000;
-  text-decoration: none;
-}
-.link:hover {
-  color: #6fe484;
-  cursor: pointer;
-  text-decoration: underline;
-}
-</style>

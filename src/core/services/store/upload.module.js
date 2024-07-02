@@ -18,6 +18,9 @@ const actions = {
         fData.append('file', data.files); //data files
       }else if(data.jenis === 'excel') {
         fData.append('jenis', data.jenis); //jenis
+        fData.append('kategori', data.kategori); //kategori
+        fData.append('mapel', data.mapel); //mapel
+        fData.append('kelas', data.kelas); //kelas
         fData.append('createupdateBy', data.createupdateBy); //createupdateBy
         fData.append('file', data.files); //data files
       }else if(data.jenis === 'logo') {
@@ -45,6 +48,7 @@ const actions = {
       }
       fData.append('nama_file', data.nama_file); //nama_file
       fData.append('table', data.table); //table
+      fData.append('folder', data.folder); //table
       fData.append('file', data.files); //data files
       // axios services
       ApiService.postFile('settings/updateBerkas', fData)
