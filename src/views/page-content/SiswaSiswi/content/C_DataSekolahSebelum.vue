@@ -19,8 +19,9 @@
 						v-model="inputDataSekolahSebelum.jenjang"
 						:data-a="jenjangOptions"
 						item-title="label"
-						item-value="kode"
+						item-value="value"
 						label-a="Jenjang Sekolah"
+						:rules-a="inputDataSekolahSebelum.jenjang != '' ? true : false"
 						:clearable-a="true"
 					/>
 				</v-col>
@@ -42,8 +43,9 @@
 						v-model="inputDataSekolahSebelum.status_sekolah"
 						:data-a="statusSekolahOptions"
 						item-title="label"
-						item-value="kode"
+						item-value="value"
 						label-a="Status Sekolah"
+						:rules-a="inputDataSekolahSebelum.status_sekolah != '' ? true : false"
 						:clearable-a="true"
 					/>
 				</v-col>
@@ -64,6 +66,8 @@
 					<TextField
 						v-model="inputDataSekolahSebelum.nama_sekolah"
 						label-tf="Nama Sekolah"
+						formatrulesTf="text"
+						:rules-tf="inputDataSekolahSebelum.nama_sekolah != '' ? true : false"
 						:clearable-tf="true"
 					/>
 				</v-col>
@@ -129,6 +133,7 @@
 						item-title="nama"
 						item-value="kode"
 						label-a="Kabupaten / Kota Sekolah"
+						:rules-a="inputDataSekolahSebelum.kabkot_sekolah != '' ? true : false"
 						:clearable-a="true"
 					/>
 				</v-col>
@@ -267,22 +272,22 @@ export default {
   },
   data: () => ({
 		inputDataSekolahSebelum: {
-      id_user: '',
+      id_user: null,
       jenjang: null,
       status_sekolah: null,
-      nama_sekolah: '',
-      npsn: '',
-      alamat_sekolah: '',
+      nama_sekolah: null,
+      npsn: null,
+      alamat_sekolah: null,
       kabkot_sekolah: null,
-      no_peserta_un: '',
-      no_skhun: '',
-      no_ijazah: '',
-      nilai_un: '',
+      no_peserta_un: null,
+      no_skhun: null,
+      no_ijazah: null,
+      nilai_un: null,
     },
 		kondisiTombol: true,
 		statusSekolahOptions: [
-			{ label: 'Negeri', kode: 1 },
-			{ label: 'Swasta', kode: 2 },
+			{ label: 'Negeri', value: 1 },
+			{ label: 'Swasta', value: 2 },
 		],
 
 		//notifikasi
@@ -314,59 +319,43 @@ export default {
 					value.nilai_un = 100
 				}
 
-				if(value.jenjang != null && value.status_sekolah != '' && value.nama_sekolah != '' && value.alamat_sekolah != '' && value.kabkot_sekolah != null){
+				if(value.jenjang != null && value.status_sekolah != null && value.nama_sekolah != null && value.alamat_sekolah != null && value.kabkot_sekolah != null){
 					this.kondisiTombol = false
 				}else{
 					this.kondisiTombol = true
 				}
 				localStorage.setItem('stepThree', JSON.stringify(this.inputDataSekolahSebelum))
-				// this.wadahInput()
 			}
 		},
 		dataStepThree: {
 			deep: true,
 			handler(value) {
 				this.inputDataSekolahSebelum = {
-					id_user: value.id_user ? value.id_user : null,
-					jenjang: value.jenjang ? value.jenjang.kode : null,
-					status_sekolah: value.status_sekolah ? value.status_sekolah.kode : null,
-					nama_sekolah: value.nama_sekolah ? value.nama_sekolah : null,
-					npsn: value.npsn ? value.npsn : null,
-					alamat_sekolah: value.alamat_sekolah ? value.alamat_sekolah : null,
-					kabkot_sekolah: value.kabkot_sekolah ? value.kabkot_sekolah.kode : null,
-					no_peserta_un: value.no_peserta_un ? value.no_peserta_un : null,
-					no_skhun: value.no_skhun ? value.no_skhun : null,
-					no_ijazah: value.no_ijazah ? value.no_ijazah : null,
-					nilai_un: value.nilai_un ? value.nilai_un : null,
+					id_user: value?.id_user,
+					jenjang: value?.jenjang,
+					status_sekolah: value?.status_sekolah,
+					nama_sekolah: value?.nama_sekolah,
+					npsn: value?.npsn,
+					alamat_sekolah: value?.alamat_sekolah,
+					kabkot_sekolah: value?.kabkot_sekolah,
+					no_peserta_un: value?.no_peserta_un,
+					no_skhun: value?.no_skhun,
+					no_ijazah: value?.no_ijazah,
+					nilai_un: value?.nilai_un,
 				}
 			}
 		},
 	},
 	mounted() {
 		this.inputDataSekolahSebelum.id_user = this.$route.params.uid;
-		this.getJenjangSekolah()
+		this.getDataMaster({ kode: 'jenjangsekolah' })
 		this.getWilayah2023({ bagian: 'kabkotaOnly', KodeWilayah: null })
 	},
 	methods: {
 		...mapActions({
-			getJenjangSekolah: 'setting/getJenjangSekolah',
+			getDataMaster: 'setting/getDataMaster',
 			getWilayah2023: 'setting/getWilayah2023',
 		}),
-		wadahInput(){
-			let inputFormThree = {
-				jenjang: this.inputDataSekolahSebelum.jenjang,
-				statusSekolah: this.inputDataSekolahSebelum.status_sekolah,
-				namaSekolah: this.inputDataSekolahSebelum.nama_sekolah,
-				npsn: this.inputDataSekolahSebelum.npsn,
-				alamatSekolah: this.inputDataSekolahSebelum.alamat_sekolah,
-				kabkotSekolah: this.inputDataSekolahSebelum.kabkot_sekolah,
-				noPesertaUN: this.inputDataSekolahSebelum.no_peserta_un,
-				noSKHUN: this.inputDataSekolahSebelum.no_skhun,
-				noIjazah: this.inputDataSekolahSebelum.no_ijazah,
-				nilaiUN: this.inputDataSekolahSebelum.nilai_un,
-			}
-      this.$emit("DataStepThree", inputFormThree)
-    },
 		backStep() {
       this.$emit("backStep", 2);
     },

@@ -159,7 +159,7 @@
 								<v-list-item
 									v-for="submenu in (!data.kondisi) ? data.subMenu : mengajarOptions"
 									:key="(!data.kondisi) ? submenu.menuText : submenu.label"
-									router :to="(!data.kondisi) ? submenu.menuRoute : `/data-akademis/${jenis}/${submenu.link}`"
+									router :to="(!data.kondisi) ? submenu.menuRoute : `/data-akademis/${submenu.link}`"
 									class="SelectedSubMenu"
 									active-class="SelectedSubMenu-active"
 									:title="(!data.kondisi) ? submenu.menuText : submenu.label"
@@ -360,7 +360,7 @@ export default {
   },
 	data: () => ({
 		API_URL: process.env.VUE_APP_BASE_URL_VIEW,
-		drawer: true,
+		drawer: false,
 		fotoProfil: '',
 		roleID: '',
 		nama: '',
@@ -369,7 +369,6 @@ export default {
 		kondisiWaKaBidKesiswaan: false,
 		kondisiWaKaBidKurikulum: false,
 		menuOptions: [],
-		jenis: '',
 		valueMenu: 'Pengguna',
 
 		//notifikasi
@@ -391,12 +390,10 @@ export default {
     },
 		mengajarOptions(){
 			if(this.roleID === '3'){
-				let result = []
-				if(localStorage.getItem('mengajar_bidang') === 'null') return result
+				if(localStorage.getItem('mengajar_bidang') === '') return []
 				let mengajar_bidang = localStorage.getItem('mengajar_bidang').split(', ')
-				mengajar_bidang.map(str => {
-					let hasil = this.mengajar.filter(val => { return val.kode == str })
-					result.push({ label: hasil.length ? hasil[0].label : '', link: hasil.length ? hasil[0].label.replace(' ', '-') : '' })
+				let result = this.mengajar.filter(val => mengajar_bidang.includes(val.value)).map(x => {
+					return { label: x?.label || '', link: `mapel/${x?.label.replace(' ', '-')}`  || '' }
 				})
 				return result
 			}
@@ -404,25 +401,17 @@ export default {
 		jabatanOptions(){
 			if(this.roleID === '3'){
 				let jabatan_guru = localStorage.getItem('jabatan_guru').split(', ')
-				let result = []
-				jabatan_guru.map(str => {
-					let hasil = this.jabatan.filter(val => { return val.kode == str })
-					result.push(hasil.length ? hasil[0].label : '')
-				})
+				let result = this.jabatan.filter(val => jabatan_guru.includes(val.value)).map(x => x?.label || '')
 				return result
 			}
 		},
 		optionMenu(){
 			if(this.roleID === '3'){
 				let jabatan_guru = localStorage.getItem('jabatan_guru').split(', ')
-				let result = []
-				jabatan_guru.map(str => {
-					let hasil = this.jabatan.filter(val => { return val.kode == str })
-					result.push(hasil.length ? hasil[0].label : '')
-				})
-				this.jenis = 'mapel'
+				let result = this.jabatan.filter(val => jabatan_guru.includes(val.value)).map(x => x?.label || '')
+				
         if(result.includes('WaKaBid. Kurikulum')){
-					return this.menuOptions.filter(el => { return this.wali_kelas === '' ? el.menuText != "Wali Kelas" && el.menuText != "Guru" && el.menuText != "Siswa Siswi" : el.menuText != "Guru" && el.menuText != "Siswa Siswi"; })
+					return this.menuOptions.filter(el => this.wali_kelas === '' ? el.menuText != "Wali Kelas" && el.menuText != "Guru" && el.menuText != "Siswa Siswi" : el.menuText != "Guru" && el.menuText != "Siswa Siswi")
         }else if(result.includes('WaKaBid. Kesiswaan')){
           return this.menuOptions.filter(el => { return this.wali_kelas === '' ? el.menuText != "Wali Kelas" && el.menuText != "Guru" && el.menuText != "Jadwal Mengajar" : el.menuText != "Guru" && el.menuText != "Jadwal Mengajar"; })
 				}else if(result.includes('Kepala Sekolah')){
@@ -460,26 +449,26 @@ export default {
 		this.roleID = localStorage.getItem('roleID')
 		this.wali_kelas = localStorage.getItem('wali_kelas')
 		this.Navbar()
-		this.getMengajar()
-		this.getJabatan()
+		this.getDataMaster({ kode: 'jabatan' })
+		this.getDataMaster({ kode: 'mengajar' })
     this.getCMSSettings()
-		let path = this.$route.path.substring(1).split('/');
-		console.log(path);
-		if(path[0] === 'settings' || path[0] === 'profile' || path[0] === 'notifikasi' || path[0] === 'percakapan'){
-			this.drawer = false;
-			return this.drawer;
-		}
+		// let path = this.$route.path.substring(1).split('/');
+		// console.log(path);
+		// if(path[0] === 'settings' || path[0] === 'profile' || path[0] === 'notifikasi' || path[0] === 'percakapan'){
+		// 	this.drawer = false;
+		// 	return this.drawer;
+		// }
+		
 	},
 	methods: {
 		...mapActions({
       getCMSSettings: 'setting/getCMSSettings',
-			getMengajar: "setting/getMengajar",
-			getJabatan: "setting/getJabatan",
+			getDataMaster: 'setting/getDataMaster',
 			getMenu: "setting/getMenu",
 			AuthLogout: "auth/AuthLogout",
 		}),
 		Navbar(){
-			this.getMenu(this.roleID)
+			this.getMenu()
 			.then((res) => {
 				let data = res.data.result;
 				this.menuOptions = data.length ? data[0].menu : null

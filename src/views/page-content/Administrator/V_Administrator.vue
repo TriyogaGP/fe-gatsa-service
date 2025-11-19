@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="subheading grey--text text-decoration-underline">Data Administrator</h1>
+    <h2 class="subheading grey--text text-decoration-underline">Data Administrator</h2>
     <v-card class="pa-1 rounded" variant="outlined" elevation="4">
       <v-alert
         color="surface"
@@ -13,7 +13,7 @@
         class="mb-2"
       >
         <template v-slot:text>
-          <ul style="font-size: 12px;">
+          <ul style="font-size: 9pt;">
             <li>- Tombol Delete ada 2 (Delete Soft & Delete Hard).</li>
             <li>- Tombol Delete Soft tidak menghapus data dari database hanya di jadikan nonaktif dan ditandai dengan flag merah.</li>
             <li>- Tombol Delete Hard menghapus data dari database secara permanen.</li>
@@ -33,7 +33,6 @@
         :sort-by="sortBy"
         density="comfortable"
         hide-default-footer
-        hide-default-header
         multi-sort
         class="elavation-3 rounded"
         sort-asc-icon="mdi mdi-sort-alphabetical-ascending"
@@ -57,32 +56,33 @@
         <template #loader>
           <LoaderDataTables />
         </template>
-        <template #[`item.number`]="{ item }">
-          {{ page > 1 ? ((page - 1)*limit) + item.index + 1 : item.index + 1 }}
+        <template #[`item.number`]="{ index }">
+          {{ page > 1 ? ((page - 1)*limit) + index + 1 : index + 1 }}
         </template>
         <template #[`item.statusAktif`]="{ item }">
-          <v-icon size="small" v-if="item.raw.statusAktif == true" color="green" icon="mdi mdi-check" />
-          <v-icon size="small" v-else-if="item.raw.statusAktif == false" color="red" icon="mdi mdi-close" />
+          <v-icon size="small" :color="item.statusAktif ? 'green' : 'red'" :icon="item.statusAktif ? 'mdi mdi-check' : 'mdi mdi-close'" />
         </template>
         <template #[`item.flag`]="{ item }">
-          <div class="flag" :style="item.raw.flag ? 'background-color: red;' : 'background-color: green;'" />
+          <div class="flag" :style="item.flag ? 'background-color: red;' : 'background-color: green;'" />
         </template>
         <template #expanded-row="{ columns, item }">
           <tr>
             <td :colspan="columns.length">
               <Button 
-                color-button="#0bd369"
+                color-button="success"
+                size-button="x-small"
                 icon-prepend-button="mdi mdi-pencil"
                 nama-button="Ubah"
-                :disabled-button="item.raw.idUser === idLog || item.raw.statusAktif === false"
-                @proses="ubahData(item.raw.idUser)"
+                :disabled-button="item.idUser === idLog || !item.statusAktif"
+                @proses="ubahData(item.idUser)"
               />
               <Button 
-                color-button="#0bd369"
-                :icon-prepend-button="item.raw.statusAktif === false ? 'mdi mdi-eye' : 'mdi mdi-eye-off'"
-                :nama-button="item.raw.statusAktif === false ? 'Active' : 'Non Active'"
-                :disabled-button="item.raw.idUser === idLog"
-                @proses="postRecord(item.raw, 'STATUSRECORD', !item.raw.statusAktif)"
+                color-button="success"
+                size-button="x-small"
+                :icon-prepend-button="!item.statusAktif ? 'mdi mdi-eye' : 'mdi mdi-eye-off'"
+                :nama-button="!item.statusAktif ? 'Active' : 'Non Active'"
+                :disabled-button="item.idUser === idLog"
+                @proses="postRecord(item, 'STATUSRECORD', !item.statusAktif)"
               />
               <v-menu
                 open-on-click
@@ -94,7 +94,8 @@
                 <template v-slot:activator="{ props }">
                   <Button 
                     v-bind="props"
-                    color-button="#bd3a07"
+                    color-button="error"
+                    size-button="x-small"
                     icon-prepend-button="mdi mdi-delete"
                     icon-append-button="mdi mdi-menu-down"
                     nama-button="Hapus"
@@ -109,11 +110,11 @@
                   class="listData"
                 >
                   <v-list-item
-                    @click="postRecord(item.raw, 'DELETESOFT', null)"
+                    @click="postRecord(item, 'DELETESOFT', null)"
                     class="SelectedMenu"
                     active-class="SelectedMenu-active"
                     title="Delete Soft"
-                    :disabled="item.raw.idUser === idLog || item.raw.statusAktif === false"
+                    :disabled="item.idUser === idLog || !item.statusAktif"
                   >
                     <template v-slot:prepend>
                       <v-icon size="middle" icon="mdi mdi-delete" color="icon-white" />
@@ -123,11 +124,11 @@
                     </template>
                   </v-list-item>
                   <v-list-item
-                    @click="postRecord(item.raw, 'DELETEHARD', null)"
+                    @click="postRecord(item, 'DELETEHARD', null)"
                     class="SelectedMenu"
                     active-class="SelectedMenu-active"
                     title="Delete Hard"
-                    :disabled="item.raw.idUser === idLog"
+                    :disabled="item.idUser === idLog"
                   >
                     <template v-slot:prepend>
                       <v-icon size="middle" icon="mdi mdi-delete" color="icon-white" />
@@ -139,51 +140,41 @@
                 </v-list>
               </v-menu>
               <Button 
-                color-button="#04f7f7"
+                color-button="info"
+                size-button="x-small"
                 icon-prepend-button="mdi mdi-information"
                 nama-button="Detail"
-                @proses="openDialog(item.raw)"
+                @proses="openDialog(item)"
               />
             </td>
           </tr>
         </template>
         <template #top>
           <v-row no-gutters class="pa-2">
-            <v-col cols="12" md="6">
+            <v-col cols="12" md="6" class="d-flex align-center">
               <Button 
                 color-button="light-blue darken-3"
                 icon-prepend-button="mdi mdi-plus-thick"
                 nama-button="Tambah"
+                size-button="x-small"
                 @proses="getUID"
               />
             </v-col>
             <v-col cols="12" md="6">
-              <v-row no-gutters>
-                <v-col cols="12" md="9" class="pr-2">
-                  <TextField
-                    v-model="searchData"
-                    icon-prepend-tf="mdi mdi-magnify"
-                    label-tf="Pencarian..."
-                    :clearable-tf="true"
-                    @click:clear="() => {
-                      page = 1
-                      getAdministrator({page: 1, limit: limit, keyword: ''})
-                    }"
-                    @keyup.enter="() => {
-                      page = 1
-                      getAdministrator({page: 1, limit: limit, keyword: searchData})
-                    }"
-                  />
-                </v-col>
-                <v-col cols="12" md="3" class="d-flex justify-end align-center">
-                  <Autocomplete
-                    v-model="page"
-                    :data-a="pageOptions"
-                    label-a="Page"
-                    :disabled-a="DataAdministrator.length ? false : true"
-                  />
-                </v-col>
-              </v-row>
+              <TextField
+                v-model="searchData"
+                icon-prepend-tf="mdi mdi-magnify"
+                label-tf="Pencarian..."
+                :clearable-tf="true"
+                @click:clear="() => {
+                  page = 1
+                  getAdministrator({page: 1, limit: limit, keyword: ''})
+                }"
+                @keyup.enter="() => {
+                  page = 1
+                  getAdministrator({page: 1, limit: limit, keyword: searchData})
+                }"
+              />
             </v-col>
           </v-row>
           <v-divider :thickness="2" class="border-opacity-100" color="white" />
@@ -192,7 +183,17 @@
           <v-divider :thickness="2" class="border-opacity-100" color="white" />
           <v-row no-gutters>
             <v-col cols="12" lg="10" class="pa-2 d-flex justify-start align-center">
-              <span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
+              <!-- <span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span> -->
+              <span style="font-size: 10pt;">Halaman</span>
+              <div style="width: 100px; margin-left: 3px; margin-right: 3px;">
+                <Autocomplete
+                  v-model="page"
+                  :data-a="pageOptions"
+                  label-a="Page"
+                  :disabled-a="!DataAdministrator.length"
+                />
+              </div>
+              <span style="font-size: 10pt;">dari Total Halaman <strong>{{ pageSummary?.totalPages }}</strong> (Records {{ pageSummary?.total }})</span>
             </v-col>
             <v-col cols="12" lg="2" class="pa-2 text-right">
               <div class="d-flex justify-start align-center">
@@ -201,24 +202,24 @@
                   pilihan-a="select"
                   :data-a="limitPage"
                   label-a="Limit"
-                  :disabled-a="DataAdministrator.length ? false : true"
+                  :disabled-a="!DataAdministrator.length"
                 />
                 <Button
                   variant="plain"
                   size-button="large"
                   model-button="comfortable"
-                  color-button="#ffffff"
+                  color-button="success"
                   icon-button="mdi mdi-arrow-left-circle-outline"
-                  :disabled-button="DataAdministrator.length ? pageSummary.page != 1 ? false : true : true"
+                  :disabled-button="!DataAdministrator.length || !(pageSummary.page != 1)"
                   @proses="() => { page = pageSummary.page - 1 }"
                 />
                 <Button
                   variant="plain"
                   size-button="large"
                   model-button="comfortable"
-                  color-button="#ffffff"
+                  color-button="success"
                   icon-button="mdi mdi-arrow-right-circle-outline"
-                  :disabled-button="DataAdministrator.length ? pageSummary.page != pageSummary.totalPages ? false : true : true"
+                  :disabled-button="!DataAdministrator.length || !(pageSummary.page != pageSummary.totalPages)"
                   @proses="() => { page = pageSummary.page + 1 }"
                 />
               </div>
@@ -338,7 +339,7 @@
                 {{ previewData.password }}
                 <Button
                   variant="plain"
-                  color-button="#000000"
+                  color-button="#fff"
                   :icon-button="endecryptType ? 'mdi mdi-eye-lock' : 'mdi mdi-eye-lock-open'"
                   model-button="comfortable"
                   size-button="large"
@@ -575,24 +576,24 @@ export default {
     roleID: '',
     idLog: '',
     previewData: {
-      idUser: '',
-      namaRole: '',
-      nama: '',
-      username: '',
-      email: '',
-      password: '',
-      tempat: '',
-      tanggalLahir: '',
-      jenisKelamin: '',
-      agama: '',
-      telp: '',
-      alamat: '',
-      provinsi: '',
-      kabKota: '',
-      kecamatan: '',
-      kelurahan: '',
-      kodePos: '',
-      fotoProfil: '',
+      idUser: null,
+      namaRole: null,
+      nama: null,
+      username: null,
+      email: null,
+      password: null,
+      tempat: null,
+      tanggalLahir: null,
+      jenisKelamin: null,
+      agama: null,
+      telp: null,
+      alamat: null,
+      provinsi: null,
+      kabKota: null,
+      kecamatan: null,
+      kelurahan: null,
+      kodePos: null,
+      fotoProfil: null,
     },
     DialogAdministrator: false,
     endecryptType: '',
@@ -634,10 +635,10 @@ export default {
         this.pageOptions = []
         this.DataAdministrator = value.records
 				this.pageSummary = {
-					page: this.DataAdministrator.length ? value.pageSummary.page : 0,
-					limit: this.DataAdministrator.length ? value.pageSummary.limit : 0,
-					total: this.DataAdministrator.length ? value.pageSummary.total : 0,
-					totalPages: this.DataAdministrator.length ? value.pageSummary.totalPages : 0
+					page: value?.pageSummary?.page,
+					limit: value?.pageSummary?.limit,
+					total: value?.pageSummary?.total,
+					totalPages: value?.pageSummary?.totalPages
 				}
         for (let index = 1; index <= this.pageSummary.totalPages; index++) {
           this.pageOptions.push(index)
@@ -647,14 +648,14 @@ export default {
     page: {
 			deep: true,
 			handler(value) {
-        if(value){
-          this.getAdministrator({page: value, limit: this.limit, keyword: this.searchData, sorting: this.kumpulSort})
-        }
+        this.DataAdministrator = []
+        this.getAdministrator({page: value, limit: this.limit, keyword: this.searchData, sorting: this.kumpulSort})
 			}
 		},
     limit: {
 			deep: true,
 			handler(value) {
+        this.DataAdministrator = []
         this.page = 1
 				this.getAdministrator({page: 1, limit: value, keyword: this.searchData, sorting: this.kumpulSort})
 			}
@@ -696,52 +697,52 @@ export default {
     openDialog(item){
       // this.getAdminbyUID(uid)
       this.previewData = {
-        idUser: item.idUser,
-        namaRole: item.namaRole,
-        nama: item.nama,
-        username: item.username,
-        email: item.email,
-        password: item.kataSandi,
-        tempat: item.tempat,
-        tanggalLahir: item.tanggalLahir,
-        jenisKelamin: item.jenisKelamin,
-        agama: item.agama.label,
-        telp: item.telp,
-        alamat: item.alamat,
-        provinsi: item.provinsi.nama,
-        kabKota: `${item.kabKota.jenisKabKota} ${item.kabKota.nama}`,
-        kecamatan: item.kecamatan.nama,
-        kelurahan: `${item.kelurahan.jenisKelDes} ${item.kelurahan.nama}`,
-        kodePos: item.kodePos,
-        fotoProfil: item.fotoProfil,
+        idUser: item?.idUser,
+        namaRole: item?.namaRole,
+        nama: item?.nama,
+        username: item?.username,
+        email: item?.email,
+        password: item?.kataSandi,
+        tempat: item?.tempat,
+        tanggalLahir: item?.tanggalLahir,
+        jenisKelamin: item?.jenisKelamin,
+        agama: item?.agama?.label,
+        telp: item?.telp,
+        alamat: item?.alamat,
+        provinsi: item?.provinsi?.nama,
+        kabKota: `${item?.kabKota?.jenisKabKota} ${item?.kabKota?.nama}`,
+        kecamatan: item?.kecamatan?.nama,
+        kelurahan: `${item?.kelurahan?.jenisKelDes} ${item?.kelurahan?.nama}`,
+        kodePos: item?.kodePos,
+        fotoProfil: item?.fotoProfil,
       }
       this.DialogAdministrator = true
     },
     clearData(){
       this.previewData = {
-        idUser: '',
-        namaRole: '',
-        nama: '',
-        username: '',
-        email: '',
-        password: '',
-        tempat: '',
-        tanggalLahir: '',
-        jenisKelamin: '',
-        agama: '',
-        telp: '',
-        alamat: '',
-        provinsi: '',
-        kabKota: '',
-        kecamatan: '',
-        kelurahan: '',
-        kodePos: '',
-        fotoProfil: '',
+        idUser: null,
+        namaRole: null,
+        nama: null,
+        username: null,
+        email: null,
+        password: null,
+        tempat: null,
+        tanggalLahir: null,
+        jenisKelamin: null,
+        agama: null,
+        telp: null,
+        alamat: null,
+        provinsi: null,
+        kabKota: null,
+        kecamatan: null,
+        kelurahan: null,
+        kodePos: null,
+        fotoProfil: null,
       }
     },
     endecryptData(d) {
       this[d] = !this[d]
-      let url = this[d] ? 'decryptPass' : 'encryptPass' 
+      let url = this[d] ? 'decrypt-pass' : 'encrypt-pass' 
       let payload = {
 				method: "get",
 				url: `settings/${url}?kata=${this.previewData.password}`,
@@ -760,13 +761,15 @@ export default {
 			this.kumpulSort = this.sortBy.map((val) => {
         return `${val.key}-${val.order === 'asc' ? 'ASC' : 'DESC'}`
       }).join(',')
+      this.DataAdministrator = []
+      this.page = 1
   		this.getAdministrator({page: this.page, limit: this.limit, keyword: this.searchData, sorting: this.kumpulSort});
 		},
     clickrow(event, data) {
-      const index = this.$data.expanded.find(i => i === data?.item?.raw?.idUser);
+      const index = this.$data.expanded.find(i => i === data?.item?.idUser);
       if(typeof index === 'undefined') return this.$data.expanded = [];
       this.$data.expanded.splice(0, 1)
-      this.$data.expanded.push(data?.item?.raw?.idUser);
+      this.$data.expanded.push(data?.item?.idUser);
     },
     notifikasi(kode, text, proses){
       this.dialogNotifikasi = true

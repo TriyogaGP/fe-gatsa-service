@@ -1,27 +1,26 @@
 <template>
   <div>
 		<div class="kotakatas">
-			<div class="timer">
-				<CountDown
-					:starttime="starttime" 
-					:endtime="endtime" 
-					:kondisi="timerKondisi"
-					@selesaiwaktu="valuesData"
-					trans='{  
-						"day":"Hari",
-						"hours":"Jam",
-						"minutes":"Menit",
-						"seconds":"Detik",
-						"expired":"Event has been expired.",
-						"running":"Till the end of event.",
-						"upcoming":"Till start of event.",
-						"status": {
-							"expired":"Expired",
-							"running":"Running",
-							"upcoming":"Future"
-						}}'
-				/>
-			</div>
+			<CountDown
+				:starttime="starttime" 
+				:endtime="endtime" 
+				:kondisi="timerKondisi"
+				@selesaiwaktu="valuesData"
+				class="timer"
+				trans='{  
+					"day":"Hari",
+					"hours":"Jam",
+					"minutes":"Menit",
+					"seconds":"Detik",
+					"expired":"Event has been expired.",
+					"running":"Till the end of event.",
+					"upcoming":"Till start of event.",
+					"status": {
+						"expired":"Expired",
+						"running":"Running",
+						"upcoming":"Future"
+					}}'
+			/>
 		</div>
 		<v-row>
 			<v-col cols="12" class="kotakawal">
@@ -94,27 +93,29 @@
 				</ol>
 			</div>
 			<table border="0" width="100%" cellspacing="0" cellpadding="0">
-				<tr>
-					<td width="14%" class="texttitle">Nama Sekolah</td>
-					<td width="30%" class="textdes">: {{ cmssettings?.namasekolah }}</td>
-					<td width="18%">&nbsp;</td>
-					<td width="16%" class="texttitle">Kelas</td>
-					<td width="20%" class="textdes">: {{ previewData.kelas }}</td>
-				</tr>
-				<tr>
-					<td width="14%" class="texttitle">Nomor Induk</td>
-					<td width="30%" class="textdes">: {{ previewData.nomorInduk }}</td>
-					<td width="18%">&nbsp;</td>
-					<td width="16%" class="texttitle">Semester</td>
-					<td width="20%" class="textdes">: {{ cmssettings?.semester.label }}</td>
-				</tr>
-				<tr>
-					<td width="14%" class="texttitle">Nama Siswa/i</td>
-					<td width="30%" class="textdes">: {{ previewData.nama }}</td>
-					<td width="18%">&nbsp;</td>
-					<td width="16%" class="texttitle">Tahun Pelajaran</td>
-					<td width="20%" class="textdes">: {{ cmssettings?.tahunpelajaran }}</td>
-				</tr>
+				<tbody>
+					<tr>
+						<td width="14%" class="texttitle">Nama Sekolah</td>
+						<td width="30%" class="textdes">: {{ cmssettings?.namasekolah }}</td>
+						<td width="18%">&nbsp;</td>
+						<td width="16%" class="texttitle">Kelas</td>
+						<td width="20%" class="textdes">: {{ previewData.kelas }}</td>
+					</tr>
+					<tr>
+						<td width="14%" class="texttitle">Nomor Induk</td>
+						<td width="30%" class="textdes">: {{ previewData.nomorInduk }}</td>
+						<td width="18%">&nbsp;</td>
+						<td width="16%" class="texttitle">Semester</td>
+						<td width="20%" class="textdes">: {{ cmssettings?.semester.label }}</td>
+					</tr>
+					<tr>
+						<td width="14%" class="texttitle">Nama Siswa/i</td>
+						<td width="30%" class="textdes">: {{ previewData.nama }}</td>
+						<td width="18%">&nbsp;</td>
+						<td width="16%" class="texttitle">Tahun Pelajaran</td>
+						<td width="20%" class="textdes">: {{ cmssettings?.tahunpelajaran }}</td>
+					</tr>
+				</tbody>
 			</table>
 			<v-divider :thickness="2" class="border-opacity-100" />
 			<!-- Panel Soal -->
@@ -122,44 +123,46 @@
 				<p class="point">I. Pilihlah jawaban yang paling tepat!</p>
 				<div style="margin-left: 15px;">
 					<table class="kotaksoal" v-for="(index) in soal.jmlpilihanganda" :key="index" border="0" width="100%" cellspacing="0" cellpadding="0">
-						<tr>
-							<td width="2%" style="vertical-align: top; font-weight: bold;">{{ `${index}.` }}</td>
-							<td style="font-weight: 500;">
-								<div v-if="!soal.pilihanganda[index-1].pertanyaan.file">
-									<span v-html="soal.pilihanganda[index-1].pertanyaan.text" />
-								</div>
-								<div v-else>
-									<v-img :src="`${API_URL}berkas/${soal.pilihanganda[index-1].pertanyaan.file}`" width="100" />
-									<span v-html="soal.pilihanganda[index-1].pertanyaan.text" />
-								</div>
-							</td>
-						</tr>
-						<tr>
-							<td />
-							<td>
-								<v-radio-group
-									v-model="jawabanPilihanTemp[index-1].jawaban"
-									v-for="(datapilihan, i) in soal.pilihanganda[index-1].pilihan"
-									:key="datapilihan.kode"
-									column
-									hide-details
-								>
-									<!-- @change="pilihanJawaban($event, soal.pilihanganda[index-1].kode)" -->
-									<v-radio :value="datapilihan.value">
-										<template v-slot:label>
-											<span style="width: 25px;">{{ `${pilihan[i]}.` }}</span>
-											<div v-if="!datapilihan.file">
-												<span v-html="datapilihan.text" />
-											</div>
-											<div v-else>
-												<v-img :src="`${API_URL}berkas/${datapilihan.file}`" width="100" style="margin-bottom: 2px;" />
-												<span v-html="datapilihan.text" />
-											</div>
-										</template>
-									</v-radio>
-								</v-radio-group>
-							</td>
-						</tr>
+						<tbody>
+							<tr>
+								<td width="2%" style="vertical-align: top; font-weight: bold;">{{ `${index}.` }}</td>
+								<td style="font-weight: 500;">
+									<div v-if="!soal.pilihanganda[index-1].pertanyaan.file">
+										<span v-html="soal.pilihanganda[index-1].pertanyaan.text" />
+									</div>
+									<div v-else>
+										<v-img :src="`${API_URL}berkas/${soal.pilihanganda[index-1].pertanyaan.file}`" width="100" />
+										<span v-html="soal.pilihanganda[index-1].pertanyaan.text" />
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td />
+								<td>
+									<v-radio-group
+										v-model="jawabanPilihanTemp[index-1].jawaban"
+										v-for="(datapilihan, i) in soal.pilihanganda[index-1].pilihan"
+										:key="datapilihan.kode"
+										column
+										hide-details
+									>
+										<!-- @change="pilihanJawaban($event, soal.pilihanganda[index-1].kode)" -->
+										<v-radio :value="datapilihan.value">
+											<template v-slot:label>
+												<span style="width: 25px;">{{ `${pilihan[i]}.` }}</span>
+												<div v-if="!datapilihan.file">
+													<span v-html="datapilihan.text" />
+												</div>
+												<div v-else>
+													<v-img :src="`${API_URL}berkas/${datapilihan.file}`" width="100" style="margin-bottom: 2px;" />
+													<span v-html="datapilihan.text" />
+												</div>
+											</template>
+										</v-radio>
+									</v-radio-group>
+								</td>
+							</tr>
+						</tbody>
 					</table>
 				</div>
 			</div>
@@ -167,44 +170,48 @@
 				<p class="point">II. Menjodohkan!</p>
 				<div class="kotaksoal" style="margin-left: 15px;">
 					<table class="tabelJodoh" border="1" width="100%" cellspacing="0" cellpadding="0">
-						<tr style="text-align: center; vertical-align: middle; font-weight: bold;">
-							<td width="2%">No</td>
-							<td>Pernyataan / Jawaban</td>
-							<td width="10%" v-for="(index) in soal.jmlmenjodohkan" :key="index">
-								<div v-if="!soal.menjodohkan[index-1].pilihan[index-1].file">
-									<span v-html="soal.menjodohkan[index-1].pilihan[index-1].text" />
-								</div>
-								<div v-else>
-									<v-img :src="`${API_URL}berkas/${soal.menjodohkan[index-1].pilihan[index-1].file}`" width="100" />
-									<span v-html="soal.menjodohkan[index-1].pilihan[index-1].text" />
-								</div>
-							</td>
-						</tr>
-						<tr v-for="(x) in soal.jmlmenjodohkan" :key="x">
-							<td width="2%" style="vertical-align: middle; text-align: center; font-weight: bold;">{{ `${x+soal.jmlpilihanganda}.` }}</td>
-							<td style="vertical-align: middle; font-weight: bold;">
-								<div v-if="!soal.menjodohkan[x-1].pertanyaan.file">
-									<span v-html="soal.menjodohkan[x-1].pertanyaan.text" />
-								</div>
-								<div v-else>
-									<v-img :src="`${API_URL}berkas/${soal.menjodohkan[x-1].pertanyaan.file}`" width="100" />
-									<span v-html="soal.menjodohkan[x-1].pertanyaan.text" />
-								</div>
-							</td>
-							<td style="font-weight: 500;" v-for="(dataPilihan, k) in soal.menjodohkan[x-1].pilihan" :key="k">
-								<v-radio-group
-									v-model="jawabanMenjodohkanTemp[x-1].jawaban"
-									column
-									hide-details
-								>
-									<v-radio :value="dataPilihan.value">
-										<template v-slot:label>
-											<!-- <span style="width: 25px;">{{ dataPilihan.value }}</span> -->
-										</template>
-									</v-radio>
-								</v-radio-group>	
-							</td>
-						</tr>
+						<thead>
+							<tr style="text-align: center; vertical-align: middle; font-weight: bold;">
+								<td width="2%">No</td>
+								<td>Pernyataan / Jawaban</td>
+								<td width="10%" v-for="(index) in soal.jmlmenjodohkan" :key="index">
+									<div v-if="!soal.menjodohkan[index-1].pilihan[index-1].file">
+										<span v-html="soal.menjodohkan[index-1].pilihan[index-1].text" />
+									</div>
+									<div v-else>
+										<v-img :src="`${API_URL}berkas/${soal.menjodohkan[index-1].pilihan[index-1].file}`" width="100" />
+										<span v-html="soal.menjodohkan[index-1].pilihan[index-1].text" />
+									</div>
+								</td>
+							</tr>
+						</thead>
+						<tbody>
+							<tr v-for="(x) in soal.jmlmenjodohkan" :key="x">
+								<td width="2%" style="vertical-align: middle; text-align: center; font-weight: bold;">{{ `${x+soal.jmlpilihanganda}.` }}</td>
+								<td style="vertical-align: middle; font-weight: bold;">
+									<div v-if="!soal.menjodohkan[x-1].pertanyaan.file">
+										<span v-html="soal.menjodohkan[x-1].pertanyaan.text" />
+									</div>
+									<div v-else>
+										<v-img :src="`${API_URL}berkas/${soal.menjodohkan[x-1].pertanyaan.file}`" width="100" />
+										<span v-html="soal.menjodohkan[x-1].pertanyaan.text" />
+									</div>
+								</td>
+								<td style="font-weight: 500;" v-for="(dataPilihan, k) in soal.menjodohkan[x-1].pilihan" :key="k">
+									<v-radio-group
+										v-model="jawabanMenjodohkanTemp[x-1].jawaban"
+										column
+										hide-details
+									>
+										<v-radio :value="dataPilihan.value">
+											<template v-slot:label>
+												<!-- <span style="width: 25px;">{{ dataPilihan.value }}</span> -->
+											</template>
+										</v-radio>
+									</v-radio-group>	
+								</td>
+							</tr>
+						</tbody>
 					</table>
 				</div>
 			</div>
@@ -212,36 +219,38 @@
 				<p class="point">III. Pilihlah Benar (B) atau Salah (S) pada pernyataan yang paling tepat!</p>
 				<div style="margin-left: 15px;">
 					<table class="kotaksoal" v-for="(index) in soal.jmlbenarsalah" :key="index" border="0" width="100%" cellspacing="0" cellpadding="0">
-						<tr>
-							<td width="2%" style="vertical-align: top; font-weight: bold;">{{ `${index+soal.jmlpilihanganda+soal.jmlmenjodohkan}.` }}</td>
-							<td style="font-weight: 500;">
-								<div v-if="!soal.benarsalah[index-1].pertanyaan.file">
-									<span v-html="soal.benarsalah[index-1].pertanyaan.text" />
-								</div>
-								<div v-else>
-									<v-img :src="`${API_URL}berkas/${soal.benarsalah[index-1].pertanyaan.file}`" width="100" />
-									<span v-html="soal.benarsalah[index-1].pertanyaan.text" />
-								</div>
-							</td>
-						</tr>
-						<tr>
-							<td />
-							<td>
-								<v-radio-group
-									v-model="jawabanBenarSalahTemp[index-1].jawaban"
-									v-for="(datapilihan) in soal.benarsalah[index-1].pilihan"
-									:key="datapilihan.kode"
-									column
-									hide-details
-								>
-									<v-radio :value="datapilihan.value">
-										<template v-slot:label>
-											<span>{{ datapilihan.text }}</span>
-										</template>
-									</v-radio>
-								</v-radio-group>
-							</td>
-						</tr>
+						<tbody>
+							<tr>
+								<td width="2%" style="vertical-align: top; font-weight: bold;">{{ `${index+soal.jmlpilihanganda+soal.jmlmenjodohkan}.` }}</td>
+								<td style="font-weight: 500;">
+									<div v-if="!soal.benarsalah[index-1].pertanyaan.file">
+										<span v-html="soal.benarsalah[index-1].pertanyaan.text" />
+									</div>
+									<div v-else>
+										<v-img :src="`${API_URL}berkas/${soal.benarsalah[index-1].pertanyaan.file}`" width="100" />
+										<span v-html="soal.benarsalah[index-1].pertanyaan.text" />
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td />
+								<td>
+									<v-radio-group
+										v-model="jawabanBenarSalahTemp[index-1].jawaban"
+										v-for="(datapilihan) in soal.benarsalah[index-1].pilihan"
+										:key="datapilihan.kode"
+										column
+										hide-details
+									>
+										<v-radio :value="datapilihan.value">
+											<template v-slot:label>
+												<span>{{ datapilihan.text }}</span>
+											</template>
+										</v-radio>
+									</v-radio-group>
+								</td>
+							</tr>
+						</tbody>
 					</table>
 				</div>
 			</div>
@@ -249,30 +258,32 @@
 				<p class="point">IV. Jawablah pertanyaan ini dengan benar!</p>
 				<div style="margin-left: 15px;">
 					<table class="kotaksoal" v-for="(index) in soal.jmlessay" :key="index" border="0" width="100%" cellspacing="0" cellpadding="0">
-						<tr>
-							<td width="2%" style="vertical-align: top; font-weight: bold;">{{ `${index+soal.jmlpilihanganda+soal.jmlmenjodohkan+soal.jmlbenarsalah}.` }}</td>
-							<td style="font-weight: 500;">
-								<div v-if="!soal.essay[index-1].pertanyaan.file">
-									<span v-html="soal.essay[index-1].pertanyaan.text" />
-								</div>
-								<div v-else>
-									<v-img :src="`${API_URL}berkas/${soal.essay[index-1].pertanyaan.file}`" width="100" />
-									<span v-html="soal.essay[index-1].pertanyaan.text" />
-								</div>
-							</td>
-						</tr>
-						<tr>
-							<td />
-							<td>
-								<TextArea
-									v-model="jawabanEssayTemp[index-1].jawaban"
-									label-ta="Jawaban"
-									rows="4"
-									class="mt-2"
-									:clearable-ta="true"
-								/>
-							</td>
-						</tr>
+						<tbody>
+							<tr>
+								<td width="2%" style="vertical-align: top; font-weight: bold;">{{ `${index+soal.jmlpilihanganda+soal.jmlmenjodohkan+soal.jmlbenarsalah}.` }}</td>
+								<td style="font-weight: 500;">
+									<div v-if="!soal.essay[index-1].pertanyaan.file">
+										<span v-html="soal.essay[index-1].pertanyaan.text" />
+									</div>
+									<div v-else>
+										<v-img :src="`${API_URL}berkas/${soal.essay[index-1].pertanyaan.file}`" width="100" />
+										<span v-html="soal.essay[index-1].pertanyaan.text" />
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td />
+								<td>
+									<TextArea
+										v-model="jawabanEssayTemp[index-1].jawaban"
+										label-ta="Jawaban"
+										rows="4"
+										class="mt-2"
+										:clearable-ta="true"
+									/>
+								</td>
+							</tr>
+						</tbody>
 					</table>
 				</div>
 			</div>
@@ -280,7 +291,7 @@
 		<v-row>
 			<v-col cols="12" class="text-end">
 				<Button
-					color-button="#0bd369"
+					color-button="success"
 					nama-button="Simpan Jawaban"
 					@proses="() => {
 						prosesTombol = 0
@@ -288,7 +299,7 @@
 					}"
 				/>
 				<Button
-					color-button="#04f7f7"
+					color-button="info"
 					nama-button="Reset Jawaban"
 					@proses="ResetJawaban()"
 				/>
@@ -575,211 +586,175 @@ export default {
   width: 100%;
   border-collapse: collapse;
 }
-</style>
-
-<style lang="scss">
 .v-selection-control--density-default {
-	--v-selection-control-size: 30px !important;
+  --v-selection-control-size: 30px !important;
 }
+
 .v-selection-control .v-label {
-	font-size: 13px !important;
-	opacity: 1;
-	font-weight: 500;
+  font-size: 13px !important;
+  opacity: 1;
+  font-weight: 500;
 }
+
 .kotakatas {
-	height: 100px;
-	width: 100%;
-	position: fixed;
-	background-color: #272727;
-	color: #FFF;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	border-bottom: 2px solid rgb(59, 111, 254);
-	z-index: 1;
+  height: 100px;
+  width: 100%;
+  position: fixed;
+  background-color: #272727;
+  color: #FFF;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 2px solid rgb(59, 111, 254);
+  z-index: 1;
 }
+
 .wadahbawah {
-	height: 100% !important;
+  height: 100% !important;
   max-height: 470px !important;
-	margin-top: 110px;
-	margin-left: 10px;
-	margin-right: 10px;
-	padding: 40px !important;
-	overflow-y: auto;
+  margin-top: 110px;
+  margin-left: 10px;
+  margin-right: 10px;
+  padding: 40px !important;
+  overflow-y: auto;
   overflow-x: hidden;
 }
+
 .wadahbawah::-webkit-scrollbar {
   width: 16px;
 }
+
 .wadahbawah::-webkit-scrollbar-thumb {
   background-color: #4CAF50;
   border: 5px solid #FFF;
   border-radius: 10rem;
 }
+
 .wadahbawah::-webkit-scrollbar-track {
   position: absolute;
   right: -3rem;
   top: -50rem;
   background: transparent;
 }
+
 .kepalasoal {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: auto;
 }
+
 .logo {
-	text-align: center; 
+  text-align: center;
 }
+
 .namasekolah {
-	text-align: center; 
-	font-weight: bold; 
-	font-size: 25px; 
+  text-align: center;
+  font-weight: bold;
+  font-size: 25px;
 }
+
 .alamat {
-	text-align: center; 
-	font-weight: bold; 
-	font-size: 12px; 
+  text-align: center;
+  font-weight: bold;
+  font-size: 12px;
 }
+
 .kop {
-	text-align: center; 
-	font-weight: bold; 
-	font-size: 18px; 
+  text-align: center;
+  font-weight: bold;
+  font-size: 18px;
 }
+
 .texttitle {
-	text-align: left;
-	font-weight: bold;
-	font-size: 13px;
+  text-align: left;
+  font-weight: bold;
+  font-size: 13px;
 }
+
 .textdes {
-	text-align: left;
-	font-size: 13px;
+  text-align: left;
+  font-size: 13px;
 }
-.kotakawal{
-	display: flex;
-	flex-direction: row-reverse;
+
+.kotakawal {
+  display: flex;
+  flex-direction: row-reverse;
 }
+
 .v-expansion-panel {
-	background-color: #c3c2c2 ;
-	border: 2px solid #FFF;
-	color: #000;
-	font-weight: bold;
-	border-radius: 10px;
+  background-color: #c3c2c2;
+  border: 2px solid #FFF;
+  color: #000;
+  font-weight: bold;
+  border-radius: 10px;
 }
+
 .v-expansion-panel-text__wrapper {
-	padding: 5px !important;
-	height: 350px !important;
+  padding: 5px !important;
+  height: 350px !important;
 }
+
 .lingkaran {
-	width: 25px;
-	height: 25px;
-	border: 2px solid#000;
-	border-radius: 50%;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	font-size: 13px;
-	color: #FFF;
-	margin: 2px;
+  width: 25px;
+  height: 25px;
+  border: 2px solid #000;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 13px;
+  color: #FFF;
+  margin: 2px;
 }
+
 .kotakexpand {
-	width: 350px;
-	height: auto;
-	margin-top: 20px;
-	margin-right: 20px;
-	position: fixed;
-	z-index: 2;
+  width: 350px;
+  height: auto;
+  margin-top: 20px;
+  margin-right: 20px;
+  position: fixed;
+  z-index: 2;
 }
+
 .kotakinfo {
-	width: 100%;
-	height: auto;
-	background-color: #c3c2c2;
-	border: 2px dashed #000;
-	border-radius: 10px;
-	margin-bottom: 5px;
-	padding: 10px 20px;
-	font-size: 13px;
-	color: #000;
+  width: 100%;
+  height: auto;
+  background-color: #c3c2c2;
+  border: 2px dashed #000;
+  border-radius: 10px;
+  margin-bottom: 5px;
+  padding: 10px 20px;
+  font-size: 13px;
+  color: #000;
 }
+
 .kotaksoal {
-	// width: 100%;
-	height: auto;
-	// background-color: #c3c2c2;
-	border: 2px dashed #000;
-	border-radius: 10px;
-	margin-bottom: 10px;
-	padding: 5px 10px;
-	font-size: 13px;
-	color: #000;
+  height: auto;
+  border: 2px dashed #000;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  padding: 5px 10px;
+  font-size: 13px;
+  color: #000;
 }
+
 .point {
-	font-size: 15px;
-	font-weight: bold;
+  font-size: 15px;
+  font-weight: bold;
 }
+
+/* Timer Section */
 .timer {
-  text-align:center;
-	font-size: 30px;
-  .day, .hour, .min, .sec {
-		display: inline-block;
-    font-weight: bold;
-    text-align: center;
-		margin: 0 20px;
-    .format {
-      font-weight: bold;
-      font-size: 15px;
-			color: #FFF;
-    }
-  }
-  .number{
-		color: #000;
-    background: #FFF;
-    padding: 0 5px;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    display: flex;
-		justify-content: center;
-		align-items: center;
-  }
-  .numberS{
-		color: #F00;
-    background: #FFF;
-    padding: 0 5px;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    display: flex;
-		justify-content: center;
-		align-items: center;
-  }
-  .message {
-    font-size: 14px;
-    font-weight: 400;
-    margin-top: 5px;
-  }
-  .status-tag{
-    width: 270px;
-    margin: 10px auto;
-    padding: 8px 0;
-    font-weight: 500;
-    color: #000;
-    text-align: center;
-    border-radius: 15px;
-    &.upcoming{
-      background-color: lightGreen;
-    }
-    &.running{
-      background-color: gold;
-    }
-    &.expired{
-      background-color: silver;
-    }
-  }
+  text-align: center;
+  font-size: 15pt;
+	display: flex;
 }
+
 @media screen and (min-width: 1920px) {
   .wadahbawah {
-		height: 100% !important;
-  	max-height: 750px !important;
-	}
+    height: 100% !important;
+    max-height: 750px !important;
+  }
 }
 </style>

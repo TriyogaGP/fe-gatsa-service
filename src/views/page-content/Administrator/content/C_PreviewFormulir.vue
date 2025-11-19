@@ -323,7 +323,7 @@ export default {
       KelurahanOptions: state => state.setting.KelurahanOptions,
     }),
 		agamaText(){
-			return this.agamaOptions.filter(str => str.kode === this.DataStepTwo.agama)[0].label
+			return this.agamaOptions.filter(str => str.value === this.DataStepTwo.agama)[0].label
 		},
 		provinsiText(){
 			return this.ProvinsiOptions.filter(str => str.kode === this.DataStepTwo.provinsi)[0].nama
@@ -351,7 +351,7 @@ export default {
 	},
 	mounted() {
     this.kondisi = this.$route.params.kondisi
-		this.getAgama()
+		this.getDataMaster({ kode: 'agama' })
 		this.getWilayah2023({ bagian: 'provinsi', KodeWilayah: null })
 		this.getWilayah2023({ bagian: 'kabkota', KodeWilayah: this.DataStepTwo.provinsi })
 		this.getWilayah2023({ bagian: 'kecamatan', KodeWilayah: this.DataStepTwo.kabkota })
@@ -360,7 +360,7 @@ export default {
 	methods: {
 		...mapActions({
 			fetchData: 'fetchData',
-			getAgama: 'setting/getAgama',
+			getDataMaster: 'setting/getDataMaster',
 			getWilayah2023: 'setting/getWilayah2023',
 		}),
 		simpanData() {
@@ -395,7 +395,11 @@ export default {
         this.notifikasi("success", res.data.message, "2")
 			})
 			.catch((err) => {
-				this.notifikasi("error", err.response.data.message, "1")
+				if(err.response.data.status == '404'){
+					this.notifikasi("error", err.response.data.message, "1")
+				}else if(err.response.data.status == '422'){
+					this.notifikasi("warning", err.response.data.message, "1")
+				}
 			});
 		},
     goToProses(){

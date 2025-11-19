@@ -421,10 +421,10 @@ export default {
 			KelurahanOptions: store => store.setting.KelurahanOptions,
 		}),
 		agamaText(){
-			return this.agamaOptions.filter(str => str.kode === this.DataStepTwo.agama)[0].label
+			return this.agamaOptions.filter(str => str.value === this.DataStepTwo.agama)[0].label
 		},
 		pendidikanText(){
-			return this.pendidikanOptions.filter(str => str.kode === this.DataStepThree.pendidikan_guru)[0].label
+			return this.pendidikanOptions.filter(str => str.value === this.DataStepThree.pendidikan_guru)[0].label
 		},
 		jabatanText(){
 			let kumpul = []
@@ -432,7 +432,7 @@ export default {
 				return '-'
 			}else{
 				this.DataStepThree.jabatan_guru.map(str => {
-					let hasil = this.jabatanOptions.filter(val => val.kode === str)[0].label
+					let hasil = this.jabatanOptions.filter(val => val.value === str)[0].label
 					kumpul.push(hasil)
 				})
 				return kumpul.sort().join(', ')
@@ -444,7 +444,7 @@ export default {
 				return '-'
 			}else{
 				this.DataStepThree.mengajar_bidang.map(str => {
-					let hasil = this.mengajarOptions.filter(val => val.kode === str)[0].label
+					let hasil = this.mengajarOptions.filter(val => val.value === str)[0].label
 					kumpul.push(hasil) 
 				})
 				return kumpul.sort().join(', ')
@@ -483,10 +483,14 @@ export default {
 	},
 	mounted() {
     this.kondisi = this.$route.params.kondisi
-		this.getAgama()
-		this.getPendidikan()
-		this.getJabatan()
-		this.getMengajar()
+		// this.getAgama()
+		// this.getPendidikan()
+		// this.getJabatan()
+		// this.getMengajar()
+		this.getDataMaster({ kode: 'agama' })
+		this.getDataMaster({ kode: 'pendidikan' })
+		this.getDataMaster({ kode: 'jabatan' })
+		this.getDataMaster({ kode: 'mengajar' })
 		this.getWilayah2023({ bagian: 'provinsi', KodeWilayah: null })
 		this.getWilayah2023({ bagian: 'kabkota', KodeWilayah: this.DataStepTwo.provinsi })
 		this.getWilayah2023({ bagian: 'kecamatan', KodeWilayah: this.DataStepTwo.kabkota })
@@ -495,10 +499,11 @@ export default {
 	methods: {
 		...mapActions({
 			fetchData: "fetchData",
-			getAgama: "setting/getAgama",
-			getPendidikan: "setting/getPendidikan",
-			getJabatan: "setting/getJabatan",
-			getMengajar: "setting/getMengajar",
+			// getAgama: "setting/getAgama",
+			// getPendidikan: "setting/getPendidikan",
+			// getJabatan: "setting/getJabatan",
+			// getMengajar: "setting/getMengajar",
+			getDataMaster: 'setting/getDataMaster',
 			getWilayah2023: "setting/getWilayah2023",
 		}),
 		simpanData() {
@@ -557,7 +562,11 @@ export default {
 				this.notifikasi("success", res.data.message, "2")
 			})
 			.catch((err) => {
-        this.notifikasi("error", err.response.data.message, "1")
+        if(err.response.data.status == '404'){
+					this.notifikasi("error", err.response.data.message, "1")
+				}else if(err.response.data.status == '422'){
+					this.notifikasi("warning", err.response.data.message, "1")
+				}
 			});
 		},
     goToProses(){
@@ -570,7 +579,7 @@ export default {
       this.$emit("backStep", 3);
     },
     endecryptData(kondisi, pass) {
-      let url = kondisi === 'EDIT' ? 'decryptPass' : 'encryptPass' 
+      let url = kondisi === 'EDIT' ? 'decrypt-pass' : 'encrypt-pass' 
       let payload = {
 				method: "get",
 				url: `settings/${url}?kata=${pass}`,

@@ -995,8 +995,8 @@ export default {
     kondisi: '',
     passText: '',
     statusSekolahOptions: [
-			{ label: 'Negeri', kode: 1 },
-			{ label: 'Swasta', kode: 2 },
+			{ label: 'Negeri', value: 1 },
+			{ label: 'Swasta', value: 2 },
 		],
 
     //notifikasi
@@ -1032,55 +1032,57 @@ export default {
 			KelurahanOptions: store => store.setting.KelurahanOptions,
 		}),
 		agamaText(){
-			return this.agamaOptions.filter(str => str.kode === this.DataStepTwo.agama)[0].label
+			return this.agamaOptions.filter(str => str.value === this.DataStepTwo.agama)[0].label
 		},
 		hobiText(){
-			return this.DataStepTwo.hobi ? this.hobiOptions.filter(str => str.kode === this.DataStepTwo.hobi)[0].label : '-'
+			return this.DataStepTwo.hobi ? this.hobiOptions.filter(str => str.value === this.DataStepTwo.hobi)[0].label : '-'
 		},
 		citacitaText(){
-			return this.DataStepTwo.cita_cita ? this.citacitaOptions.filter(str => str.kode === this.DataStepTwo.cita_cita)[0].label : '-'
+			return this.DataStepTwo.cita_cita ? this.citacitaOptions.filter(str => str.value === this.DataStepTwo.cita_cita)[0].label : '-'
 		},
 		statussekolahText(){
-			return this.statusSekolahOptions.filter(str => str.kode === this.DataStepThree.status_sekolah )[0].label
+			return this.statusSekolahOptions.filter(str => str.value === this.DataStepThree.status_sekolah )[0].label
 		},
 		jenjangsekolahText(){
-			return this.jenjangOptions.filter(str => str.kode === this.DataStepThree.jenjang)[0].label
+			return this.jenjangOptions.filter(str => str.value === this.DataStepThree.jenjang)[0].label
 		},
 		pendidikanTextAyah(){
-			return this.pendidikanOptions.filter(str => str.kode === this.DataStepFour.pendidikan_ayah)[0].label
+			return this.pendidikanOptions.filter(str => str.value === this.DataStepFour.pendidikan_ayah)[0].label
 		},
 		pendidikanTextIbu(){
-			return this.pendidikanOptions.filter(str => str.kode === this.DataStepFour.pendidikan_ibu)[0].label
+			return this.pendidikanOptions.filter(str => str.value === this.DataStepFour.pendidikan_ibu)[0].label
 		},
 		pendidikanTextWali(){
-			return this.DataStepFour.pendidikan_wali ? this.pendidikanOptions.filter(str => str.kode === this.DataStepFour.pendidikan_wali)[0].label : '-'
+			return this.DataStepFour.pendidikan_wali ? this.pendidikanOptions.filter(str => str.value === this.DataStepFour.pendidikan_wali)[0].label : '-'
 		},
 		pekerjaanTextAyah(){
-			return this.pekerjaanOptions.filter(str => str.kode === this.DataStepFour.pekerjaan_ayah)[0].label
+			console.log(this.DataStepFour.pekerjaan_ayah, this.pekerjaanOptions);
+			
+			return this.pekerjaanOptions.filter(str => str.value === this.DataStepFour.pekerjaan_ayah)[0].label
 		},
 		pekerjaanTextIbu(){
-			return this.pekerjaanOptions.filter(str => str.kode === this.DataStepFour.pekerjaan_ibu)[0].label
+			return this.pekerjaanOptions.filter(str => str.value === this.DataStepFour.pekerjaan_ibu)[0].label
 		},
 		pekerjaanTextWali(){
-			return this.DataStepFour.pekerjaan_wali ? this.pekerjaanOptions.filter(str => str.kode === this.DataStepFour.pekerjaan_wali)[0].label : '-'
+			return this.DataStepFour.pekerjaan_wali ? this.pekerjaanOptions.filter(str => str.value === this.DataStepFour.pekerjaan_wali)[0].label : '-'
 		},
 		statusTextAyah(){
-			return this.statusorangtuaOptions.filter(str => str.kode === this.DataStepFour.status_ayah)[0].label
+			return this.statusorangtuaOptions.filter(str => str.value === this.DataStepFour.status_ayah)[0].label
 		},
 		statusTextIbu(){
-			return this.statusorangtuaOptions.filter(str => str.kode === this.DataStepFour.status_ibu)[0].label
+			return this.statusorangtuaOptions.filter(str => str.value === this.DataStepFour.status_ibu)[0].label
 		},
 		penghasilanText(){
-			return this.penghasilanOptions.filter(str => str.kode === this.DataStepFour.penghasilan)[0].label
+			return this.penghasilanOptions.filter(str => str.value === this.DataStepFour.penghasilan)[0].label
 		},
 		statustempattinggalText(){
-			return this.DataStepFour.status_tempat_tinggal ? this.statustempattinggalOptions.filter(str => str.kode === this.DataStepFour.status_tempat_tinggal)[0].label : '-'
+			return this.DataStepFour.status_tempat_tinggal ? this.statustempattinggalOptions.filter(str => str.value === this.DataStepFour.status_tempat_tinggal)[0].label : '-'
 		},
 		jarakrumahText(){
-			return this.DataStepFour.jarak_rumah ? this.jarakrumahOptions.filter(str => str.kode === this.DataStepFour.jarak_rumah)[0].label : '-'
+			return this.DataStepFour.jarak_rumah ? this.jarakrumahOptions.filter(str => str.value === this.DataStepFour.jarak_rumah)[0].label : '-'
 		},
 		transportasiText(){
-			return this.DataStepFour.transportasi ? this.transportasiOptions.filter(str => str.kode === this.DataStepFour.transportasi)[0].label : '-'
+			return this.DataStepFour.transportasi ? this.transportasiOptions.filter(str => str.value === this.DataStepFour.transportasi)[0].label : '-'
 		},
 		provinsiText(){
 			return this.ProvinsiOptions.filter(str => str.kode === this.DataStepFour.provinsi)[0].nama
@@ -1112,17 +1114,16 @@ export default {
 	},
 	mounted() {
     this.kondisi = this.$route.params.kondisi
-		this.getAgama()
-		this.getHobi()
-		this.getCitaCita()
-		this.getJenjangSekolah()
-		this.getPendidikan()
-		this.getPekerjaan()
-		this.getStatusOrangTua()
-		this.getPenghasilan()
-		this.getStatusTempatTinggal()
-		this.getJarakRumah()
-		this.getTransportasi()
+		this.getDataMaster({ kode: 'agama' })
+		this.getDataMaster({ kode: 'hobi' })
+		this.getDataMaster({ kode: 'citacita' })
+		this.getDataMaster({ kode: 'jenjangsekolah' })
+		this.getDataMaster({ kode: 'pendidikan' })
+		this.getDataMaster({ kode: 'pekerjaan' })
+		this.getDataMaster({ kode: 'statusorangtua' })
+		this.getDataMaster({ kode: 'statustempattinggal' })
+		this.getDataMaster({ kode: 'jarakrumah' })
+		this.getDataMaster({ kode: 'transportasi' })
 		this.getWilayah2023({ bagian: 'kabkotaOnly', KodeWilayah: null })
 		this.getWilayah2023({ bagian: 'provinsi', KodeWilayah: null })
 		this.getWilayah2023({ bagian: 'kabkota', KodeWilayah: this.DataStepFour.provinsi })
@@ -1132,17 +1133,7 @@ export default {
 	methods: {
 		...mapActions({
 			fetchData: "fetchData", 
-			getAgama: "setting/getAgama", 
-			getHobi: "setting/getHobi", 
-			getCitaCita: "setting/getCitaCita", 
-			getJenjangSekolah: "setting/getJenjangSekolah", 
-			getPendidikan: "setting/getPendidikan", 
-			getPekerjaan: "setting/getPekerjaan", 
-			getPenghasilan: "setting/getPenghasilan", 
-			getStatusOrangTua: "setting/getStatusOrangTua", 
-			getStatusTempatTinggal: "setting/getStatusTempatTinggal", 
-			getJarakRumah: "setting/getJarakRumah", 
-			getTransportasi: "setting/getTransportasi", 
+			getDataMaster: 'setting/getDataMaster',
 			getWilayah2023: "setting/getWilayah2023",
 		}),
 		simpanData() {
@@ -1252,7 +1243,11 @@ export default {
         this.notifikasi("success", res.data.message, "2")
 			})
 			.catch((err) => {
-        this.notifikasi("error", err.response.data.message, "1")
+        if(err.response.data.status == '404'){
+					this.notifikasi("error", err.response.data.message, "1")
+				}else if(err.response.data.status == '422'){
+					this.notifikasi("warning", err.response.data.message, "1")
+				}
 			});
 		},
     goToProses(){
@@ -1265,7 +1260,7 @@ export default {
       this.$emit("backStep", 4);
     },
     endecryptData(kondisi, pass) {
-      let url = kondisi === 'EDIT' ? 'decryptPass' : 'encryptPass' 
+      let url = kondisi === 'EDIT' ? 'decrypt-pass' : 'encrypt-pass' 
       let payload = {
 				method: "get",
 				url: `settings/${url}?kata=${pass}`,

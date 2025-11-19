@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="subheading grey--text text-decoration-underline">Data Jadwal Exam</h1>
+    <h2 class="subheading grey--text text-decoration-underline">Data Jadwal Exam</h2>
     <v-card class="pa-1 rounded" variant="outlined" elevation="4">
       <v-alert
         color="surface"
@@ -13,7 +13,7 @@
         class="mb-2"
       >
         <template v-slot:text>
-          <ul style="font-size: 12px;">
+          <ul style="font-size: 9pt;">
             <li>- Untuk import nilai pastikan sudah mendapatkan template data jadwal exam</li>
             <li>- Mengurutkan data berdasarkan MATA PELAJARAN, KELAS, STATUS.</li>
           </ul>
@@ -32,7 +32,6 @@
         :sort-by="sortBy"
         density="comfortable"
         hide-default-footer
-        hide-default-header
         multi-sort
         class="elavation-3 rounded"
         sort-asc-icon="mdi mdi-sort-alphabetical-ascending"
@@ -57,97 +56,103 @@
         <template #loader>
           <LoaderDataTables />
         </template>
-        <template #[`item.number`]="{ item }">
-          {{ page > 1 ? ((page - 1)*limit) + item.index + 1 : item.index + 1 }}
+        <template #[`item.number`]="{ index }">
+          {{ page > 1 ? ((page - 1)*limit) + index + 1 : index + 1 }}
         </template>
         <template #[`item.waktu`]="{ item }">
-          <span v-html="`${item.raw.waktu} menit`" /> 
+          <span v-html="`${item.waktu} menit`" /> 
         </template>
         <template #[`item.startDate`]="{ item }">
-          <span v-html="convertDateTime(item.raw.startDate)" /> 
+          <span v-html="convertDateTime(item.startDate)" /> 
         </template>
         <template #[`item.endDate`]="{ item }">
-          <span v-html="convertDateTime(item.raw.endDate)" /> 
+          <span v-html="convertDateTime(item.endDate)" /> 
         </template>
         <template #[`item.status`]="{ item }">
-          <v-icon size="small" v-if="item.raw.status == true" color="green" icon="mdi mdi-check" />
-          <v-icon size="small" v-else-if="item.raw.status == false" color="red" icon="mdi mdi-close" />
+          <v-icon size="small" :color="item.status ? 'green' : 'red'" :icon="item.status ? 'mdi mdi-check' : 'mdi mdi-close'" />
         </template>
         <template #expanded-row="{ columns, item }">
           <tr>
             <td :colspan="columns.length">
               <Button 
                 v-if="kondisiJabatan"
-                color-button="#0bd369"
+                color-button="success"
                 icon-prepend-button="mdi mdi-pencil"
                 nama-button="Ubah"
-                :disabled-button="item.raw.status === false"
-                @proses="openDialog(item.raw, 1)"
+                size-button="x-small"
+                :disabled-button="!item.status"
+                @proses="openDialog(item, 1)"
               />
               <Button 
                 v-if="kondisiJabatan"
-                color-button="#0bd369"
-                :icon-prepend-button="item.raw.status === false ? 'mdi mdi-eye' : 'mdi mdi-eye-off'"
-                :nama-button="item.raw.status === false ? 'Active' : 'Non Active'"
-                @proses="postRecord('STATUSRECORD', item.raw, !item.raw.status)"
+                color-button="success"
+                size-button="x-small"
+                :icon-prepend-button="!item.status ? 'mdi mdi-eye' : 'mdi mdi-eye-off'"
+                :nama-button="!item.status ? 'Active' : 'Non Active'"
+                @proses="postRecord('STATUSRECORD', item, !item.status)"
               />
               <Button 
                 v-if="kondisiJabatan"
-                color-button="#bd3a07"
+                color-button="error"
                 icon-prepend-button="mdi mdi-delete"
                 nama-button="Hapus"
-                :disabled-button="item.raw.status === false"
-                @proses="postRecord('DELETE', item.raw, null)"
+                size-button="x-small"
+                :disabled-button="!item.status"
+                @proses="postRecord('DELETE', item, null)"
                 />
                 <Button 
-                color-button="#0bd369"
+                color-button="success"
                 icon-prepend-button="mdi mdi-pencil"
                 nama-button="Pilih Soal"
-                :disabled-button="roleID === '3' ? !kondisiMengajar.includes(item.raw.kodemapel) : false"
-                @proses="SelectExam(item.raw)"
+                size-button="x-small"
+                @proses="SelectExam(item)"
+                :disabled-button="roleID === '3' ? !kondisiMengajar.includes(String(item.kodemapel)) || !kondisiKelas.includes(item.kelas) : false"
               />
               <Button 
-                color-button="#04f7f7"
+                color-button="info"
                 icon-prepend-button="mdi mdi-information"
                 nama-button="Detail"
-                @proses="openDialog(item.raw, 2)"
+                size-button="x-small"
+                @proses="openDialog(item, 2)"
               />
             </td>
           </tr>
         </template>
         <template #top>
           <v-row no-gutters class="pa-2">
-            <v-col cols="12" md="6">
+            <v-col cols="12" md="6" class="d-flex align-center">
               <Button 
                 v-if="kondisiJabatan"
                 color-button="light-blue darken-3"
                 icon-prepend-button="mdi mdi-plus-thick"
                 nama-button="Tambah"
+                size-button="x-small"
                 @proses="openDialog(null, 0)"
               />
               <Button 
                 v-if="kondisiJabatan"
-                color-button="#0bd369"
+                color-button="success"
                 icon-prepend-button="mdi mdi-import"
                 nama-button="Import Data"
+                size-button="x-small"
                 @proses="() => { dialogImport = true }"
               />
             </v-col>
             <v-col cols="12" md="6">
               <v-row no-gutters>
-                <v-col cols="12" md="5" class="pr-2">
+                <v-col cols="12" md="6" class="pr-2">
                   <Autocomplete
                     v-model="pencarian.mapel"
                     :data-a="mengajarOptions"
                     label-a="Pilih Mata Pelajaran"
                     item-title="label"
-                    item-value="kode"
+                    item-value="value"
                     :clearable-a="true"
-                    @click:clear="() => { page = 1; getJadwalExam({page: 1, limit: limit, kelas: pencarian.kelas, mapel: null, sorting: kumpulSort}); }"
-                    @ubah="(e) => { page = 1; getJadwalExam({page: 1, limit: limit, kelas: pencarian.kelas, mapel: e, sorting: kumpulSort}); }"
+                    @click:clear="() => { page = 1; getJadwalExam({page: 1, limit, kelas: pencarian.kelas, mapel: null, sorting: kumpulSort}); }"
+                    @ubah="(e) => { page = 1; getJadwalExam({page: 1, limit, kelas: pencarian.kelas, mapel: e, sorting: kumpulSort}); }"
                   />
                 </v-col>
-                <v-col cols="12" md="5" class="pr-2">
+                <v-col cols="12" md="6" class="pr-2">
                   <Autocomplete
                     v-model="pencarian.kelas"
                     :data-a="kelasOptions"
@@ -155,16 +160,8 @@
                     item-title="kelas"
                     item-value="kelas"
                     :clearable-a="true"
-                    @click:clear="() => { page = 1; getJadwalExam({page: 1, limit: limit, kelas: null, mapel: pencarian.mapel, sorting: kumpulSort}); }"
-                    @ubah="(e) => { page = 1; getJadwalExam({page: 1, limit: limit, kelas: e, mapel: pencarian.mapel, sorting: kumpulSort}); }"
-                  />
-                </v-col>
-                <v-col cols="12" md="2" class="d-flex justify-end align-center">
-                  <Autocomplete
-                    v-model="page"
-                    :data-a="pageOptions"
-                    label-a="Page"
-                    :disabled-a="DataJadwalExam.length ? false : true"
+                    @click:clear="() => { page = 1; getJadwalExam({page: 1, limit, kelas: null, mapel: pencarian.mapel, sorting: kumpulSort}); }"
+                    @ubah="(e) => { page = 1; getJadwalExam({page: 1, limit, kelas: e, mapel: pencarian.mapel, sorting: kumpulSort}); }"
                   />
                 </v-col>
               </v-row>
@@ -178,22 +175,25 @@
             <v-col cols="12" class="pa-2 d-flex justify-start align-center">
               <Button
                 v-if="DataJadwalExam.length && selectRecord.length < DataJadwalExam.length"
-                color-button="#0bd369"
+                color-button="success"
                 icon-prepend-button="mdi mdi-select-all"
+                size-button="x-small"
                 :nama-button="`Choose All (${selectRecord.length})`"
                 @proses="allData(DataJadwalExam)"
               />
               <Button
                 v-if="selectRecord.length"
-                color-button="#0bd369"
+                color-button="success"
                 icon-prepend-button="mdi mdi-select-remove"
+                size-button="x-small"
                 :nama-button="`Remove Select`"
                 @proses="() => { selectRecord = [] }"
               />
               <Button 
-                color-button="#bd3a07"
+                color-button="error"
                 icon-prepend-button="mdi mdi-delete"
                 nama-button="Hapus Record Selected"
+                size-button="x-small"
                 :disabled-button="!DataJadwalExam.length"
                 @proses="hapusAllRecord()"
               />
@@ -202,7 +202,17 @@
           <v-divider :thickness="2" class="border-opacity-100" color="white" />
           <v-row no-gutters>
             <v-col cols="12" lg="10" class="pa-2 d-flex justify-start align-center">
-              <span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
+              <!-- <span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span> -->
+              <span style="font-size: 10pt;">Halaman</span>
+              <div style="width: 100px; margin-left: 3px; margin-right: 3px;">
+                <Autocomplete
+                  v-model="page"
+                  :data-a="pageOptions"
+                  label-a="Page"
+                  :disabled-a="!DataJadwalExam.length"
+                />
+              </div>
+              <span style="font-size: 10pt;">dari Total Halaman <strong>{{ pageSummary?.totalPages }}</strong> (Records {{ pageSummary?.total }})</span>
             </v-col>
             <v-col cols="12" lg="2" class="pa-2 text-right">
               <div class="d-flex justify-start align-center">
@@ -211,24 +221,24 @@
                   pilihan-a="select"
                   :data-a="limitPage"
                   label-a="Limit"
-                  :disabled-a="DataJadwalExam.length ? false : true"
+                  :disabled-a="!DataJadwalExam.length"
                 />
                 <Button
                   variant="plain"
                   size-button="large"
                   model-button="comfortable"
-                  color-button="#ffffff"
+                  color-button="success"
                   icon-button="mdi mdi-arrow-left-circle-outline"
-                  :disabled-button="DataJadwalExam.length ? pageSummary.page != 1 ? false : true : true"
+                  :disabled-button="!DataJadwalExam.length || !(pageSummary.page != 1)"
                   @proses="() => { page = pageSummary.page - 1 }"
                 />
                 <Button
                   variant="plain"
                   size-button="large"
                   model-button="comfortable"
-                  color-button="#ffffff"
+                  color-button="success"
                   icon-button="mdi mdi-arrow-right-circle-outline"
-                  :disabled-button="DataJadwalExam.length ? pageSummary.page != pageSummary.totalPages ? false : true : true"
+                  :disabled-button="!DataJadwalExam.length || !(pageSummary.page != pageSummary.totalPages)"
                   @proses="() => { page = pageSummary.page + 1 }"
                 />
               </div>
@@ -246,7 +256,7 @@
     >
       <v-card color="background-dialog-card">
         <v-toolbar color="surface">
-          <v-toolbar-title>{{editedIndex == 0 ? 'Tambah' : editedIndex == 1 ? 'Ubah' : 'View'}} Data Kelas</v-toolbar-title>
+          <v-toolbar-title>{{editedIndex == 0 ? 'Tambah' : editedIndex == 1 ? 'Ubah' : 'View'}} Data Exam</v-toolbar-title>
           <v-spacer />
           <v-toolbar-items>
             <Button
@@ -301,7 +311,7 @@
                 v-model="inputDataJadwalExam.mapel"
                 :data-a="mengajarOptions"
                 item-title="label"
-                item-value="kode"
+                item-value="value"
                 label-a="Pilih Mata Pelajaran"
                 :clearable-a="editedIndex != 2"
                 :readonly-a="editedIndex == 2"
@@ -327,6 +337,7 @@
                 format="dd-MM-yyyy HH:mm"
                 time-picker-inline
                 range
+                :teleport="true"
                 :clearable="editedIndex != 2"
                 :readonly="editedIndex == 2"
               />
@@ -358,11 +369,11 @@
                     :readonly="editedIndex === 2"
                   />
                   <TextField
-                    v-if="checkTempPilihan"
                     v-model="limitSoal.pilihanganda"
                     label-tf="Limit Soal Pilihan Ganda"
                     :clearable-tf="editedIndex !== 2"
                     :readonly-tf="editedIndex === 2"
+                    :disabled-tf="!checkTempPilihan"
                     @keypress="onlyNumber($event, 2, limitSoal.pilihanganda)"                          
                   />
                 </v-col>
@@ -378,11 +389,11 @@
                     :readonly="editedIndex === 2"
                   />
                   <TextField
-                    v-if="checkTempEssay"
                     v-model="limitSoal.essay"
                     label-tf="Limit Soal Essay"
                     :clearable-tf="editedIndex !== 2"
                     :readonly-tf="editedIndex === 2"
+                    :disabled-tf="!checkTempEssay"
                     @keypress="onlyNumber($event, 2, limitSoal.essay)"                          
                   />
                 </v-col>
@@ -400,11 +411,11 @@
                     :readonly="editedIndex === 2"
                   />
                   <TextField
-                    v-if="checkTempMenjodohkan"
                     v-model="limitSoal.menjodohkan"
                     label-tf="Limit Soal Menjodohkan"
                     :clearable-tf="editedIndex !== 2"
                     :readonly-tf="editedIndex === 2"
+                    :disabled-tf="!checkTempMenjodohkan"
                     @keypress="onlyNumber($event, 2, limitSoal.menjodohkan)"                          
                   />
                 </v-col>
@@ -420,11 +431,11 @@
                     :readonly="editedIndex === 2"
                   />
                   <TextField
-                    v-if="checkTempBS"
                     v-model="limitSoal.benarsalah"
                     label-tf="Limit Soal Benar Salah"
                     :clearable-tf="editedIndex !== 2"
                     :readonly-tf="editedIndex === 2"
+                    :disabled-tf="!checkTempBS"
                     @keypress="onlyNumber($event, 2, limitSoal.benarsalah)"                          
                   />
                 </v-col>
@@ -445,9 +456,9 @@
               class="pt-3"
             >
               <Button
-                color-button="black"
+                color-button="info"
                 nama-button="Random Soal"
-                :disabled-button="inputDataJadwalExam.mapel === null && inputDataJadwalExam.kelas === null"
+                :disabled-button="!inputDataJadwalExam?.mapel || !inputDataJadwalExam?.kelas || (!checkTempPilihan && !checkTempEssay && !checkTempBS && !checkTempMenjodohkan)"
                 @proses="getRandom()"
               />
             </v-col>
@@ -465,14 +476,14 @@
             >
               <Button
                 v-if="editedIndex == 0" 
-                color-button="black"
+                color-button="info"
                 nama-button="Simpan Data"
                 :disabled-button="kondisiTombol"
                 @proses="postRecord('ADD')"
               />
               <Button
                 v-if="editedIndex == 1" 
-                color-button="black"
+                color-button="info"
                 nama-button="Ubah Data"
                 :disabled-button="kondisiTombol"
                 @proses="postRecord('EDIT')"
@@ -535,7 +546,7 @@
             <v-col cols="12" lg="5">
               <v-card>
                 <v-toolbar color="surface">
-                  <v-toolbar-title>Available</v-toolbar-title>
+                  <v-toolbar-title>Soal Tersedia</v-toolbar-title>
                   <v-spacer></v-spacer>
                   <span>
                     <Button
@@ -547,11 +558,11 @@
                       :disabled-button="!available.length"
                       @proses="clearAvailable()"
                     />
-                    <v-tooltip activator="parent" location="left">clear selected</v-tooltip>
+                    <v-tooltip activator="parent" location="left">hapus pilihan</v-tooltip>
                   </span>
                     <!-- :tooltip-condition-button="true"
                     tooltip-position-button="left"
-                    tooltip-button="clear selected" -->
+                    tooltip-button="hapus pilihan" -->
                 </v-toolbar>
                 <v-divider :thickness="2" class="border-opacity-100" color="white" />
                 <v-list v-if="dataAvailable.length" lines="three" nav density="comfortable" class="list-pick">
@@ -564,7 +575,7 @@
                       @click="pilihDataAvailable(item.kode)"
                     >
                     <template v-slot:title>
-                      <span v-html="`${roleID === '3' ? item.kode : `${item.kode} (${item.namamapel})`}`" />
+                      <span v-html="`${item.kode} (${item.namamapel} - ${item.kelas})`" />
                     </template>
                     <template v-slot:subtitle>
                       <span v-if="item.pertanyaan.file === null" v-html="item.pertanyaan.text" /> 
@@ -644,7 +655,7 @@
             <v-col cols="12" lg="5">
               <v-card>
                 <v-toolbar color="surface">
-                  <v-toolbar-title>Selected</v-toolbar-title>
+                  <v-toolbar-title>Soal Terpilih</v-toolbar-title>
                   <v-spacer></v-spacer>
                   <span>
                     <Button
@@ -656,11 +667,11 @@
                       :disabled-button="!selected.length"
                       @proses="clearSelected()"
                     />
-                    <v-tooltip activator="parent" location="left">clear selected</v-tooltip>
+                    <v-tooltip activator="parent" location="left">hapus pilihan</v-tooltip>
                   </span>
                     <!-- :tooltip-condition-button="true"
                     tooltip-position-button="left"
-                    tooltip-button="clear selected" -->
+                    tooltip-button="hapus pilihan" -->
                 </v-toolbar>
                 <v-divider :thickness="2" class="border-opacity-100" color="white" />
                 <v-list v-if="dataSelected.length" lines="three" nav density="comfortable" class="list-pick">
@@ -672,7 +683,7 @@
                     @click="pilihDataSelected(item.kode)"
                   >
                   <template v-slot:title>
-                    <span v-html="`${roleID === '3' ? item.kode : `${item.kode} (${item.namamapel})`}`" />
+                    <span v-html="`${item.kode} (${item.namamapel} - ${item.kelas})`" />
                   </template>
                   <template v-slot:subtitle>
                     <span v-if="item.pertanyaan.file === null" v-html="item.pertanyaan.text" /> 
@@ -840,10 +851,10 @@ export default {
       dateRange: [],
     },
     limitSoal: {
-      pilihanganda: '',
-      essay: '',
-      menjodohkan: '',
-      benarsalah: '',
+      pilihanganda: 0,
+      essay: 0,
+      menjodohkan: 0,
+      benarsalah: 0,
     },
     kumpulanKodeSoal: {
       pilihanganda: [],
@@ -857,6 +868,7 @@ export default {
     checkTempBS: false,
     showTimeRangePanel: false,
     editedIndex: 0,
+    kondisiJabatan: false,
     kondisiTombol: true,
     DialogJadwalExam: false,
     DialogPilihExam: false,
@@ -898,6 +910,7 @@ export default {
       }
     })
   },
+  
   computed: {
     ...mapState({
       mengajarOptions: store => store.setting.mengajarOptions, 
@@ -910,37 +923,34 @@ export default {
       jadwalExam: 'user/jadwalExam',
       // listPick: 'user/listPick',
     }),
-    kondisiJabatan(){
+    jabatanOptions(){
 			if(this.roleID === '3'){
+				if(localStorage.getItem('jabatan_guru') === '') return []
 				let jabatan_guru = localStorage.getItem('jabatan_guru').split(', ')
-				let result = []
-				jabatan_guru.map(str => {
-					let hasil = this.jabatan.filter(val => { return val.kode == str })
-					result.push(hasil.length ? hasil[0].label : '')
+				let result = this.jabatan.filter(val => jabatan_guru.includes(val.value)).map(x => {
+					return x?.label
 				})
-        let kondisi = false
-        if(result.includes('WaKaBid. Kurikulum')){
-          kondisi = true
-        }else if(result.includes('WaKaBid. Kesiswaan')){
-          kondisi = false
-          this.headers = this.headers.filter(el => { return el.key != "data-table-select"; })
-        }else if(result.includes('Kepala Sekolah')){
-          kondisi = true
-        }else{
-          this.headers = this.headers.filter(el => { return el.key != "data-table-select"; })
-        }
-				return kondisi
-			}else if(this.roleID === '1' || this.roleID === '2'){
-				return true
+				return result
+			}else{
+				return []
       }
 		},
     kondisiMengajar(){
 			if(this.roleID === '3'){
+        if(localStorage.getItem('mengajar_bidang') === '') return []
 				let mengajar_bidang = localStorage.getItem('mengajar_bidang').split(', ')
-				let result = []
-				mengajar_bidang.map(str => {
-					let hasil = this.mengajarOptions.filter(val => { return val.kode == str })
-					result.push(hasil.length ? hasil[0].kode : '')
+				let result = this.mengajarOptions.filter(val => mengajar_bidang.includes(val.value)).map(x => {
+					return x?.value
+				})
+				return result
+			}
+		},
+    kondisiKelas(){
+			if(this.roleID === '3'){
+        if(localStorage.getItem('mengajar_kelas') === '') return []
+				let kelas = localStorage.getItem('mengajar_kelas').split(', ')
+				let result = this.kelasOptions.filter(val => kelas.includes(val.kelas)).map(x => {
+					return x?.kelas
 				})
 				return result
 			}
@@ -966,7 +976,8 @@ export default {
     inputDataJadwalExam: {
       deep: true,
       handler(value){
-        if(value.kelas != null || value.mapel != null){
+        if(value.dateRange == null) value.dateRange = []
+        if(value.kelas != null && value.mapel != null && value.dateRange.length && !value.dateRange.includes(null)){
           this.kondisiTombol = false
         }else{
           this.kondisiTombol = true
@@ -999,6 +1010,26 @@ export default {
         }
 			}
 		},
+    jabatanOptions: {
+			deep: true,
+			handler(value) {
+        if(this.roleID === '3'){
+          if(value.includes('WaKaBid. Kurikulum')){
+            this.kondisiJabatan = true
+          }else if(value.includes('WaKaBid. Kesiswaan')){
+            this.kondisiJabatan = false
+            this.headers = this.headers.filter(el => { return el.key != "data-table-select"; })
+          }else if(value.includes('Kepala Sekolah')){
+            this.kondisiJabatan = true
+          }else{
+            this.kondisiJabatan = false
+            this.headers = this.headers.filter(el => { return el.key != "data-table-select"; })
+          }
+        }else if(this.roleID === '2' || this.roleID === '1'){
+          this.kondisiJabatan = true
+        }
+			}
+		},
   },
   mounted() {
     if(!localStorage.getItem('user_token')) return this.$router.push({name: 'LogIn'});
@@ -1006,8 +1037,8 @@ export default {
     this.idLog = localStorage.getItem('idLogin')
     this.BASEURL = process.env.VUE_APP_BASE_URL
 		this.getJadwalExam({page: this.page, limit: this.limit, mapel: this.pencarian.mapel, kelas: this.pencarian.kelas, sorting: this.kumpulSort});
-    this.getMengajar()
-    this.getJabatan()
+		this.getDataMaster({ kode: 'mengajar' })
+		this.getDataMaster({ kode: 'jabatan' })
     this.getKelas({ kondisi: 'All' })
 	},
 	methods: {
@@ -1017,9 +1048,8 @@ export default {
       getRandomQuestion: 'user/getRandomQuestion',
       postListPick: 'user/postListPick',
       getListPick: 'user/getListPick',
-      getMengajar: 'setting/getMengajar', 
+			getDataMaster: 'setting/getDataMaster',
       getKelas: 'setting/getKelas',
-			getJabatan: "setting/getJabatan",
     }),
     postRecord(jenis, item = null, status) {
       let bodyData = {
@@ -1048,6 +1078,7 @@ export default {
           status: status,
         },
       }
+      // return console.log(bodyData);
       this.$store.dispatch('user/postJadwalExam', jenis === 'ADD' || jenis === 'EDIT' ? bodyData.ADDEDIT : bodyData.DELETESTATUS)
       .then((res) => {
         this.DialogJadwalExam = false
@@ -1062,21 +1093,21 @@ export default {
       this.editedIndex = index
       if(index == 0){
         this.clearData()
-        this.checkTempPilihan = true
-        this.checkTempEssay = true
-        this.checkTempMenjodohkan = true
-        this.checkTempBS = true
+        // this.checkTempPilihan = true
+        // this.checkTempEssay = true
+        // this.checkTempMenjodohkan = true
+        // this.checkTempBS = true
       }else{
         this.inputDataJadwalExam = {
           idJadwalExam: item?.idJadwalExam,
           kelas: item?.kelas,
-          mapel: item?.kodemapel,
+          mapel: String(item?.kodemapel),
           dateRange: [item?.startDate, item?.endDate],
         }
-        item?.limitSoal?.pilihanganda > 0 ? this.checkTempPilihan = true : this.checkTempPilihan = false
-        item?.limitSoal?.essay > 0 ? this.checkTempEssay = true : this.checkTempEssay = false
-        item?.limitSoal?.menjodohkan > 0 ? this.checkTempMenjodohkan = true : this.checkTempMenjodohkan = false
-        item?.limitSoal?.benarsalah > 0 ? this.checkTempBS = true : this.checkTempBS = false
+        this.checkTempPilihan = item?.limitSoal?.pilihanganda > 0
+        this.checkTempEssay = item?.limitSoal?.essay > 0
+        this.checkTempMenjodohkan = item?.limitSoal?.menjodohkan > 0
+        this.checkTempBS = item?.limitSoal?.benarsalah > 0
         this.limitSoal = {
           pilihanganda: item?.limitSoal?.pilihanganda,
           essay: item?.limitSoal?.essay,
@@ -1089,6 +1120,7 @@ export default {
           menjodohkan: item?.kumpulanKodeSoal?.menjodohkan,
           benarsalah: item?.kumpulanKodeSoal?.benarsalah,
         }
+        
       }
       this.DialogJadwalExam = true
     },
@@ -1096,19 +1128,21 @@ export default {
       const bodyData = {
         mapel: this.inputDataJadwalExam.mapel,
         kelas: this.inputDataJadwalExam.kelas,
-        limitSoal: JSON.stringify({
-          pilihanganda: this.checkTempPilihan ? this.limitSoal.pilihanganda ? Number(this.limitSoal.pilihanganda) : 0 : 0,
-          essay: this.checkTempEssay ? this.limitSoal.essay ? Number(this.limitSoal.essay) : 0 : 0,
-          menjodohkan: this.checkTempMenjodohkan ? this.limitSoal.menjodohkan ? Number(this.limitSoal.menjodohkan) : 0 : 0,
-          benarsalah: this.checkTempBS ? this.limitSoal.benarsalah ? Number(this.limitSoal.benarsalah) : 0 : 0,
-        })
+        limitSoal: {
+          pilihanganda: this.checkTempPilihan ? Number(this.limitSoal.pilihanganda) : 0,
+          essay: this.checkTempEssay ? Number(this.limitSoal.essay) : 0,
+          menjodohkan: this.checkTempMenjodohkan ? Number(this.limitSoal.menjodohkan) : 0,
+          benarsalah: this.checkTempBS ? Number(this.limitSoal.benarsalah) : 0,
+        }
       }
+      // return console.log(bodyData);
       this.getRandomQuestion(bodyData)
       .then((res) => {
         this.notifikasi("success", "Berhasil Mengacak Question Exam", "1")
 			})
 			.catch((err) => {
-        this.notifikasi("error", err.response.data.message, "1")
+        if(err.response.data.status == 404) return this.notifikasi("error", err.response.data.message, "1")
+        if(err.response.data.status == 422) return this.notifikasi("warning", err.response.data.message, "1")
 			});
     },
     clearData(){
@@ -1119,10 +1153,10 @@ export default {
         dateRange: [],
       }
       this.limitSoal = {
-        pilihanganda: '',
-        essay: '',
-        menjodohkan: '',
-        benarsalah: '',
+        pilihanganda: 0,
+        essay: 0,
+        menjodohkan: 0,
+        benarsalah: 0,
       }
       this.kumpulanKodeSoal = {
         pilihanganda: [],
@@ -1217,10 +1251,10 @@ export default {
 			document.body.removeChild(link);
 		},
     clickrow(event, data) {
-      const index = this.$data.expanded.find(i => i === data?.item?.raw?.idJadwalExam);
+      const index = this.$data.expanded.find(i => i === data?.item?.idJadwalExam);
       if(typeof index === 'undefined') return this.$data.expanded = [];
       this.$data.expanded.splice(0, 1)
-      this.$data.expanded.push(data?.item?.raw?.idJadwalExam);
+      this.$data.expanded.push(data?.item?.idJadwalExam);
     },
     allData(item) {
       if(item.length === this.selectRecord.length) return this.notifikasi("warning", "Data sudah di pilih semua pada page ini!", "1")
@@ -1247,7 +1281,7 @@ export default {
 			});
     },
     async listPickExam(page){
-      let { data: response } = await this.getListPick({page, limit: 20, keyword: '', jenis: this.itemJenis})
+      let { data: response } = await this.getListPick({page, limit: 20, keyword: '', jenis: this.itemJenis, kelas: this.inputDataJadwalExam.kelas, mapel: this.inputDataJadwalExam.mapel})
       let data = response.result.records
       data.map(val => {
         this.dataAvailable.push(val)
@@ -1263,6 +1297,8 @@ export default {
     SelectExam(item){
       this.inputDataJadwalExam = {
         idJadwalExam: item?.idJadwalExam,
+        kelas: item?.kelas.split('-')[0],
+        mapel: item?.kodemapel,
       }
       this.itemJenis = 'pilihan ganda'
       this.listPickExam(1)
@@ -1424,7 +1460,7 @@ export default {
 .tombol {
   display: flex;
   align-items: center;
-  justify-content: center;
+  /* justify-content: center; */
   flex-direction: column;
 }
 .kotak-panel {

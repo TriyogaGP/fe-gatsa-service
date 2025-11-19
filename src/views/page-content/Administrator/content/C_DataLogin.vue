@@ -17,10 +17,11 @@
 				>
 					<Autocomplete
 						v-model="inputDataLogIn.level"
-						:data-a="levelOptions"
+						label-a="Consumer Type"
 						item-title="title"
 						item-value="value"
-						label-a="Consumer Type"
+						:rules-a="inputDataLogIn.level != '' ? true : false"
+						:data-a="levelOptions"
 						:clearable-a="true"
 					/>
 				</v-col>
@@ -41,6 +42,8 @@
 					<TextField
 						v-model="inputDataLogIn.nama_lengkap"
 						label-tf="Nama Lengkap"
+						formatrulesTf="text"
+						:rules-tf="inputDataLogIn.nama_lengkap != '' ? true : false"
 						:clearable-tf="true"
 					/>
 				</v-col>
@@ -61,6 +64,8 @@
 					<TextField
 						v-model="inputDataLogIn.username"
 						label-tf="Username"
+						formatrulesTf="text"
+						:rules-tf="inputDataLogIn.username != '' ? true : false"
 						:clearable-tf="true"
 					/>
 				</v-col>
@@ -81,8 +86,8 @@
 					<TextField
 						v-model="inputDataLogIn.email"
 						label-tf="Email"
+						formatrulesTf="email"
 						:rules-tf="inputDataLogIn.email != '' ? true : false"
-						hide-details="auto"
 						:clearable-tf="true"
 					/>
 				</v-col>
@@ -102,8 +107,10 @@
 				>
 					<TextField
 						v-model="inputDataLogIn.password"
-						:slot-tf="true"
 						label-tf="Kata Sandi"
+						formatrulesTf="text"
+						:slot-tf="true"
+						:rules-tf="inputDataLogIn.password != '' ? true : false"
 						:type-tf="passType ? 'text' : 'password'"
 						:icon-append-tf="passType ? 'mdi mdi-eye-lock' : 'mdi mdi-eye-lock-open'"
 						:clearable-tf="true"
@@ -161,12 +168,12 @@ export default {
   },
   data: () => ({
 		inputDataLogIn: {
-      id_user: '',
+      id_user: null,
       level: null,
-      nama_lengkap: '',
-      username: '',
-      email: '',
-      password: '',
+      nama_lengkap: null,
+      username: null,
+      email: null,
+      password: null,
     },
     levelOptions: [
 			{ title: 'Super Administrator', value: 1 },
@@ -187,25 +194,24 @@ export default {
 		inputDataLogIn: {
 			deep: true,
 			handler(value) {
-				if(value.nama_lengkap != '' && value.username != '' && value.email != '' && value.password != ''){
+				if(value.nama_lengkap != null && value.username != null && value.email != null && value.password != null){
 					this.kondisiTombol = false
 				}else{
 					this.kondisiTombol = true
 				}
 				localStorage.setItem('stepOne', JSON.stringify(this.inputDataLogIn))
-				// this.wadahInput()
 			}
 		},
 		dataStepOne: {
 			deep: false,
 			handler(value) {
 				this.inputDataLogIn = {
-					id_user: value.id_user ? value.id_user : null,
-					level: value.level ? value.level : null,
-					nama_lengkap: value.nama_lengkap ? value.nama_lengkap : null,
-					username: value.username ? value.username : null,
-					email: value.email ? value.email : null,
-					password: value.password ? value.password : null,
+					id_user: value?.id_user,
+					level: value?.level,
+					nama_lengkap: value?.nama_lengkap,
+					username: value?.username,
+					email: value?.email,
+					password: value?.password,
 				}
 				this.endecryptData()
 			}
@@ -219,27 +225,16 @@ export default {
 		...mapActions({
 			fetchData: 'fetchData',
     }),
-		wadahInput(){
-			let inputFormOne = {
-				idUser: this.inputDataLogIn.id_user,
-				consumerType: this.inputDataLogIn.level,
-				nama: this.inputDataLogIn.nama_lengkap,
-				username: this.inputDataLogIn.username,
-				email: this.inputDataLogIn.email,
-				password: this.inputDataLogIn.password,
-			}
-      this.$emit("DataStepOne", inputFormOne)
-    },
 		onClickVisible(d) {
       this[d] = !this[d]
     },
     endecryptData() { 
       let payload = {
 				method: "get",
-				url: `settings/decryptPass?kata=${this.inputDataLogIn.password}`,
+				url: `settings/decrypt-pass?kata=${this.inputDataLogIn.password}`,
 				authToken: localStorage.getItem('user_token')
 			};
-      this.inputDataLogIn.password = ''
+      this.inputDataLogIn.password = null
 			this.fetchData(payload)
 			.then((res) => {
 				this.inputDataLogIn.password = res.data.result.hasil;

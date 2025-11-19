@@ -32,7 +32,7 @@ const actions = {
         fData.append('file', data.files); //data files
       }
       // axios services
-      let link = data.jenis === 'pdf' || data.jenis === 'image' || data.jenis === 'logo' ? 'settings/updateFile' : 'user/importexcel'
+      let link = data.jenis === 'pdf' || data.jenis === 'image' || data.jenis === 'logo' ? 'settings/update-file' : 'user/importexcel'
       ApiService.postFile(link, fData)
         .then((res) => resolve(res))
         .catch((err) => reject(err))
@@ -44,6 +44,7 @@ const actions = {
       if(data.table === 'Berkas'){
         fData.append('title', data.title); //title
         fData.append('type', data.type); //type
+        fData.append('jenis', data.jenis); //jenis
         fData.append('ext', data.ext); //ext
       }
       fData.append('nama_file', data.nama_file); //nama_file
@@ -51,7 +52,7 @@ const actions = {
       fData.append('folder', data.folder); //table
       fData.append('file', data.files); //data files
       // axios services
-      ApiService.postFile('settings/updateBerkas', fData)
+      ApiService.postFile('settings/update-berkas', fData)
         .then((res) => resolve(res))
         .catch((err) => reject(err))
     });

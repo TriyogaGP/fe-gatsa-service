@@ -10,10 +10,19 @@ module.exports = defineConfig({
         errors: false,
         warnings: false,
         runtimeErrors: false,
-      },
-
-      // or
-      // overlay: true,
+      }
+    }
+  },
+  configureWebpack: {
+    module: {
+      rules: [
+        {
+          test: /\.m?js$/,
+          resolve: {
+            fullySpecified: false // ⬅️ penting untuk ESM Vuetify
+          }
+        }
+      ]
     }
   }
 })

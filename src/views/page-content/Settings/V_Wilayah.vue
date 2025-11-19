@@ -87,7 +87,7 @@
         <tr>
           <td :colspan="columns.length">
             <Button 
-              color-button="#0bd369"
+              color-button="success"
               icon-button="mdi mdi-pencil"
               nama-button="Ubah"
               @proses="bukaDialog(item.raw, 1)"

@@ -21,6 +21,7 @@
     :color="Bcolor"
     :size="Bsize"
     :density="Bmodel"
+    variant="elevated"
     depressed
     class="ma-2 white--text text--darken-2"
     :prepend-icon="BPrependicon"
@@ -30,6 +31,9 @@
     @click="clicked()"
   >
     {{ Bnama }}
+    <template v-slot:loader>
+      <v-progress-circular indeterminate :size="15" />
+    </template>
     <!-- <v-tooltip v-if="BtooltipCondition" activator="parent" :location="BtooltipPosition">{{ Btooltip }}</v-tooltip> -->
   </v-btn>
   <v-btn

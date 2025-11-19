@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="subheading grey--text text-decoration-underline">Data {{ jenis === 'mapel' ? 'Akademis' : 'Koreksi Exam' }} ({{ mapelText }})</h1>
+    <h2 class="subheading grey--text text-decoration-underline">Data {{ jenis === 'mapel' ? 'Akademis' : 'Koreksi Exam' }} ({{ mapelText }})</h2>
     <div v-if="roleID === '1' || roleID === '2' || (roleID === '3' && jenis === 'koreksi')">
       <div class="text-right wadah">
         <span @click="gotolist()" class="link">Data {{ jenis === 'mapel' ? 'Akademis' : 'Koreksi Exam' }}</span>
@@ -84,7 +84,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      kelasSiswa: 'kelas/kelasSiswa',
+      kelasSiswa: 'user/kelasSiswa',
     }),
     mapelText() {
       let pelajaran = this.$route.params.mapel
@@ -133,10 +133,10 @@ export default {
 	},
 	methods: {
 		...mapActions({
-      getKelasSiswa: 'kelas/getKelasSiswa',
+      getKelasSiswa: 'user/getKelasSiswa',
     }),
     gotoDetail(kelas, mapel) {
-      this.$router.push({name: "DataDetailKelasSiswa", params: { kondisi: this.jenis === 'mapel' ? 'penilaian' : 'koreksi', kelas: kelas }, query: { mapel: mapel }});
+      this.$router.push({name: "DataDetailKelasSiswa", params: { kondisi: this.jenis === 'mapel' ? 'penilaian' : 'koreksi', kelas }, query: { mapel }});
     },
     gotolist() {
       this.$router.push(this.jenis === 'mapel' ? {name: "DataAkademis"} : {name: "KoreksiExam"});

@@ -1,6 +1,6 @@
 <template>
   <div>
-		<h1 class="subheading grey--text text-decoration-underline">Panel Hak Akses</h1>
+		<h2 class="subheading grey--text text-decoration-underline">Panel Hak Akses</h2>
 		<v-data-table
 			loading-text="Sedang memuat... Harap tunggu"
 			no-data-text="Tidak ada data yang tersedia"
@@ -12,7 +12,6 @@
 			item-value="idRole"
 			density="comfortable"
 			hide-default-footer
-			hide-default-header
 			class="elavation-3 rounded"
 			:items-per-page="itemsPerPage"
 			@page-count="pageCount = $event"
@@ -28,74 +27,64 @@
 			<template #loader>
 				<LoaderDataTables />
 			</template>
-			<template #[`item.number`]="{ item }">
-				{{ page > 1 ? ((page - 1)*limit) + item.index + 1 : item.index + 1 }}
+			<template #[`item.number`]="{ index }">
+				{{ page > 1 ? ((page - 1)*limit) + index + 1 : index + 1 }}
 			</template>
 			<template #[`item.status`]="{ item }">
-				<v-icon size="small" v-if="item.raw.status == true" color="green" icon="mdi mdi-check" />
-				<v-icon size="small" v-else-if="item.raw.status == false" color="red" icon="mdi mdi-close" />
+				<v-icon size="small" :color="item.status ? 'green' : 'red'" :icon="item.status ? 'mdi mdi-check' : 'mdi mdi-close'" />
 			</template>
 			<template #expanded-row="{ columns, item }">
 				<tr>
 					<td :colspan="columns.length">
 						<Button 
-							color-button="#0bd369"
+							color-button="success"
 							icon-prepend-button="mdi mdi-pencil"
 							nama-button="Ubah"
-							@proses="bukaDialog(item.raw, 1)"
+							size-button="x-small"
+							@proses="bukaDialog(item, 1)"
 						/>
 						<Button 
-							color-button="#0bd369"
-							:icon-prepend-button="item.raw.status === false ? 'mdi mdi-eye' : 'mdi mdi-eye-off'"
-							:nama-button="item.raw.status === false ? 'Active' : 'Non Active'"
-							@proses="postRecord(item.raw, 'STATUSRECORD', !item.raw.status)"
+							color-button="success"
+							size-button="x-small"
+							:icon-prepend-button="!item.status ? 'mdi mdi-eye' : 'mdi mdi-eye-off'"
+							:nama-button="!item.status ? 'Active' : 'Non Active'"
+							@proses="postRecord(item, 'STATUSRECORD', !item.status)"
 						/>
 						<!-- <Button 
 							color-button="#bd3a07"
 							icon-prepend-button="mdi mdi-delete"
 							nama-button="Hapus"
-							@proses="postRecord(item.raw, 'DELETE', null)"
+							@proses="postRecord(item, 'DELETE', null)"
 						/> -->
 					</td>
 				</tr>
 			</template>
 			<template #top>
 				<v-row no-gutters class="pa-2">
-					<v-col cols="12" md="6">
+					<v-col cols="12" md="6" class="d-flex align-center">
 						<Button 
 							color-button="light-blue darken-3"
 							icon-prepend-button="mdi mdi-plus-thick"
 							nama-button="Tambah"
+							size-button="x-small"
 							@proses="bukaDialog(null, 0)"
 						/>
 					</v-col>
 					<v-col cols="12" md="6">
-						<v-row no-gutters>
-							<v-col cols="12" md="9">
-								<TextField
-									v-model="searchData"
-									icon-prepend-tf="mdi mdi-magnify"
-									label-tf="Pencarian..."
-									:clearable-tf="true"
-									@click:clear="() => {
-										page = 1
-										getRole({page: 1, limit: limit, keyword: ''})
-									}"
-									@keyup.enter="() => {
-										page = 1
-										getRole({page: 1, limit: limit, keyword: searchData})
-									}"
-								/>
-							</v-col>
-							<v-col cols="12" md="3" class="pl-2 d-flex justify-end align-center">
-								<Autocomplete
-									v-model="page"
-									:data-a="pageOptions"
-									label-a="Page"
-									:disabled-a="DataHakAkses.length ? false : true"
-								/>
-							</v-col>
-						</v-row>
+						<TextField
+							v-model="searchData"
+							icon-prepend-tf="mdi mdi-magnify"
+							label-tf="Pencarian..."
+							:clearable-tf="true"
+							@click:clear="() => {
+								page = 1
+								getRole({page: 1, limit: limit, keyword: ''})
+							}"
+							@keyup.enter="() => {
+								page = 1
+								getRole({page: 1, limit: limit, keyword: searchData})
+							}"
+						/>
 					</v-col>
 				</v-row>
 				<v-divider :thickness="2" class="border-opacity-100" color="white" />
@@ -104,7 +93,17 @@
 				<v-divider :thickness="2" class="border-opacity-100" color="white" />
 				<v-row no-gutters>
 					<v-col cols="12" lg="10" class="pa-2 d-flex justify-start align-center">
-						<span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
+						<!-- <span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span> -->
+						<span style="font-size: 10pt;">Halaman</span>
+						<div style="width: 100px; margin-left: 3px; margin-right: 3px;">
+							<Autocomplete
+								v-model="page"
+								:data-a="pageOptions"
+								label-a="Page"
+								:disabled-a="DataHakAkses.length ? false : true"
+							/>
+						</div>
+						<span style="font-size: 10pt;">dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
 					</v-col>
 					<v-col cols="12" lg="2" class="pa-2 text-right">
 						<div class="d-flex justify-start align-center">
@@ -119,7 +118,7 @@
 								variant="plain"
 								size-button="large"
 								model-button="comfortable"
-								color-button="#ffffff"
+								color-button="success"
 								icon-button="mdi mdi-arrow-left-circle-outline"
 								:disabled-button="DataHakAkses.length ? pageSummary.page != 1 ? false : true : true"
 								@proses="() => { page = pageSummary.page - 1 }"
@@ -128,7 +127,7 @@
 								variant="plain"
 								size-button="large"
 								model-button="comfortable"
-								color-button="#ffffff"
+								color-button="success"
 								icon-button="mdi mdi-arrow-right-circle-outline"
 								:disabled-button="DataHakAkses.length ? pageSummary.page != pageSummary.totalPages ? false : true : true"
 								@proses="() => { page = pageSummary.page + 1 }"
@@ -194,14 +193,14 @@
 						>
 							<Button 
 								v-if="editedIndex == 0"
-								color-button="black"
+								color-button="info"
 								nama-button="Simpan Data"
 								:disabled-button="kondisiTombol"
 								@proses="postRecord(null, 'ADD', null)"
 							/>
 							<Button 
 								v-if="editedIndex == 1"
-								color-button="black"
+								color-button="info"
 								nama-button="Ubah Data"
 								:disabled-button="kondisiTombol"
 								@proses="postRecord(null, 'EDIT', null)"
@@ -380,10 +379,10 @@ export default {
 			this.DialogRole = false
 		},
 		clickrow(event, data) {
-      const index = this.$data.expanded.find(i => i === data?.item?.raw?.idRole);
+      const index = this.$data.expanded.find(i => i === data?.item?.idRole);
       if(typeof index === 'undefined') return this.$data.expanded = [];
       this.$data.expanded.splice(0, 1)
-      this.$data.expanded.push(data?.item?.raw?.idRole);
+      this.$data.expanded.push(data?.item?.idRole);
     },
 		notifikasi(kode, text, proses){
       this.dialogNotifikasi = true

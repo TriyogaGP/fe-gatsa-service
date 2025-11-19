@@ -1,20 +1,20 @@
 <template>
   <div>
-    <h1 class="subheading grey--text text-decoration-underline">Formulir SiswaSiswi</h1>
+    <h2 class="subheading grey--text text-decoration-underline">Formulir SiswaSiswi</h2>
     <div class="text-right wadah">
       <span class="link" @click="gotolist()">Data Siswa Siswi</span>
       <v-icon size="small" class="iconstyle" icon="mdi mdi-menu-right" />
       <span>Formulir SiswaSiswi</span>
     </div>
-    <v-stepper v-model="stepperVal">
-      <v-stepper-header>
+    <v-stepper alt-labels v-model="stepperVal">
+      <v-stepper-header style="color: #272727; font-size: 10pt; font-weight: bold;">
         <v-stepper-item
           :complete="stepperVal > 1"
           title="Data Log in"
           :value="1"
         ></v-stepper-item>
 
-        <v-divider></v-divider>
+        <v-divider style="border: solid 1px #272727;" />
 
         <v-stepper-item
           :complete="stepperVal > 2"
@@ -22,13 +22,15 @@
           :value="2"
         ></v-stepper-item>
 
-        <v-divider></v-divider>
-
+        <v-divider style="border: solid 1px #272727;" />
+        
         <v-stepper-item
-          :complete="stepperVal > 3"
-          title="Data Sekolah Sebelumnya"
-          :value="3"
+        :complete="stepperVal > 3"
+        title="Data Sekolah Sebelumnya"
+        :value="3"
         ></v-stepper-item>
+
+        <v-divider style="border: solid 1px #272727;" />
 
         <v-stepper-item
           :complete="stepperVal > 4"
@@ -36,7 +38,7 @@
           :value="4"
         ></v-stepper-item>
 
-        <v-divider></v-divider>
+        <v-divider style="border: solid 1px #272727;" />
 
         <v-stepper-item
           title="Preview Formulir"
@@ -117,74 +119,74 @@ export default {
     steps: 5,
     lazyStep2: false,
     tampungStepOne: {
-      id_user: '',
-      nama_lengkap: '',
-      username: '',
-      email: '',
-      password: '',
+      id_user: null,
+      nama_lengkap: null,
+      username: null,
+      email: null,
+      password: null,
     },
     tampungStepTwo: {
-      id_user: '',
-      nik_siswa: '',
-      nomor_induk: '',
-      tempat: '',
-      tanggal_lahir: '',
+      id_user: null,
+      nik_siswa: null,
+      nomor_induk: null,
+      tempat: null,
+      tanggal_lahir: null,
       jenis_kelamin: null,
       agama: null,
-      anakke: '',
-      jumlah_saudara: '',
+      anakke: null,
+      jumlah_saudara: null,
       hobi: null,
       cita_cita: null,
       kelas: null,
     },
     tampungStepThree: {
-      id_user: '',
+      id_user: null,
       jenjang: null,
       status_sekolah: null,
-      nama_sekolah: '',
-      npsn: '',
-      alamat_sekolah: '',
+      nama_sekolah: null,
+      npsn: null,
+      alamat_sekolah: null,
       kabkot_sekolah: null,
-      no_peserta_un: '',
-      no_skhun: '',
-      no_ijazah: '',
-      nilai_un: '',
+      no_peserta_un: null,
+      no_skhun: null,
+      no_ijazah: null,
+      nilai_un: null,
     },
     tampungStepFour: {
-      id_user: '',
-      no_kk: '',
-      nama_kk: '',
-      nama_ayah: '',
+      id_user: null,
+      no_kk: null,
+      nama_kk: null,
+      nama_ayah: null,
       tahun_ayah: null,
       status_ayah: null,
-      nik_ayah: '',
+      nik_ayah: null,
       pendidikan_ayah: null,
       pekerjaan_ayah: null,
-      telp_ayah: '',
-      nama_ibu: '',
+      telp_ayah: null,
+      nama_ibu: null,
       tahun_ibu: null,
       status_ibu: null,
-      nik_ibu: '',
+      nik_ibu: null,
       pendidikan_ibu: null,
       pekerjaan_ibu: null,
-      telp_ibu: '',
-      nama_wali: '',
+      telp_ibu: null,
+      nama_wali: null,
       tahun_wali: null,
-      nik_wali: '',
+      nik_wali: null,
       pendidikan_wali: null,
       pekerjaan_wali: null,
-      telp_wali: '',
+      telp_wali: null,
       penghasilan: null,
       status_tempat_tinggal: null,
       jarak_rumah: null,
       transportasi: null,
-      telp: '',
-      alamat: '',
+      telp: null,
+      alamat: null,
       provinsi: null,
       kabkota: null,
       kecamatan: null,
       kelurahan: null,
-      kode_pos: '',
+      kode_pos: null,
     },
   }),
   setup() {
@@ -218,80 +220,80 @@ export default {
       handler(value) {
         if(this.stepperVal === 1){
           this.tampungStepOne = {
-            id_user: value.idUser ? value.idUser : '',
-            nama_lengkap: value.nama ? value.nama : '',
-            username: value.username ? value.username : '',
-            email: value.email ? value.email : '',
-            password: value.kataSandi ? value.kataSandi : '',
+            id_user: value?.idUser,
+            nama_lengkap: value?.nama,
+            username: value?.username,
+            email: value?.email,
+            password: value?.kataSandi,
           }
         }
         if(this.stepperVal === 2){
           this.tampungStepTwo = {
-            id_user: value.idUser ? value.idUser : '',
-            nik_siswa: value.nikSiswa ? value.nikSiswa : '',
-            nomor_induk: value.nomorInduk ? value.nomorInduk : '',
-            tempat: value.tempat ? value.tempat : '',
-            tanggal_lahir: value.tanggalLahir ? value.tanggalLahir : '',
-            jenis_kelamin: value.jenisKelamin ? value.jenisKelamin : null,
-            agama: value.agama ? value.agama : null,
-            anakke: value.anakKe ? value.anakKe : '',
-            jumlah_saudara: value.jumlahSaudara ? value.jumlahSaudara : '',
-            hobi: value.hobi ? value.hobi : null,
-            cita_cita: value.citaCita ? value.citaCita : null,
-            kelas: value.kelas ? value.kelas : null,
+            id_user: value?.idUser,
+            nik_siswa: value?.nikSiswa,
+            nomor_induk: value?.nomorInduk,
+            tempat: value?.tempat,
+            tanggal_lahir: value?.tanggalLahir,
+            jenis_kelamin: value?.jenisKelamin,
+            agama: value?.agama?.value,
+            anakke: value?.anakKe,
+            jumlah_saudara: value?.jumlahSaudara,
+            hobi: value?.hobi?.value,
+            cita_cita: value?.citaCita?.value,
+            kelas: value?.kelas,
           }
         }
         if(this.stepperVal === 3){
           this.tampungStepThree = {
-            id_user: value.idUser ? value.idUser : '',
-            jenjang: value.dataSekolahSebelumnya.jenjang ? value.dataSekolahSebelumnya.jenjang : null,
-            status_sekolah: value.dataSekolahSebelumnya.statusSekolah ? value.dataSekolahSebelumnya.statusSekolah : null,
-            nama_sekolah: value.dataSekolahSebelumnya.namaSekolah ? value.dataSekolahSebelumnya.namaSekolah : '',
-            npsn: value.dataSekolahSebelumnya.npsn ? value.dataSekolahSebelumnya.npsn : '',
-            alamat_sekolah: value.dataSekolahSebelumnya.alamatSekolah ? value.dataSekolahSebelumnya.alamatSekolah : '',
-            kabkot_sekolah: value.dataSekolahSebelumnya.kabkotSekolah ? value.dataSekolahSebelumnya.kabkotSekolah : null,
-            no_peserta_un: value.dataSekolahSebelumnya.noPesertaUN ? value.dataSekolahSebelumnya.noPesertaUN : '',
-            no_skhun: value.dataSekolahSebelumnya.noSKHUN ? value.dataSekolahSebelumnya.noSKHUN : '',
-            no_ijazah: value.dataSekolahSebelumnya.noIjazah ? value.dataSekolahSebelumnya.noIjazah : '',
-            nilai_un: value.dataSekolahSebelumnya.nilaiUN ? value.dataSekolahSebelumnya.nilaiUN : '',
+            id_user: value?.idUser,
+            jenjang: value?.dataSekolahSebelumnya?.jenjang?.value,
+            status_sekolah: value?.dataSekolahSebelumnya?.statusSekolah?.value,
+            nama_sekolah: value?.dataSekolahSebelumnya?.namaSekolah,
+            npsn: value?.dataSekolahSebelumnya?.npsn,
+            alamat_sekolah: value?.dataSekolahSebelumnya?.alamatSekolah,
+            kabkot_sekolah: value?.dataSekolahSebelumnya?.kabkotSekolah?.kode,
+            no_peserta_un: value?.dataSekolahSebelumnya?.noPesertaUN,
+            no_skhun: value?.dataSekolahSebelumnya?.noSKHUN,
+            no_ijazah: value?.dataSekolahSebelumnya?.noIjazah,
+            nilai_un: value?.dataSekolahSebelumnya?.nilaiUN,
           }
         }
         if(this.stepperVal === 4){
           this.tampungStepFour = {
-            id_user: value.idUser ? value.idUser : '',
-            no_kk: value.noKK ? value.noKK : '',
-            nama_kk: value.namaKK ? value.namaKK : '',
-            nama_ayah: value.dataOrangtua.dataAyah.namaAyah ? value.dataOrangtua.dataAyah.namaAyah : '',
-            tahun_ayah: value.dataOrangtua.dataAyah.tahunAyah ? value.dataOrangtua.dataAyah.tahunAyah : null,
-            status_ayah: value.dataOrangtua.dataAyah.statusAyah ? value.dataOrangtua.dataAyah.statusAyah : null,
-            nik_ayah: value.dataOrangtua.dataAyah.nikAyah ? value.dataOrangtua.dataAyah.nikAyah : '',
-            pendidikan_ayah: value.dataOrangtua.dataAyah.pendidikanAyah ? value.dataOrangtua.dataAyah.pendidikanAyah : null,
-            pekerjaan_ayah: value.dataOrangtua.dataAyah.pekerjaanAyah ? value.dataOrangtua.dataAyah.pekerjaanAyah : null,
-            telp_ayah: value.dataOrangtua.dataAyah.telpAyah ? value.dataOrangtua.dataAyah.telpAyah : '',
-            nama_ibu: value.dataOrangtua.dataIbu.namaIbu ? value.dataOrangtua.dataIbu.namaIbu : '',
-            tahun_ibu: value.dataOrangtua.dataIbu.tahunIbu ? value.dataOrangtua.dataIbu.tahunIbu : null,
-            status_ibu: value.dataOrangtua.dataIbu.statusIbu ? value.dataOrangtua.dataIbu.statusIbu : null,
-            nik_ibu: value.dataOrangtua.dataIbu.nikIbu ? value.dataOrangtua.dataIbu.nikIbu : '',
-            pendidikan_ibu: value.dataOrangtua.dataIbu.pendidikanIbu ? value.dataOrangtua.dataIbu.pendidikanIbu : null,
-            pekerjaan_ibu: value.dataOrangtua.dataIbu.pekerjaanIbu ? value.dataOrangtua.dataIbu.pekerjaanIbu : null,
-            telp_ibu: value.dataOrangtua.dataIbu.telpIbu ? value.dataOrangtua.dataIbu.telpIbu : '',
-            nama_wali: value.dataOrangtua.dataWali.namaWali ? value.dataOrangtua.dataWali.namaWali : '',
-            tahun_wali: value.dataOrangtua.dataWali.tahunWali ? value.dataOrangtua.dataWali.tahunWali : null,
-            nik_wali: value.dataOrangtua.dataWali.nikWali ? value.dataOrangtua.dataWali.nikWali : '',
-            pendidikan_wali: value.dataOrangtua.dataWali.pendidikanWali ? value.dataOrangtua.dataWali.pendidikanWali : null,
-            pekerjaan_wali: value.dataOrangtua.dataWali.pekerjaanWali ? value.dataOrangtua.dataWali.pekerjaanWali : null,
-            telp_wali: value.dataOrangtua.dataWali.telpWali ? value.dataOrangtua.dataWali.telpWali : '',
-            penghasilan: value.penghasilan ? value.penghasilan : null,
-            status_tempat_tinggal: value.dataLainnya.statusTempatTinggal ? value.dataLainnya.statusTempatTinggal : null,
-            jarak_rumah: value.dataLainnya.jarakRumah ? value.dataLainnya.jarakRumah : null,
-            transportasi: value.dataLainnya.transportasi ? value.dataLainnya.transportasi : null,
-            telp: value.dataAlamatOrangtua.telp ? value.dataAlamatOrangtua.telp : '',
-            alamat: value.dataAlamatOrangtua.alamat ? value.dataAlamatOrangtua.alamat : '',
-            provinsi: value.dataAlamatOrangtua.provinsi ? value.dataAlamatOrangtua.provinsi : null,
-            kabkota: value.dataAlamatOrangtua.kabKota ? value.dataAlamatOrangtua.kabKota : null,
-            kecamatan: value.dataAlamatOrangtua.kecamatan ? value.dataAlamatOrangtua.kecamatan : null,
-            kelurahan: value.dataAlamatOrangtua.kelurahan ? value.dataAlamatOrangtua.kelurahan : null,
-            kode_pos: value.dataAlamatOrangtua.kodePos ? value.dataAlamatOrangtua.kodePos : '',
+            id_user: value?.idUser,
+            no_kk: value?.noKK,
+            nama_kk: value?.namaKK,
+            nama_ayah: value?.dataOrangtua?.dataAyah?.namaAyah,
+            tahun_ayah: value?.dataOrangtua?.dataAyah?.tahunAyah,
+            status_ayah: value?.dataOrangtua?.dataAyah?.statusAyah?.value,
+            nik_ayah: value?.dataOrangtua?.dataAyah?.nikAyah,
+            pendidikan_ayah: value?.dataOrangtua?.dataAyah?.pendidikanAyah?.value,
+            pekerjaan_ayah: value?.dataOrangtua?.dataAyah?.pekerjaanAyah?.value,
+            telp_ayah: value?.dataOrangtua?.dataAyah?.telpAyah,
+            nama_ibu: value?.dataOrangtua?.dataIbu?.namaIbu,
+            tahun_ibu: value?.dataOrangtua?.dataIbu?.tahunIbu,
+            status_ibu: value?.dataOrangtua?.dataIbu?.statusIbu?.value,
+            nik_ibu: value?.dataOrangtua?.dataIbu?.nikIbu,
+            pendidikan_ibu: value?.dataOrangtua?.dataIbu?.pendidikanIbu?.value,
+            pekerjaan_ibu: value?.dataOrangtua?.dataIbu?.pekerjaanIbu?.value,
+            telp_ibu: value?.dataOrangtua?.dataIbu?.telpIbu,
+            nama_wali: value?.dataOrangtua?.dataWali?.namaWali,
+            tahun_wali: value?.dataOrangtua?.dataWali?.tahunWali,
+            nik_wali: value?.dataOrangtua?.dataWali?.nikWali,
+            pendidikan_wali: value?.dataOrangtua?.dataWali?.pendidikanWali?.value,
+            pekerjaan_wali: value?.dataOrangtua?.dataWali?.pekerjaanWali?.value,
+            telp_wali: value?.dataOrangtua?.dataWali?.telpWali,
+            penghasilan: value?.penghasilan?.value,
+            status_tempat_tinggal: value?.dataLainnya?.statusTempatTinggal?.value,
+            jarak_rumah: value?.dataLainnya?.jarakRumah?.value,
+            transportasi: value?.dataLainnya?.transportasi?.value,
+            telp: value?.dataAlamatOrangtua?.telp,
+            alamat: value?.dataAlamatOrangtua?.alamat,
+            provinsi: value?.dataAlamatOrangtua?.provinsi?.kode,
+            kabkota: value?.dataAlamatOrangtua?.kabKota?.kode,
+            kecamatan: value?.dataAlamatOrangtua?.kecamatan?.kode,
+            kelurahan: value?.dataAlamatOrangtua?.kelurahan?.kode,
+            kode_pos: value?.dataAlamatOrangtua?.kodePos,
           }
         }
       },

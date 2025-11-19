@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="subheading grey--text text-decoration-underline">Data Akademis</h1>
+    <h2 class="subheading grey--text text-decoration-underline">Data Akademis</h2>
     <v-card class="pa-1 rounded" variant="outlined" elevation="4">
       <v-row no-gutters>
         <v-col cols="12" md="8" />
@@ -28,7 +28,7 @@
             cols="12"
             lg="4"
           >
-            <v-card color="white" style="border: 2px solid #000;" @click="roleID === '1' || roleID === '2' ? gotoDetail(hasil.link) : openDetail(hasil.kode, hasil.link)">
+            <v-card color="white" style="border: 2px solid #000;" @click="roleID === '1' || roleID === '2' ? gotoDetail(hasil.link) : openDetail(hasil.value, hasil.link)">
               <v-sheet color="green" class="sheetData" elevation="2">
                 <v-icon icon="mdi mdi-book-education" size="large" />
                 <v-card-title class="text-white" style="font-weight: bold; font-size: 15px; margin-left: 5px;">Mata Pelajaran</v-card-title>
@@ -80,7 +80,7 @@
               md="8"
               class="pt-2 font-weight-bold"
             >
-              : {{ dataSiswaSiswi ? uppercaseLetterFirst2(dataSiswaSiswi.dataPenilaian.namaGuru) : '' }}
+              : {{ uppercaseLetterFirst2(dataSiswaSiswi?.dataPenilaian?.namaGuru || '') }}
             </v-col>
           </v-row>
           <v-row no-gutters>
@@ -112,7 +112,7 @@
               md="8"
               class="pt-2 font-weight-bold"
             >
-              : {{ dataSiswaSiswi ? uppercaseLetterFirst2(dataSiswaSiswi.semester) : '' }}
+              : {{ uppercaseLetterFirst2(dataSiswaSiswi?.semester || '') }}
             </v-col>
           </v-row>
           <v-row no-gutters>
@@ -144,7 +144,7 @@
               md="8"
               class="pt-2 font-weight-bold"
             >
-              : {{ dataSiswaSiswi ? dataSiswaSiswi.dataPenilaian.kkm : '' }}
+              : {{ dataSiswaSiswi?.dataPenilaian?.kkm || '' }}
             </v-col>
           </v-row>
           <table dark class="mb-2">
@@ -156,70 +156,25 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td style="font-weight: bold;">Tugas 1</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataNilai.tugas1 : '' }}</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataNilai.tugas1 === 0 ? 'Nol' : setPembilang.pembilang(dataSiswaSiswi.dataNilai.tugas1) : '' }}</td>
-              </tr>
-              <tr>
-                <td style="font-weight: bold;">Tugas 2</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataNilai.tugas2 : '' }}</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataNilai.tugas2 === 0 ? 'Nol' : setPembilang.pembilang(dataSiswaSiswi.dataNilai.tugas2) : '' }}</td>
-              </tr>
-              <tr>
-                <td style="font-weight: bold;">Tugas 3</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataNilai.tugas3 : '' }}</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataNilai.tugas3 === 0 ? 'Nol' : setPembilang.pembilang(dataSiswaSiswi.dataNilai.tugas3) : '' }}</td>
-              </tr>
-              <tr>
-                <td style="font-weight: bold;">Tugas 4</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataNilai.tugas4 : '' }}</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataNilai.tugas4 === 0 ? 'Nol' : setPembilang.pembilang(dataSiswaSiswi.dataNilai.tugas4) : '' }}</td>
-              </tr>
-              <tr>
-                <td style="font-weight: bold;">Tugas 5</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataNilai.tugas5 : '' }}</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataNilai.tugas5 === 0 ? 'Nol' : setPembilang.pembilang(dataSiswaSiswi.dataNilai.tugas5) : '' }}</td>
-              </tr>
-              <tr>
-                <td style="font-weight: bold;">Tugas 6</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataNilai.tugas6 : '' }}</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataNilai.tugas6 === 0 ? 'Nol' : setPembilang.pembilang(dataSiswaSiswi.dataNilai.tugas6) : '' }}</td>
-              </tr>
-              <tr>
-                <td style="font-weight: bold;">Tugas 7</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataNilai.tugas7 : '' }}</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataNilai.tugas7 === 0 ? 'Nol' : setPembilang.pembilang(dataSiswaSiswi.dataNilai.tugas7) : '' }}</td>
-              </tr>
-              <tr>
-                <td style="font-weight: bold;">Tugas 8</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataNilai.tugas8 : '' }}</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataNilai.tugas8 === 0 ? 'Nol' : setPembilang.pembilang(dataSiswaSiswi.dataNilai.tugas8) : '' }}</td>
-              </tr>
-              <tr>
-                <td style="font-weight: bold;">Tugas 9</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataNilai.tugas9 : '' }}</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataNilai.tugas9 === 0 ? 'Nol' : setPembilang.pembilang(dataSiswaSiswi.dataNilai.tugas9) : '' }}</td>
-              </tr>
-              <tr>
-                <td style="font-weight: bold;">Tugas 10</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataNilai.tugas10 : '' }}</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataNilai.tugas10 === 0 ? 'Nol' : setPembilang.pembilang(dataSiswaSiswi.dataNilai.tugas10) : '' }}</td>
+              <tr v-for="(item, index) in daftarTugas" :key="index">
+                <td style="font-weight: bold;">{{ item.nama }}</td>
+                <td class="text-center">{{ item.nilai }}</td>
+                <td class="text-center">{{ setPembilang.pembilang(item.nilai || 'Nol') || 'Nol' }}</td>
               </tr>
               <tr>
                 <td style="font-weight: bold;">Ujian Tengah Semester</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataNilai.uts : '' }}</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataNilai.uts === 0 ? 'Nol' : setPembilang.pembilang(dataSiswaSiswi.dataNilai.uts) : '' }}</td>
+                <td class="text-center">{{ dataSiswaSiswi?.dataNilai?.uts || 0 }}</td>
+                <td class="text-center">{{ setPembilang.pembilang(dataSiswaSiswi?.dataNilai?.uts || 'Nol') || 'Nol' }}</td>
               </tr>
               <tr>
                 <td style="font-weight: bold;">Ujian Akhir Semester</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataNilai.uas : '' }}</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataNilai.uas === 0 ? 'Nol' : setPembilang.pembilang(dataSiswaSiswi.dataNilai.uas) : '' }}</td>
+                <td class="text-center">{{ dataSiswaSiswi?.dataNilai?.uas || 0 }}</td>
+                <td class="text-center">{{ setPembilang.pembilang(dataSiswaSiswi?.dataNilai?.uas || 'Nol') || 'Nol' }} </td>
               </tr>
               <tr>
                 <td class="text-right" style="font-weight: bold;">Nilai Akhir</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.rataRataNilai : '' }}</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.rataRataNilai === 0 ? 'Nol' : setPembilang.pembilang(dataSiswaSiswi.rataRataNilai) : '' }}</td>
+                <td class="text-center">{{ dataSiswaSiswi?.rataRataNilai || 0 }}</td>
+                <td class="text-center">{{ setPembilang.pembilang(dataSiswaSiswi?.rataRataNilai || 'Nol') || 'Nol' }}</td>
               </tr>
             </tbody>
           </table>
@@ -233,15 +188,15 @@
             <tbody>
               <tr>
                 <td style="font-weight: bold;">Sakit</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataKehadiran.sakit : '' }}</td>
+                <td class="text-center">{{ dataSiswaSiswi?.dataKehadiran?.sakit || 0 }}</td>
               </tr>
               <tr>
                 <td style="font-weight: bold;">Ijin</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataKehadiran.ijin : '' }}</td>
+                <td class="text-center">{{ dataSiswaSiswi?.dataKehadiran?.ijin || 0 }}</td>
               </tr>
               <tr>
                 <td style="font-weight: bold;">Tanpa Keterangan</td>
-                <td class="text-center">{{ dataSiswaSiswi ? dataSiswaSiswi.dataKehadiran.alfa : '' }}</td>
+                <td class="text-center">{{ dataSiswaSiswi?.dataKehadiran?.alfa || 0 }}</td>
               </tr>
             </tbody>
           </table>
@@ -250,6 +205,16 @@
         <v-card-actions />
       </v-card>
     </v-dialog>
+    <v-overlay v-model="isLoading" persistent class="align-center justify-center">
+      <div style="width: 550px;">
+        <v-progress-linear
+          class="pa-3"
+          indeterminate
+          color="black darken-3"
+        />
+        <h4 style="color: #FFF; text-align: center; background-color: #272727;">Sedang proses pengambilan data, harap menunggu ...</h4>
+      </div>
+    </v-overlay>
     <v-dialog
       v-model="dialogNotifikasi"
       transition="dialog-bottom-transition"
@@ -280,6 +245,7 @@ export default {
     idLogin: '',
     kelas: '',
     mapel: '',
+    isLoading: false,
     DialogSiswaSiswi: false,
     dataSiswaSiswi: '',
     searchData: '',
@@ -302,7 +268,6 @@ export default {
   },
   computed: {
     ...mapState({
-      // mengajar: store => store.setting.mengajarOptions,
     }),
     ...mapGetters({
       cmssettings: 'setting/cmssettings',
@@ -315,13 +280,21 @@ export default {
     DataNilai(){
       return this.nilai ? this.nilai : null
     },
-    // mengajarOptions(){
-    //   let result = []
-    //   this.mengajar.map(str => {
-    //     result.push({ label: str.label, link: str.label.replace(' ', '-') })
-    //   })
-		// 	return result
-		// },
+    daftarTugas() {
+      if (!this.dataSiswaSiswi || !this.dataSiswaSiswi.dataNilai) return [];
+
+      const nilai = this.dataSiswaSiswi.dataNilai;
+      const jumlah = this.DataNilai.jumlahTugas || 0; // misalnya 2
+
+      // Ambil hanya tugas1 sampai tugasN
+      return Array.from({ length: jumlah }, (_, i) => {
+        const key = `tugas${i + 1}`;
+        return {
+          nama: `Tugas ${i + 1}`,
+          nilai: nilai[key]
+        };
+      });
+    },
   },
   watch: {
     siswasiswiBy: {
@@ -376,27 +349,32 @@ export default {
       getSiswaSiswibyUID: 'user/getSiswaSiswibyUID',
       getNilai: 'user/getNilai',
       getCMSSettings: 'setting/getCMSSettings',
-      getMengajar: 'setting/getMengajar',
+      // getMengajar: 'setting/getMengajar',
+			getDataMaster: 'setting/getDataMaster',
     }),
     openDetail(kode, mapel) {
-      this.mapel = mapel.replace('-', ' ')
-      this.getCMSSettings()
-      this.getNilai({idUser: this.idLogin, kelas: this.kelas, mapel: kode})
-      this.getSiswaSiswibyUID({uid: this.idLogin, mapel: kode})
-      this.DialogSiswaSiswi = true
+      this.isLoading = true
+      setTimeout(() => {
+        this.mapel = mapel.replace('-', ' ')
+        this.getCMSSettings()
+        this.getNilai({idUser: this.idLogin, kelas: this.kelas, mapel: kode})
+        this.getSiswaSiswibyUID({uid: this.idLogin, mapel: kode})
+        this.DialogSiswaSiswi = true
+        this.isLoading = false
+      }, 3000)
     },
     pencarianData(searchData){
       this.mengajarOptions = []
-      this.getMengajar().then((res) => {
+		  this.getDataMaster({ kode: 'mengajar' }).then((res) => {
 				let result = res.data.result;
         if(searchData === ''){
           result.map(str => {
-            this.mengajarOptions.push({ label: str.label, link: str.label.replace(' ', '-'), kode: str.kode })
+            this.mengajarOptions.push({ ...str, link: str.label.replace(' ', '-') })
           })
         }else{
           result.map(str => {
             let search = new RegExp(searchData , 'i');
-            if(search.test(str.label)) return this.mengajarOptions.push({ label: str.label, link: str.label.replace(' ', '-'), kode: str.kode })
+            if(search.test(str.label)) return this.mengajarOptions.push({ ...str, link: str.label.replace(' ', '-') })
           })
         }
 			})

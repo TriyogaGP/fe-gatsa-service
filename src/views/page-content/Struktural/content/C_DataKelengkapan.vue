@@ -18,8 +18,10 @@
 					<TextField
 						v-model="inputDataKelengkapan.nomor_induk"
 						label-tf="Nomor Induk"
-						@keypress="onlyNumber($event, 25, inputDataKelengkapan.nomor_induk)"
+						formatrulesTf="text"
+						:rules-tf="inputDataKelengkapan.nomor_induk != '' ? true : false"
 						:clearable-tf="true"
+						@keypress="onlyNumber($event, 25, inputDataKelengkapan.nomor_induk)"
 					/>
 				</v-col>
 			</v-row>
@@ -40,8 +42,9 @@
 						v-model="inputDataKelengkapan.pendidikan_guru"
 						:data-a="pendidikanOptions"
 						item-title="label"
-						item-value="kode"
+						item-value="value"
 						label-a="Pendidikan Struktural"
+						:rules-a="inputDataKelengkapan.pendidikan_guru != '' ? true : false"
 						:clearable-a="true"
 					/>
 				</v-col>
@@ -63,7 +66,7 @@
 						v-model="inputDataKelengkapan.jabatan_guru"
 						:data-a="jabatanOptions"
 						item-title="label"
-						item-value="kode"
+						item-value="value"
 						label-a="Jabatan Struktural"
 						multiple
 						chips
@@ -89,7 +92,7 @@
 						v-model="inputDataKelengkapan.mengajar_bidang"
 						:data-a="mengajarOptions"
 						item-title="label"
-						item-value="kode"
+						item-value="value"
 						label-a="Mengajar Bidang"
 						multiple
 						chips
@@ -140,7 +143,6 @@
 					<Autocomplete
 						v-model="inputDataKelengkapan.wali_kelas"
 						:data-a="kelasUseOptions"
-						item-disabled="disabled"
 						item-title="kelas"
 						item-value="kelas"
 						label-a="Wali Kelas"
@@ -199,8 +201,8 @@ export default {
   },
   data: () => ({
 		inputDataKelengkapan: {
-      id_user: '',
-      nomor_induk: '',
+      id_user: null,
+      nomor_induk: null,
       pendidikan_guru: null,
       jabatan_guru: null,
       mengajar_bidang: null,
@@ -229,14 +231,13 @@ export default {
 		inputDataKelengkapan:{
 			deep: true,
 			handler(value) {
-				console.log(value.jabatan_guru);
 				if(value.jabatan_guru !== null && value.jabatan_guru.length === 0){
 					this.inputDataKelengkapan.wali_kelas = null
 					this.kondisiJabatan = true
 				}
 
 				if(value.jabatan_guru !== null){
-					let jabatan = value.jabatan_guru.includes(7)
+					let jabatan = value.jabatan_guru.includes('7')
 					if(jabatan){
 						this.kondisiJabatan = false
 					}else{
@@ -244,27 +245,26 @@ export default {
 						this.kondisiJabatan = true
 					}
 				}
-				// && value.jabatan_guru != null && value.mengajar_bidang != null && value.mengajar_kelas != null
-				if(value.nomor_induk != '' && value.pendidikan_guru != null){
+				if(value.nomor_induk != null && value.pendidikan_guru != null){
 					this.kondisiTombol = false
 				}else{
 					this.kondisiTombol = true
 				}
+				
 				localStorage.setItem('stepThree', JSON.stringify(this.inputDataKelengkapan))
-				// this.wadahInput()
 			}
 		},
 		dataStepThree: {
 			deep: true,
 			handler(value) {
 				this.inputDataKelengkapan = {
-					id_user: value.id_user ? value.id_user : null,
-					nomor_induk: value.nomor_induk ? value.nomor_induk : null,
-					pendidikan_guru: value.pendidikan_guru ? value.pendidikan_guru.kode : null,
-					jabatan_guru: value.jabatan_guru ? value.jabatan_guru : null,
-					mengajar_bidang: value.mengajar_bidang ? value.mengajar_bidang : null,
-					mengajar_kelas: value.mengajar_kelas ? value.mengajar_kelas.split(', ') : null,
-					wali_kelas: value.wali_kelas ? value.wali_kelas : null,
+					id_user: value?.id_user,
+					nomor_induk: value?.nomor_induk,
+					pendidikan_guru: value?.pendidikan_guru,
+					jabatan_guru: value?.jabatan_guru,
+					mengajar_bidang: value?.mengajar_bidang,
+					mengajar_kelas: value?.mengajar_kelas,
+					wali_kelas: value?.wali_kelas,
 				}
 				if(this.inputDataKelengkapan.wali_kelas){
 					this.getKelas({ kondisi: 'Use', walikelas: this.inputDataKelengkapan.wali_kelas })
@@ -274,43 +274,17 @@ export default {
 	},
 	mounted() {
 		this.inputDataKelengkapan.id_user = this.$route.params.uid;
-		this.getPendidikan()
-		this.getJabatan()
-		this.getMengajar()
+		this.getDataMaster({ kode: 'pendidikan' })
+		this.getDataMaster({ kode: 'jabatan' })
+		this.getDataMaster({ kode: 'mengajar' })
 		this.getKelas({ kondisi: 'All' })
 		this.getKelas({ kondisi: 'Use', walikelas: null })
 	},
 	methods: {
 		...mapActions({
-			getPendidikan: 'setting/getPendidikan',
-			getJabatan: 'setting/getJabatan',
-			getMengajar: 'setting/getMengajar',
+			getDataMaster: 'setting/getDataMaster',
 			getKelas: 'setting/getKelas',
 		}),
-		wadahInput(){
-			let inputFormThree = {
-				nomorInduk: this.inputDataKelengkapan.nomor_induk,
-				pendidikanGuru: this.inputDataKelengkapan.pendidikan_guru,
-				jabatanGuru: this.inputDataKelengkapan.jabatan_guru,
-				mengajarBidang: this.inputDataKelengkapan.mengajar_bidang,
-				mengajarKelas: this.inputDataKelengkapan.mengajar_kelas,
-				waliKelas: this.inputDataKelengkapan.wali_kelas,
-			}
-      this.$emit("DataStepThree", inputFormThree)
-    },
-		// remove(item, kondisi) {
-		// 	if(kondisi === 'jabatan'){
-		// 		if(item.kode === 7){
-		// 			this.inputDataKelengkapan.wali_kelas = ''
-		// 			this.kondisiJabatan = true
-		// 		}
-		// 		this.inputDataKelengkapan.jabatan_guru.splice(this.inputDataKelengkapan.jabatan_guru.indexOf(item.kode), 1);
-		// 	}else if(kondisi === 'bidang'){
-		// 		this.inputDataKelengkapan.mengajar_bidang.splice(this.inputDataKelengkapan.mengajar_bidang.indexOf(item.kode), 1);
-		// 	}else if(kondisi === 'kelas'){
-		// 		this.inputDataKelengkapan.mengajar_kelas.splice(this.inputDataKelengkapan.mengajar_kelas.indexOf(item.kelas), 1);
-		// 	}
-    // },
 		backStep() {
       this.$emit("backStep", 2);
     },

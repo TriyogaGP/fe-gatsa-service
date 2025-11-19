@@ -6,7 +6,8 @@
     density="comfortable"
     color="light-black darken-3"
     bg-color="white"
-    hide-details
+    hide-details="auto"
+    :rules="[rules.required]"
     :clearable="TaClearable"
     :disabled="TaDisabled"
     :readonly="TaReadonly"
@@ -37,6 +38,9 @@ export default {
   data() {
     return{
       API_URL: process.env.VUE_APP_BASE_URL_VIEW,
+      rules: {
+        required: value => !!value || 'Field ini wajib diisi !'
+      }
     }
   },
   computed: {

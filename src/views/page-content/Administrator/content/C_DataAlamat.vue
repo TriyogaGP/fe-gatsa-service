@@ -19,26 +19,37 @@
 						<v-col
 							cols="12"
 							md="6"
-							class="d-flex justify-center align-center"
+							class="d-flex justify-center align-start"
 						>
 							<TextField
 								v-model="inputDataAlamat.tempat"
 								label-tf="Tempat Lahir"
+								formatrulesTf="text"
+								:rules-tf="inputDataAlamat.tempat != '' ? true : false"
                 :clearable-tf="true"
 							/>
 						</v-col>
 						<v-col
 							cols="12"
 							md="6"
-							class="pl-2 d-flex justify-end align-center"
+							class="pl-2 d-flex justify-center align-start flex-wrap"
 						>
-							<vue-date-picker
-								v-model="inputDataAlamat.tanggal_lahir"
-								placeholder="Tanggal Lahir"
-								format="dd-MM-yyyy"
-								:enable-time-picker="false"
-								auto-apply
-							/>
+							<div class="v-input_control_tanggal">
+								<vue-date-picker
+									v-model="inputDataAlamat.tanggal_lahir"
+									placeholder="Tanggal Lahir"
+									format="dd-MM-yyyy"
+									:enable-time-picker="false"
+									:teleport="true"
+									:auto-position="false"
+									:input-class="{ 'dp__input': showError }"
+									position="left"
+									auto-apply
+									@update:model-value="validateTanggal(inputDataAlamat.tanggal_lahir)"
+									@blur="validateTanggal(inputDataAlamat.tanggal_lahir)"
+								/>
+							</div>
+							<span v-if="showError" class="v-messages-tanggal">Field ini wajib diisi !</span>
 						</v-col>
 					</v-row>
 				</v-col>
@@ -60,6 +71,7 @@
 						v-model="inputDataAlamat.jenis_kelamin"
 						:data-a="jenisKelaminOptions"
 						label-a="Jenis Kelamin"
+						:rules-a="inputDataAlamat.jenis_kelamin != '' ? true : false"
 						:clearable-a="true"
 					/>
 				</v-col>
@@ -81,8 +93,9 @@
 						v-model="inputDataAlamat.agama"
 						:data-a="agamaOptions"
 						item-title="label"
-						item-value="kode"
+						item-value="value"
 						label-a="Agama"
+						:rules-a="inputDataAlamat.agama != '' ? true : false"
 						:clearable-a="true"
 					/>
 				</v-col>
@@ -103,6 +116,8 @@
 					<TextField
 						v-model="inputDataAlamat.telp"
 						label-tf="Telepon"
+						formatrulesTf="text"
+						:rules-tf="inputDataAlamat.telp != '' ? true : false"
 						:clearable-tf="true"
 						@keypress="onlyNumber($event, 15, inputDataAlamat.telp)"
 					/>
@@ -148,6 +163,7 @@
 						item-title="nama"
 						item-value="kode"
 						label-a="Provinsi"
+						:rules-a="inputDataAlamat.provinsi != '' ? true : false"
 						:clearable-a="true"
 						@ubah="wilayah('provinsi', $event)"
 					/>
@@ -172,8 +188,9 @@
 						item-title="nama"
 						item-value="kode"
 						label-a="Kabupaten / Kota"
+						:rules-a="inputDataAlamat.kabkota != '' ? true : false"
 						:clearable-a="true"
-						:disabled-a="inputDataAlamat.provinsi ? false : true"
+						:disabled-a="!inputDataAlamat.provinsi"
 						@ubah="wilayah('kabkota', $event)"
 					/>
 				</v-col>
@@ -197,8 +214,9 @@
 						item-title="nama"
 						item-value="kode"
 						label-a="Kecamatan"
+						:rules-a="inputDataAlamat.kecamatan != '' ? true : false"
 						:clearable-a="true"
-						:disabled-a="inputDataAlamat.kabkota ? false : true"
+						:disabled-a="!inputDataAlamat.kabkota"
 						@ubah="wilayah('kecamatan', $event)"
 					/>
 				</v-col>
@@ -222,8 +240,9 @@
 						item-title="nama"
 						item-value="kode"
 						label-a="Kelurahan / Desa"
+						:rules-a="inputDataAlamat.kelurahan != '' ? true : false"
 						:clearable-a="true"
-						:disabled-a="inputDataAlamat.kecamatan ? false : true"
+						:disabled-a="!inputDataAlamat.kecamatan"
 						@ubah="wilayah('kelurahan', $event)"
 					/>
 				</v-col>
@@ -298,19 +317,20 @@ export default {
   },
   data: () => ({
 		inputDataAlamat: {
-      id_user: '',
-      tempat: '',
-      tanggal_lahir: '',
+      id_user: null,
+      tempat: null,
+      tanggal_lahir: null,
       jenis_kelamin: null,
       agama: null,
-      telp: '',
-      alamat: '',
+      telp: null,
+      alamat: null,
       provinsi: null,
       kabkota: null,
       kecamatan: null,
       kelurahan: null,
-      kode_pos: '',
+      kode_pos: null,
     },
+		showError: false,
 		kondisiTombol: true,
     jenisKelaminOptions: ['Laki - Laki', 'Perempuan'],
 
@@ -358,33 +378,33 @@ export default {
 					this.inputDataAlamat.kode_pos = null
 				}
 
-				if(value.tempat != '' && value.tanggal_lahir != '' && value.jenis_kelamin != null && value.agama != null && value.telp != '' && value.alamat != '' && value.provinsi != null &&
+				if(value.tempat != null && value.tanggal_lahir != null && value.jenis_kelamin != null && value.agama != null && value.telp != null && value.alamat != null && value.provinsi != null &&
 					value.kabkota != null && value.kecamatan != null && value.kelurahan != null){
 					this.kondisiTombol = false
 				}else{
 					this.kondisiTombol = true
 				}
 				localStorage.setItem('stepTwo', JSON.stringify(this.inputDataAlamat))
-				// this.wadahInput()
 			}
 		},
 		dataStepTwo: {
 			deep: true,
 			handler(value) {
 				this.inputDataAlamat = {
-					id_user: value.id_user ? value.id_user : null,
-					tempat: value.tempat ? value.tempat : null,
-					tanggal_lahir: value.tanggal_lahir ? value.tanggal_lahir : null,
-					jenis_kelamin: value.jenis_kelamin ? value.jenis_kelamin : null,
-					agama: value.agama ? value.agama.kode : null,
-					telp: value.telp ? value.telp : null,
-					alamat: value.alamat ? value.alamat : null,
-					provinsi: value.provinsi ? value.provinsi.kode : null,
-					kabkota: value.kabkota ? value.kabkota.kode : null,
-					kecamatan: value.kecamatan ? value.kecamatan.kode : null,
-					kelurahan: value.kelurahan ? value.kelurahan.kode : null,
-					kode_pos: value.kode_pos ? value.kode_pos : null,
+					id_user: value?.id_user,
+					tempat: value?.tempat,
+					tanggal_lahir: value?.tanggal_lahir,
+					jenis_kelamin: value?.jenis_kelamin,
+					agama: value?.agama,
+					telp: value?.telp,
+					alamat: value?.alamat,
+					provinsi: value?.provinsi,
+					kabkota: value?.kabkota,
+					kecamatan: value?.kecamatan,
+					kelurahan: value?.kelurahan,
+					kode_pos: value?.kode_pos,
 				}
+				this.validateTanggal(this.inputDataAlamat.tanggal_lahir)
 				this.getWilayah2023({ bagian: 'kabkota', KodeWilayah: this.inputDataAlamat.provinsi })
 				this.getWilayah2023({ bagian: 'kecamatan', KodeWilayah: this.inputDataAlamat.kabkota })
 				this.getWilayah2023({ bagian: 'kelurahan', KodeWilayah: this.inputDataAlamat.kecamatan })
@@ -394,30 +414,17 @@ export default {
 	mounted() {
 		this.inputDataAlamat.id_user = this.$route.params.uid;
 		this.kondisi = this.$route.params.kondisi;
-		this.getAgama()
+		this.getDataMaster({ kode: 'agama' })
 		this.getWilayah2023({ bagian: 'provinsi', KodeWilayah: null })
 	},
 	methods: {
 		...mapActions({
-			getAgama: 'setting/getAgama',
+			getDataMaster: 'setting/getDataMaster',
 			getWilayah2023: 'setting/getWilayah2023',
 		}),
-		wadahInput(){
-			let inputFormTwo = {
-				tempat: this.inputDataAlamat.tempat,
-				tanggalLahir: this.inputDataAlamat.tanggal_lahir,
-				jenisKelamin: this.inputDataAlamat.jenis_kelamin,
-				agama: this.inputDataAlamat.agama,
-				telp: this.inputDataAlamat.telp,
-				alamat: this.inputDataAlamat.alamat,
-				provinsi: this.inputDataAlamat.provinsi,
-				kabKota: this.inputDataAlamat.kabkota,
-				kecamatan: this.inputDataAlamat.kecamatan,
-				kelurahan: this.inputDataAlamat.kelurahan,
-				kodePos: this.inputDataAlamat.kode_pos,
-			}
-      this.$emit("DataStepTwo", inputFormTwo)
-    },
+		validateTanggal(val) {
+			this.showError = !val
+		},
 		wilayah(kondisi, e){
 			if(kondisi === 'provinsi'){
 				if(e){
@@ -425,7 +432,7 @@ export default {
 					this.inputDataAlamat.kabkota = null
 					this.inputDataAlamat.kecamatan = null
 					this.inputDataAlamat.kelurahan = null
-					this.inputDataAlamat.kode_pos = ''
+					this.inputDataAlamat.kode_pos = null
 				}
 			}else if(kondisi === 'kabkota'){
 				if(e){
@@ -433,23 +440,23 @@ export default {
 					if(e !== this.inputDataAlamat.kecamatan) {
 						this.inputDataAlamat.kecamatan = null
 						this.inputDataAlamat.kelurahan = null
-						this.inputDataAlamat.kode_pos = ''
+						this.inputDataAlamat.kode_pos = null
 					}
 				}else{
 					this.inputDataAlamat.kecamatan = null
 					this.inputDataAlamat.kelurahan = null
-					this.inputDataAlamat.kode_pos = ''
+					this.inputDataAlamat.kode_pos = null
 				}
 			}else if(kondisi === 'kecamatan'){
 				if(e){
 					this.getWilayah2023({ bagian: 'kelurahan', KodeWilayah: e })
 					if(e !== this.inputDataAlamat.kelurahan) {
 						this.inputDataAlamat.kelurahan = null
-						this.inputDataAlamat.kode_pos = ''	
+						this.inputDataAlamat.kode_pos = null	
 					}
 				}else{
 					this.inputDataAlamat.kelurahan = null
-					this.inputDataAlamat.kode_pos = ''
+					this.inputDataAlamat.kode_pos = null
 				}
 			}else if(kondisi === 'kelurahan'){
 				if(e){
@@ -460,7 +467,7 @@ export default {
 						this.inputDataAlamat.kode_pos = this.inputDataAlamat.kode_pos ? data.length ? data[0].kodePos : this.inputDataAlamat.kode_pos : data[0].kodePos
 					}
 				}else{
-					this.inputDataAlamat.kode_pos = ''
+					this.inputDataAlamat.kode_pos = null
 				}
 			}
 		},

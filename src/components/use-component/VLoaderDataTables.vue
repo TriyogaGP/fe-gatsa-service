@@ -1,7 +1,8 @@
 <template>
   <v-progress-linear
     indeterminate
-    class="loader"
+    class="loading"
+    height="3"
     color="#4CAF50"
   />
 </template>
@@ -18,7 +19,7 @@ export default {
 </script>
 
 <style>
-.loader {
+.loading {
   margin: 2px 0px;
   text-align: center;
 }

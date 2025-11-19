@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="subheading grey--text text-decoration-underline">Data Kelas Siswa {{ kelasText }}</h1>
+    <h2 class="subheading grey--text text-decoration-underline">Data Kelas Siswa {{ kelasText }}</h2>
     <v-card class="pa-1 rounded" variant="outlined" elevation="4">
       <v-container fluid v-if="DataKelas.length">
         <v-row>

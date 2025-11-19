@@ -32,6 +32,7 @@ import VButton from './components/use-component/VButton.vue'
 import VTextField from './components/use-component/VTextField.vue' 
 import VTextArea from './components/use-component/VTextarea.vue' 
 import VAutocomplete from './components/use-component/VAutocomplete.vue' 
+import VVirtualScroll from "./components/use-component/VVirtualScroll.vue";
 import VLoaderDataTables from './components/use-component/VLoaderDataTables.vue' 
 
 import CascadeSelect from 'primevue/cascadeselect';
@@ -64,6 +65,7 @@ app.component('Button', VButton);
 app.component('TextField', VTextField);
 app.component('TextArea', VTextArea);
 app.component('Autocomplete', VAutocomplete);
+app.component('VirtualScroll', VVirtualScroll);
 app.component('LoaderDataTables', VLoaderDataTables);
 
 app.component('CascadeSelect', CascadeSelect);
@@ -76,5 +78,5 @@ app.component('StencilPreview', StencilPreview);
 app.component('Cropper', Cropper);
 app.component('CircleStencil', CircleStencil);
 
-await router.isReady()
+router.isReady()
 app.mount("#app");

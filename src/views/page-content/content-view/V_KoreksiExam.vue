@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="subheading grey--text text-decoration-underline">Data Koreksi Exam</h1>
+    <h2 class="subheading grey--text text-decoration-underline">Data Koreksi Exam</h2>
     <v-card class="pa-1 rounded" variant="outlined" elevation="4">
       <v-container fluid v-if="mengajarOptions.length">
         <v-row>
@@ -77,18 +77,16 @@ export default {
     }),
     mengajarOptions(){
       if(this.roleID === '3'){
+        if(localStorage.getItem('mengajar_bidang') === '') return []
 				let mengajar_bidang = localStorage.getItem('mengajar_bidang').split(', ')
-				let result = []
-				mengajar_bidang.map(str => {
-					let hasil = this.mengajar.filter(val => { return val.kode == str })
-					result.push({ label: hasil.length ? hasil[0].label : '', link: hasil.length ? hasil[0].label.replace(' ', '-') : '' })
+				let result = this.mengajar.filter(val => mengajar_bidang.includes(val.value)).map(x => {
+					return { label: x?.label || '', link: `${x?.label.replace(' ', '-')}`  || '' }
 				})
 				return result
 			}else{
-        let result = []
-        this.mengajar.map(str => {
-          result.push({ label: str.label, link: str.label.replace(' ', '-') })
-        })
+        let result = this.mengajar.map(x => {
+					return { label: x?.label || '', link: `${x?.label.replace(' ', '-')}`  || '' }
+				})
         return result
       }
 		},
@@ -97,11 +95,11 @@ export default {
   mounted() {
     if(!localStorage.getItem('user_token')) return this.$router.push({name: 'LogIn'});
     this.roleID = localStorage.getItem('roleID')
-		this.getMengajar()
+		this.getDataMaster({ kode: 'mengajar' })
 	},
 	methods: {
 		...mapActions({
-      getMengajar: 'setting/getMengajar',
+			getDataMaster: 'setting/getDataMaster',
     }),
     gotoDetail(mapel) {
       this.$router.push({name: "DataDetailAkademis", params: { mapel: mapel, jenis: 'koreksi' }});

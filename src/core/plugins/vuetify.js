@@ -24,12 +24,16 @@ const myCustomLightTheme = {
     'secondary-darken-1': '#018786',
     error: '#B00020',
     info: '#2196F3',
-    success: '#4CAF50',
+    success: '#4CAF50', //#0bd369
     warning: '#FB8C00',
     'icon-white': '#FFFFFF',
     'icon-black': '#000000',
     'nav-back': '#a9a9d9',
     'background-dialog-card': '#e1e1f0',
+    'text-red': '#D50000',
+    'text-green': '#00C853',
+    'text-yellow': '#FFD600',
+    'text-blue': '#2962FF',
   },
 }
 

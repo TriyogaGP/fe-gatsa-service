@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="timer">
 		<!-- <div class="day">
 			<span class="number">{{ days }}</span>
 			<div class="format">{{ wordString.day }}</div>
@@ -97,7 +97,7 @@ export default {
 			this.hours = Math.floor((passTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
 			this.minutes = Math.floor((passTime % (1000 * 60 * 60)) / (1000 * 60));
 			this.seconds = Math.floor((passTime % (1000 * 60)) / 1000);
-			if(this.minutes === 0 && this.seconds === 0) {
+			if(this.hours === 0 && this.minutes === 0 && this.seconds === 0) {
 				this.message = this.wordString.expired;
 				this.statusType = "Waktu Habis";
 				this.statusText = this.wordString.status.expired;
@@ -119,5 +119,82 @@ export default {
   },
 }
 </script>
-<style>
+<style scoped>
+/* Timer Section */
+.timer {
+  text-align: center;
+  font-size: 15pt;
+	display: flex;
+}
+
+.timer .day,
+.timer .hour,
+.timer .min,
+.timer .sec {
+  display: inline-block;
+  font-weight: bold;
+  text-align: center;
+  margin: 0 20px;
+}
+
+.timer .day .format,
+.timer .hour .format,
+.timer .min .format,
+.timer .sec .format {
+  font-weight: bold;
+  font-size: 15px;
+  color: #FFF;
+}
+
+.timer .number {
+  color: #000;
+  background: #FFF;
+  padding: 0 5px;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.timer .numberS {
+  color: #F00;
+  background: #FFF;
+  padding: 0 5px;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.timer .message {
+  font-size: 14px;
+  font-weight: 400;
+  margin-top: 5px;
+}
+
+.timer .status-tag {
+  width: 270px;
+  margin: 10px auto;
+  padding: 8px 0;
+  font-weight: 500;
+  color: #000;
+  text-align: center;
+  border-radius: 15px;
+}
+
+.timer .status-tag.upcoming {
+  background-color: lightGreen;
+}
+
+.timer .status-tag.running {
+  background-color: gold;
+}
+
+.timer .status-tag.expired {
+  background-color: silver;
+}
 </style>

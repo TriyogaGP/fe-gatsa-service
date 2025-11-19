@@ -223,6 +223,7 @@ export default {
     this.overlay = true
   },
 	mounted(){
+    if(!localStorage.getItem('user_token')) return this.$router.push({name: 'LogIn'});
     this.getCMSSettings()
 	},
 	methods: {

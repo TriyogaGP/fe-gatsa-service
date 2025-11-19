@@ -18,11 +18,12 @@
           <v-window v-model="tab">
             <v-window-item value="1">
               <div v-if="roleID === '1' || roleID === '2'" class="customScrollLeft">
-                <div class="text-right">
+                <div class="d-flex align-center justify-end">
                   <Button 
-                    color-button="#0bd369"
+                    color-button="success"
                     :icon-prepend-button="kondisiForm ? 'mdi mdi-pencil' : 'mdi mdi-close'"
                     nama-button="Ubah Data Diri"
+                    size-button="x-small"
                     @proses="() => { kondisiForm = !kondisiForm; }"
                   />
                 </div>
@@ -179,6 +180,9 @@
                             placeholder="Tanggal Lahir"
                             format="dd-MM-yyyy"
                             :enable-time-picker="false"
+                            :teleport="true"
+                            :auto-position="false"
+                            position="left"
                             auto-apply
                           />
                         </v-col>
@@ -227,7 +231,7 @@
                         v-model="inputAdministrator.agama"
                         :data-a="agamaOptions"
                         item-title="label"
-                        item-value="kode"
+                        item-value="value"
                         label-a="Agama"
                         :clearable-a="true"
                       />
@@ -419,18 +423,20 @@
                 <div class="text-right">
                   <Button
                     v-if="!kondisiForm"
-                    color-button="#0bd369"
+                    color-button="success"
                     nama-button="Simpan Data"
+                    size-button="x-small"
                     @proses="SimpanDataProfile()"
                   />
                 </div>
               </div>
               <div v-if="roleID === '3'" class="customScrollLeft">
-                <div class="text-right">
+                <div class="d-flex align-center justify-end">
                   <Button 
-                    color-button="#0bd369"
+                    color-button="success"
                     :icon-button="kondisiForm ? 'mdi mdi-pencil' : 'mdi mdi-close'"
                     nama-button="Ubah Data Diri"
+                    size-button="x-small"
                     @proses="() => { kondisiForm = !kondisiForm; }"
                   />
                 </div>
@@ -563,6 +569,9 @@
                             placeholder="Tanggal Lahir"
                             format="dd-MM-yyyy"
                             :enable-time-picker="false"
+                            :teleport="true"
+                            :auto-position="false"
+                            position="left"
                             auto-apply
                           />
                         </v-col>
@@ -611,7 +620,7 @@
                         v-model="inputGuru.agama"
                         :data-a="agamaOptions"
                         item-title="label"
-                        item-value="kode"
+                        item-value="value"
                         label-a="Agama"
                         :clearable-a="true"
                       />
@@ -846,7 +855,7 @@
                         v-model="inputGuru.pendidikanGuru"
                         :data-a="pendidikanOptions"
                         item-title="label"
-                        item-value="kode"
+                        item-value="value"
                         label-a="Pendidikan Struktural"
                         :clearable-a="true"
                       />
@@ -856,8 +865,9 @@
                 <div class="text-right">
                   <Button
                     v-if="!kondisiForm"
-                    color-button="#0bd369"
+                    color-button="success"
                     nama-button="Simpan Data"
+                    size-button="x-small"
                     @proses="SimpanDataProfile()"
                   />
                 </div>
@@ -1894,10 +1904,11 @@
                     />
                   </v-col>
                 </v-row>
-                <div class="text-right mt-2">
+                <div class="d-flex align-center justify-end mt-2">
                   <Button
-                    color-button="#0bd369"
+                    color-button="success"
                     nama-button="Ubah Kata Sandi"
+                    size-button="x-small"
                     :disabled-button="kondisiTombol"
                     @proses="UbahKataSandi()"
                   />
@@ -1928,41 +1939,32 @@
           <v-divider :thickness="2" class="border-opacity-100" />
           <div v-if="roleID === '4'" class="customScrollRight">
             <h4 class="white--text text-center ma-4">******&nbsp;Berkas - Berkas&nbsp;******</h4>
-            <!-- <v-row no-gutters class="d-flex flex-row justify-center align-center">
-              <v-col
-                cols="12"
-                lg="5"
-                class="d-flex flex-column justify-center boxlist"
-                style="cursor: pointer;"
-                v-for="data in dataBerkas"
-                :key="data.kode"
-                @click="pdfCreate(data)">
-                <div>
-                  <v-progress-circular v-if="isLoadingPDF[data.kode]" indeterminate />
-                  <span v-else><v-icon icon="mdi mdi-file-pdf-box" /> {{ data.title }}</span>
-                </div>
-              </v-col>
-            </v-row> -->
-            <div>
-              <v-chip-group class="d-flex flex-row justify-center align-center">
-                <v-chip v-for="data in dataBerkas" :key="data.kode" class="boxlistBerkas" @click="pdfCreate(data)">
-                  <v-progress-circular v-if="isLoadingPDF[data.kode]" indeterminate />
-                  <span v-else><v-icon icon="mdi mdi-file-pdf-box" /> {{ data.title }}</span>  
-                </v-chip>
-              </v-chip-group>
+            <div class="d-flex justify-center align-start flex-wrap">
+              <v-chip v-for="data in dataBerkas" :key="data.kode" class="boxlistBerkas" @click="pdfCreate(data)">
+                <v-progress-circular v-if="isLoadingPDF[data.kode]" indeterminate />
+                <span v-else><v-icon icon="mdi mdi-file-pdf-box" /> {{ data.title }}</span>  
+              </v-chip>
             </div>
             <div class="white--text text-center ma-4" style="font-weight: bold; font-size: 10pt">******&nbsp;Data Kelengkapan&nbsp;******</div>
             <v-row no-gutters class="mb-2">
               <v-col cols="12" md="12">
-                <div class="white--text text-left" style="font-weight: bold; font-size: 10pt">*Jadwal Mengajar</div>
-                <div>
-                  <v-chip-group class="d-flex flex-row justify-center align-center">
-                    <v-chip class="boxlist" @click="lookJadwal()"><strong>Jadwal Pelajaran</strong></v-chip>
-                  </v-chip-group>
+                <div class="white--text text-center" style="font-weight: bold; font-size: 10pt">*Jadwal Mengajar</div>
+                <div class="d-flex justify-center align-start flex-wrap">
+                  <v-chip class="boxlist" @click="lookJadwal()"><strong>Jadwal Pelajaran</strong></v-chip>
                 </div>
               </v-col>
             </v-row>
-            <!-- <h4 class="white--text text-center ma-4">******&nbsp;Raport Nilai&nbsp;******</h4> -->
+            <v-row no-gutters class="mb-2">
+              <v-col cols="12" md="12">
+                <div class="white--text text-center" style="font-weight: bold; font-size: 10pt">*Modul Mata Pelajaran</div>
+                <div class="d-flex justify-center align-start flex-wrap">
+                  <v-chip class="boxlist" v-for="data in dataModulPelajaran" :key="data.mapel" @click="downloadModul(data)">
+                    <v-progress-circular v-if="isLoadingModul[data.mapel]" indeterminate />
+                    <span v-else>{{ data.namaMapel }}</span>
+                  </v-chip>
+                </div>
+              </v-col>
+            </v-row>
           </div>
           <div v-if="roleID === '3'" class="customScrollRight">
             <div class="white--text text-center ma-4" style="font-weight: bold; font-size: 10pt">******&nbsp;Signature&nbsp;******</div>
@@ -1972,47 +1974,31 @@
             <div class="white--text text-center ma-4" style="font-weight: bold; font-size: 10pt">******&nbsp;Data Kelengkapan&nbsp;******</div>
             <v-row no-gutters class="mb-2">
               <v-col cols="12" md="12">
-                <div class="white--text text-left" style="font-weight: bold; font-size: 10pt">*Jabatan Struktural</div>
-                <div>
-                  <v-chip-group class="d-flex flex-row justify-center align-center">
-                    <v-chip v-for="jabatan in arrayData.jabatanGuru" :key="jabatan" class="boxlist" style="cursor: default;"><strong><span v-html="jabatan" /></strong></v-chip>
-                  </v-chip-group>
-                  <!-- <v-row no-gutters class="d-flex flex-row justify-center align-center">
-                    <v-col cols="3" class="d-flex flex-column justify-center boxlist" v-for="jabatan in arrayData.jabatanGuru" :key="jabatan">
-                      {{ jabatan }}
-                    </v-col>
-                  </v-row> -->
+                <div class="white--text text-center" style="font-weight: bold; font-size: 10pt">*Jabatan Struktural</div>
+                <div class="d-flex justify-center align-start flex-wrap">
+                  <v-chip v-for="jabatan in arrayData.jabatanGuru" :key="jabatan" class="boxlist" style="cursor: default;"><strong><span v-html="jabatan" /></strong></v-chip>
                 </div>
               </v-col>
             </v-row>
             <v-row no-gutters class="mb-2">
               <v-col cols="12" md="12">
-                <div class="white--text text-left" style="font-weight: bold; font-size: 10pt">*Mengajar Bidang</div>
-                <div>
-                  <v-chip-group class="d-flex flex-row justify-center align-center">
-                    <v-chip v-for="bidang in arrayData.mengajarBidang" :key="bidang" class="boxlist" style="cursor: default;"><strong><span v-html="bidang" /></strong></v-chip>
-                  </v-chip-group>
-                  <!-- <v-row no-gutters class="d-flex flex-row justify-center align-center">
-                    <v-col cols="3" class="d-flex flex-column justify-center boxlist" v-for="bidang in arrayData.mengajarBidang" :key="bidang">
-                      {{ bidang }}
-                    </v-col>
-                  </v-row> -->
+                <div class="white--text text-center" style="font-weight: bold; font-size: 10pt">*Mengajar Bidang</div>
+                <div class="d-flex justify-center align-start flex-wrap">
+                  <v-chip v-for="bidang in arrayData.mengajarBidang" :key="bidang" class="boxlist" style="cursor: default;"><strong><span v-html="bidang" /></strong></v-chip>
                 </div>
               </v-col>
             </v-row>
             <v-row v-if="arrayData.mengajarBidang.length" no-gutters class="mb-2">
               <v-col cols="12" md="12">
-                <div class="white--text text-left" style="font-weight: bold; font-size: 10pt">*Jadwal Mengajar</div>
-                <div>
-                  <v-chip-group class="d-flex flex-row justify-center align-center">
-                    <v-chip class="boxlist" @click="lookJadwal()"><strong>Jadwal Pelajaran</strong></v-chip>
-                  </v-chip-group>
+                <div class="white--text text-center" style="font-weight: bold; font-size: 10pt">*Jadwal Mengajar</div>
+                <div class="d-flex justify-center align-start flex-wrap">
+                  <v-chip class="boxlist" @click="lookJadwal()"><strong>Jadwal Pelajaran</strong></v-chip>
                 </div>
               </v-col>
             </v-row>
             <v-row no-gutters class="mb-2">
               <v-col cols="12" md="12">
-                <div class="white--text text-left" style="font-weight: bold; font-size: 10pt">*Mengajar Kelas</div>
+                <div class="white--text text-center" style="font-weight: bold; font-size: 10pt">*Mengajar Kelas</div>
                 <div>
                   <template v-if="DataKelas.length">
                     <div
@@ -2021,53 +2007,26 @@
                     >
                       <span v-if="data.dataKelas.length" class="d-flex flex-row justify-center align-center black--text ml-3" style="font-weight: bold; font-size: 10pt"><u>Kelas ({{ data.kategori }})</u></span>
                       <v-container fluid v-if="data.dataKelas.length">
-                        <v-chip-group class="d-flex flex-row justify-center align-center">
+                        <div class="d-flex justify-center align-start flex-wrap">
                           <v-chip v-for="hasil in data.dataKelas" :key="hasil.label" class="boxlist" @click="hasil.jumlah > 0 ? gotoDetail(hasil.kelas) : warningNotif()">
                             <template v-slot:append>
                               <span class="green-darken-4">&nbsp;({{hasil.jumlah}})</span>
                             </template>
                             <strong><span v-html="hasil.kelas" /></strong>
                           </v-chip>
-                        </v-chip-group>
+                        </div>
                       </v-container>
                     </div>
                   </template>
                   <span v-else class="d-flex flex-row justify-center align-center black--text ml-3" style="font-weight: bold; font-size: 10pt"><u>Tidak ada data</u></span>
-                  <!-- <v-chip-group class="d-flex flex-row justify-center align-center">
-                    <v-chip v-for="kelas in arrayData.mengajarKelas" :key="kelas" class="boxlist" @click="gotoDetail(kelas)">
-                      <template v-slot:append>
-                        <span class="green-darken-4">&nbsp;(25)</span>
-                      </template>
-                      <strong><span v-html="kelas" /></strong>
-                    </v-chip>
-                  </v-chip-group> -->
-                  <!-- <v-row no-gutters class="d-flex flex-row justify-center align-center">
-                    <v-col
-                      cols="3"
-                      class="d-flex flex-column justify-center boxlist"
-                      v-for="kelas in arrayData.mengajarKelas"
-                      :key="kelas"
-                      @click="gotoDetail(kelas)"
-                      style="cursor: pointer;" 
-                    >
-                      {{ kelas }}
-                    </v-col>
-                  </v-row> -->
                 </div>
               </v-col>
             </v-row>
             <v-row no-gutters class="mb-2">
               <v-col cols="12" md="12">
-                <div class="white--text text-left" style="font-weight: bold; font-size: 10pt">*Wali Kelas</div>
-                <div>
-                  <v-chip-group class="d-flex flex-row justify-center align-center">
-                    <v-chip class="boxlist" style="cursor: default;"><strong><span v-html="previewData.waliKelas ? previewData.waliKelas : '-'" /></strong></v-chip>
-                  </v-chip-group>
-                  <!-- <v-row no-gutters class="d-flex flex-row justify-center align-center">
-                    <v-col cols="3" class="d-flex flex-column justify-center boxlist">
-                      {{ previewData.waliKelas ? previewData.waliKelas : '-' }}
-                    </v-col>
-                  </v-row> -->
+                <div class="white--text text-center" style="font-weight: bold; font-size: 10pt">*Wali Kelas</div>
+                <div class="d-flex justify-center align-start flex-wrap">
+                  <v-chip class="boxlist" style="cursor: default;"><strong><span v-html="previewData.waliKelas ? previewData.waliKelas : '-'" /></strong></v-chip>
                 </div>
               </v-col>
             </v-row>
@@ -2219,17 +2178,17 @@
               class="d-flex align-center justify-center"
             >
               <Button
-                color-button="#0bd369"
+                color-button="success"
                 nama-button="Clear"
                 @proses="clearSignature()"
               />
               <Button
-                color-button="#0bd369"
+                color-button="success"
                 nama-button="Undo"
                 @proses="undoSignature()"
               />
               <Button
-                color-button="#0bd369"
+                color-button="success"
                 nama-button="Proses"
                 @proses="saveSignature()"
               />
@@ -2240,12 +2199,12 @@
               class="d-flex align-center justify-center"
             >
               <Button
-                color-button="#0bd369"
+                color-button="success"
                 nama-button="Crop Signature"
                 @proses="cropSignature()"
               />
               <Button
-                color-button="#0bd369"
+                color-button="success"
                 nama-button="Clear"
                 @proses="clearCropSignature()"
               />
@@ -2283,7 +2242,7 @@
               md="4"
               class="pa-1"
             >
-            <table dark class="tableClass mb-2">
+              <table dark class="tableClass mb-2">
                 <thead>
                   <tr>
                     <th class="thSClass">Nama Guru</th>
@@ -2358,62 +2317,68 @@
                 </tbody>
               </table>
               <table border="0" width="100%" cellspacing="0" cellpadding="0" style="margin-top: 20px;">
-                <tr>
-                  <td style="width: 50%;">
-                    <table border="0" width="300px" cellspacing="0" cellpadding="0" style="float: left; margin-left: 80px;">
-                      <tr class="ttd">
-                        <td style="padding-bottom: 10px;">Mengetahui,</td>
-                      </tr>
-                      <tr class="ttd">
-                        <td>{{ `Kepala Sekolah ${dataTTD.ttd.namasekolah}` }}</td>
-                      </tr>
-                      <tr class="ttd">
-                        <td style="padding: 10px 0px;">
-                          <template v-if="dataTTD.kepalasekolah.signature !== null">
-                            <v-img
-                              :src="`${dataTTD.url}/image/${dataTTD.kepalasekolah.signature}`"
-                              width="80px"
-                              height="80px"
-                            />
-                          </template>
-                        </td>
-                      </tr>
-                      <tr class="ttd">
-                        <td style="text-decoration: underline;">{{ dataTTD.kepalasekolah.nama }}</td>
-                      </tr>
-                      <tr class="ttd">
-                        <td>{{ `NIP. ${dataTTD.kepalasekolah.nomorInduk}` }}</td>
-                      </tr>
-                    </table>
-                  </td>
-                  <td style="width: 50%;">
-                    <table border="0" width="300px" cellspacing="0" cellpadding="0" style="float: right;">
-                      <tr class="ttd">
-                        <td style="padding-bottom: 10px;">{{ `${dataTTD.ttd.tempat}, ${dataTTD.ttd.tanggal}` }}</td>
-                      </tr>
-                      <tr class="ttd">
-                        <td>{{ `WaKaBid. Kurikulum ${dataTTD.ttd.namasekolah}` }}</td>
-                      </tr>
-                      <tr class="ttd">
-                        <td style="padding: 10px 0px;">
-                          <template v-if="dataTTD.kurikulum.signature !== null">
-                            <v-img
-                              :src="`${dataTTD.url}/image/${dataTTD.kurikulum.signature}`"
-                              width="80px"
-                              height="80px"
-                            />
-                          </template>
-                        </td>
-                      </tr>
-                      <tr class="ttd">
-                        <td style="text-decoration: underline;">{{ dataTTD.kurikulum.nama }}</td>
-                      </tr>
-                      <tr class="ttd">
-                        <td>{{ `NIP. ${dataTTD.kurikulum.nomorInduk}` }}</td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
+                <tbody>
+                  <tr>
+                    <td style="width: 50%;">
+                      <table border="0" width="300px" cellspacing="0" cellpadding="0" style="float: left; margin-left: 80px;">
+                        <tbody>
+                          <tr class="ttd">
+                            <td style="padding-bottom: 10px;">Mengetahui,</td>
+                          </tr>
+                          <tr class="ttd">
+                            <td>{{ `Kepala Sekolah ${dataTTD.ttd.namasekolah}` }}</td>
+                          </tr>
+                          <tr class="ttd">
+                            <td style="padding: 10px 0px;">
+                              <template v-if="dataTTD.kepalasekolah.signature !== null">
+                                <v-img
+                                  :src="dataTTD.kepalasekolah.signature"
+                                  width="80px"
+                                  height="80px"
+                                />
+                              </template>
+                            </td>
+                          </tr>
+                          <tr class="ttd">
+                            <td style="text-decoration: underline;">{{ dataTTD.kepalasekolah.nama }}</td>
+                          </tr>
+                          <tr class="ttd">
+                            <td>{{ `NIP. ${dataTTD.kepalasekolah.nomorInduk}` }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                    <td style="width: 50%;">
+                      <table border="0" width="300px" cellspacing="0" cellpadding="0" style="float: right;">
+                        <tbody>
+                          <tr class="ttd">
+                            <td style="padding-bottom: 10px;">{{ `${dataTTD.ttd.tempat}, ${dataTTD.ttd.tanggal}` }}</td>
+                          </tr>
+                          <tr class="ttd">
+                            <td>{{ `WaKaBid. Kurikulum ${dataTTD.ttd.namasekolah}` }}</td>
+                          </tr>
+                          <tr class="ttd">
+                            <td style="padding: 10px 0px;">
+                              <template v-if="dataTTD.kurikulum.signature !== null">
+                                <v-img
+                                  :src="dataTTD.kurikulum.signature"
+                                  width="80px"
+                                  height="80px"
+                                />
+                              </template>
+                            </td>
+                          </tr>
+                          <tr class="ttd">
+                            <td style="text-decoration: underline;">{{ dataTTD.kurikulum.nama }}</td>
+                          </tr>
+                          <tr class="ttd">
+                            <td>{{ `NIP. ${dataTTD.kurikulum.nomorInduk}` }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                </tbody>
               </table>
             </v-col>
           </v-row>
@@ -2440,6 +2405,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import { mapActions, mapGetters, mapState } from "vuex";
 import { useMeta } from 'vue-meta'
 import PopUpNotifikasi from "./Layout/PopUpNotifikasi.vue";
@@ -2478,43 +2444,44 @@ export default {
     namaRole: '',
     idUser: '',
     isLoadingPDF: [],
+    isLoadingModul: [],
     dialogPDF: false,
     urlSk: window.location.href,
     BASE_URL: '',
     inputAdministrator: {
-      idUser: '',
-      nama: '',
-      username: '',
-      email: '',
-      tempat: '',
-      tanggalLahir: '',
+      idUser: null,
+      nama: null,
+      username: null,
+      email: null,
+      tempat: null,
+      tanggalLahir: null,
       jenisKelamin: null,
       agama: null,
-      telp: '',
-      alamat: '',
+      telp: null,
+      alamat: null,
       provinsi: null,
       kabKota: null,
       kecamatan: null,
       kelurahan: null,
-      kodePos: '',
+      kodePos: null,
     },
     inputGuru: {
-      idUser: '',
-      nomorInduk: '',
-      nama: '',
-      username: '',
-      email: '',
-      tempat: '',
-      tanggalLahir: '',
+      idUser: null,
+      nomorInduk: null,
+      nama: null,
+      username: null,
+      email: null,
+      tempat: null,
+      tanggalLahir: null,
       jenisKelamin: null,
       agama: null,
-      telp: '',
-      alamat: '',
+      telp: null,
+      alamat: null,
       provinsi: null,
       kabKota: null,
       kecamatan: null,
       kelurahan: null,
-      kodePos: '',
+      kodePos: null,
       pendidikanGuru: null,
     },
     previewData: {
@@ -2675,6 +2642,7 @@ export default {
   },
   computed: {
     ...mapState({
+      dataModulPelajaran: state => state.user.dataModulPelajaran,
       agamaOptions: state => state.setting.agamaOptions,
       pendidikanOptions: state => state.setting.pendidikanOptions,
       ProvinsiOptions: state => state.setting.ProvinsiOptions,
@@ -2712,26 +2680,26 @@ export default {
 			handler(value){
         if(this.roleID === '3'){
           this.inputGuru = {
-            idUser: value.idUser,
-            nomorInduk: value.nomorInduk,
-            nama: this.uppercaseLetterFirst2(value.nama),
-            username: value.username,
-            email: value.email,
-            tempat: value.tempat,
-            tanggalLahir: value.tanggalLahir,
-            jenisKelamin: value.jenisKelamin,
-            agama: value.agama.kode,
-            telp: value.telp,
-            alamat: this.uppercaseLetterFirst2(value.alamat),
-            provinsi: value.provinsi.kode,
-            kabKota: value.kabKota.kode,
-            kecamatan: value.kecamatan.kode,
-            kelurahan: value.kelurahan.kode,
-            kodePos: value.kodePos,
-            pendidikanGuru: value.pendidikanGuru.kode,
+            idUser: value?.idUser,
+            nomorInduk: value?.nomorInduk,
+            nama: this.uppercaseLetterFirst2(value?.nama || '-'),
+            username: value?.username,
+            email: value?.email,
+            tempat: value?.tempat,
+            tanggalLahir: value?.tanggalLahir,
+            jenisKelamin: value?.jenisKelamin,
+            agama: value?.agama?.value,
+            telp: value?.telp,
+            alamat: this.uppercaseLetterFirst2(value?.alamat || '-'),
+            provinsi: value?.provinsi?.kode,
+            kabKota: value?.kabKota?.kode,
+            kecamatan: value?.kecamatan?.kode,
+            kelurahan: value?.kelurahan?.kode,
+            kodePos: value?.kodePos,
+            pendidikanGuru: value?.pendidikanGuru?.value,
           }
-          this.getAgama()
-          this.getPendidikan()
+          this.getDataMaster({ kode: 'agama' })
+          this.getDataMaster({ kode: 'pendidikan' })
           this.getWilayah2023({ bagian: 'provinsi', KodeWilayah: null })
           this.getWilayah2023({ bagian: 'kabkota', KodeWilayah: this.inputGuru.provinsi })
           this.getWilayah2023({ bagian: 'kecamatan', KodeWilayah: this.inputGuru.kabKota })
@@ -2739,101 +2707,101 @@ export default {
         }
         if(this.roleID === '1' || this.roleID === '2'){
           this.inputAdministrator = {
-            idUser: value.idUser,
-            nama: this.uppercaseLetterFirst2(value.nama),
-            username: value.username,
-            email: value.email,
-            tempat: value.tempat,
-            tanggalLahir: value.tanggalLahir,
-            jenisKelamin: value.jenisKelamin,
-            agama: value.agama.kode,
-            telp: value.telp,
-            alamat: value.alamat ? this.uppercaseLetterFirst2(value.alamat) : '-',
-            provinsi: value.provinsi.kode,
-            kabKota: value.kabKota.kode,
-            kecamatan: value.kecamatan.kode,
-            kelurahan: value.kelurahan.kode,
-            kodePos: value.kodePos,
+            idUser: value?.idUser,
+            nama: this.uppercaseLetterFirst2(value?.nama || '-'),
+            username: value?.username,
+            email: value?.email,
+            tempat: value?.tempat,
+            tanggalLahir: value?.tanggalLahir,
+            jenisKelamin: value?.jenisKelamin,
+            agama: value?.agama?.value,
+            telp: value?.telp,
+            alamat: this.uppercaseLetterFirst2(value?.alamat || '-'),
+            provinsi: value?.provinsi?.kode,
+            kabKota: value?.kabKota?.kode,
+            kecamatan: value?.kecamatan?.kode,
+            kelurahan: value?.kelurahan?.kode,
+            kodePos: value?.kodePos,
           }
-          this.getAgama()
+          this.getDataMaster({ kode: 'agama' })
           this.getWilayah2023({ bagian: 'provinsi', KodeWilayah: null })
           this.getWilayah2023({ bagian: 'kabkota', KodeWilayah: this.inputAdministrator.provinsi })
           this.getWilayah2023({ bagian: 'kecamatan', KodeWilayah: this.inputAdministrator.kabKota })
           this.getWilayah2023({ bagian: 'kelurahan', KodeWilayah: this.inputAdministrator.kecamatan })
         }
         this.previewData = {
-          idUser: value.idUser,
-          namaRole: value.namaRole,
-          nama: this.uppercaseLetterFirst2(value.nama),
-          username: value.username,
-          email: value.email,
-          password: value.kataSandi,
-          nikSiswa: this.roleID === '4' ? value.nikSiswa ? value.nikSiswa : '-' : null,
-          nomorInduk: this.roleID === '4' || this.roleID === '3' ? value.nomorInduk : null,
-          tempat: value.tempat,
-          tanggalLahir: value.tanggalLahir,
-          jenisKelamin: value.jenisKelamin,
-          agama: value.agama.label,
-          anakKe: this.roleID === '4' ? value.anakKe ? value.anakKe : '-' : null,
-          jumlahSaudara: this.roleID === '4' ? value.jumlahSaudara ? value.jumlahSaudara : '-' : null,
-          hobi: this.roleID === '4' ? value.hobi ? value.hobi.label : '-' : null,
-          citaCita: this.roleID === '4' ? value.citaCita ? value.citaCita.label : '-' : null,
-          kelas: this.roleID === '4' ? value.kelas ? value.kelas : '-' : null,
-          jenjang: this.roleID === '4' ? value.dataSekolahSebelumnya.jenjang.label : null,
-          statusSekolah: this.roleID === '4' ? value.dataSekolahSebelumnya.statusSekolah.label : null,
-          namaSekolah: this.roleID === '4' ? value.dataSekolahSebelumnya.namaSekolah : null,
-          npsn: this.roleID === '4' ? value.dataSekolahSebelumnya.npsn ? value.dataSekolahSebelumnya.npsn : '-' : null,
-          alamatSekolah: this.roleID === '4' ? this.uppercaseLetterFirst2(value.dataSekolahSebelumnya.alamatSekolah) : null,
-          kabkotSekolah: this.roleID === '4' ? `${value.dataSekolahSebelumnya.kabkotSekolah.jenisKabKota} ${value.dataSekolahSebelumnya.kabkotSekolah.nama}` : null,
-          noPesertaUN: this.roleID === '4' ? value.dataSekolahSebelumnya.noPesertaUN ? value.dataSekolahSebelumnya.noPesertaUN : '-': null,
-          noSKHUN: this.roleID === '4' ? value.dataSekolahSebelumnya.noSKHUN ? value.dataSekolahSebelumnya.noSKHUN : '-' : null,
-          noIjazah: this.roleID === '4' ? value.dataSekolahSebelumnya.noIjazah ? value.dataSekolahSebelumnya.noSKHUN : '-' : null,
-          nilaiUN: this.roleID === '4' ? value.dataSekolahSebelumnya.nilaiUN ? value.dataSekolahSebelumnya.noSKHUN : '-' : null,
-          noKK: this.roleID === '4' ? value.noKK : null,
-          namaKK: this.roleID === '4' ? this.uppercaseLetterFirst2(value.namaKK) : null,
-          telp: this.roleID === '4' ? value.dataAlamatOrangtua.telp ? value.dataAlamatOrangtua.telp : '-' : value.telp ? value.telp : '-',
-          alamat: this.uppercaseLetterFirst2(this.roleID === '4' ? value.dataAlamatOrangtua.alamat ? value.dataAlamatOrangtua.alamat : '-' : value.alamat ? value.alamat : '-'),
-          provinsi: this.roleID === '4' ? value.dataAlamatOrangtua.provinsi.nama : value.provinsi.nama,
-          kabKota: this.roleID === '4' ? `${value.dataAlamatOrangtua.kabKota.jenisKabKota} ${value.dataAlamatOrangtua.kabKota.nama}` : `${value.kabKota.jenisKabKota} ${value.kabKota.nama}`,
-          kecamatan: this.roleID === '4' ? value.dataAlamatOrangtua.kecamatan.nama : value.kecamatan.nama,
-          kelurahan: this.roleID === '4' ? `${value.dataAlamatOrangtua.kelurahan.jenisKelDes} ${value.dataAlamatOrangtua.kelurahan.nama}` : `${value.kelurahan.jenisKelDes} ${value.kelurahan.nama}`,
-          kodePos: this.roleID === '4' ? value.dataAlamatOrangtua.kodePos : value.kodePos,
-          nikAyah: this.roleID === '4' ? value.dataOrangtua.dataAyah.nikAyah : null,
-          namaAyah: this.roleID === '4' ? this.uppercaseLetterFirst2(value.dataOrangtua.dataAyah.namaAyah) : null,
-          tahunAyah: this.roleID === '4' ? value.dataOrangtua.dataAyah.tahunAyah : null,
-          statusAyah: this.roleID === '4' ? value.dataOrangtua.dataAyah.statusAyah.label : null,
-          pendidikanAyah: this.roleID === '4' ? value.dataOrangtua.dataAyah.pendidikanAyah.label : null,
-          pekerjaanAyah: this.roleID === '4' ? value.dataOrangtua.dataAyah.pekerjaanAyah.label : null,
-          telpAyah: this.roleID === '4' ? value.dataOrangtua.dataAyah.telpAyah : null,
-          nikIbu: this.roleID === '4' ? value.dataOrangtua.dataIbu.nikIbu : null,
-          namaIbu: this.roleID === '4' ? this.uppercaseLetterFirst2(value.dataOrangtua.dataIbu.namaIbu) : null,
-          tahunIbu: this.roleID === '4' ? value.dataOrangtua.dataIbu.tahunIbu : null,
-          statusIbu: this.roleID === '4' ? value.dataOrangtua.dataIbu.statusIbu.label : null,
-          pendidikanIbu: this.roleID === '4' ? value.dataOrangtua.dataIbu.pendidikanIbu.label : null,
-          pekerjaanIbu: this.roleID === '4' ? value.dataOrangtua.dataIbu.pekerjaanIbu.label : null,
-          telpIbu: this.roleID === '4' ? value.dataOrangtua.dataIbu.telpIbu : null,
-          nikWali: this.roleID === '4' ? value.dataOrangtua.dataWali.nikWali ? value.dataOrangtua.dataWali.nikWali : '-' : null,
-          namaWali: this.roleID === '4' ? value.dataOrangtua.dataWali.namaWali ? this.uppercaseLetterFirst2(value.dataOrangtua.dataWali.namaWali) : '-' : null,
-          tahunWali: this.roleID === '4' ? value.dataOrangtua.dataWali.tahunWali ? value.dataOrangtua.dataWali.tahunWali : '-' : null,
-          pendidikanWali: this.roleID === '4' ? value.dataOrangtua.dataWali.pendidikanWali ? value.dataOrangtua.dataWali.pendidikanWali.label : '-' : null,
-          pekerjaanWali: this.roleID === '4' ? value.dataOrangtua.dataWali.pekerjaanWali ? value.dataOrangtua.dataWali.pekerjaanWali.label : '-' : null,
-          telpWali: this.roleID === '4' ? value.dataOrangtua.dataWali.telpWali ? value.dataOrangtua.dataWali.telpWali : '-' : null,
-          penghasilan: this.roleID === '4' ? value.penghasilan ? value.penghasilan.label : '-' : null,
-          statusTempatTinggal: this.roleID === '4' ? value.dataLainnya.statusTempatTinggal ? value.dataLainnya.statusTempatTinggal.label : '-' : null,
-          jarakRumah: this.roleID === '4' ? value.dataLainnya.jarakRumah ? value.dataLainnya.jarakRumah.label : '-' : null,
-          transportasi: this.roleID === '4' ? value.dataLainnya.transportasi ? value.dataLainnya.transportasi.label : '-' : null,
-          pendidikanGuru: this.roleID === '3' ? value.pendidikanGuru.label : null,
-          jabatanGuru: this.roleID === '3' ? value.jabatanGuru === null ? '-' : value.jabatanGuru.map(str => { return str.label; }).sort().join(', ') : null,
-          mengajarBidang: this.roleID === '3' ? value.mengajarBidang === null ? '-' : value.mengajarBidang.map(str => { return str.label; }).sort().join(', ') : null,
-          mengajarKelas: this.roleID === '3' ? value.mengajarKelas === null ? '-' : value.mengajarKelas : null,
-          waliKelas: this.roleID === '3' ? value.waliKelas : null,
-          fotoProfil: value.fotoProfil,
-          fcIjazah: this.roleID === '4' ? value.berkas.fcIjazah : null,
-          fcSKHUN: this.roleID === '4' ? value.berkas.fcSKHUN : null,
-          fcKK: this.roleID === '4' ? value.berkas.fcKK : null,
-          fcKTPOrtu: this.roleID === '4' ? value.berkas.fcKTPOrtu : null,
-          fcAktaLahir: this.roleID === '4' ? value.berkas.fcAktaLahir : null,
-          fcSKL: this.roleID === '4' ? value.berkas.fcSKl : null,
+          idUser: value?.idUser,
+          namaRole: value?.namaRole,
+          nama: this.uppercaseLetterFirst2(value?.nama || '-'),
+          username: value?.username,
+          email: value?.email,
+          password: value?.kataSandi,
+          nikSiswa: this.roleID === '4' ? value?.nikSiswa || '-' : null,
+          nomorInduk: this.roleID === '4' || this.roleID === '3' ? value?.nomorInduk : null,
+          tempat: value?.tempat,
+          tanggalLahir: value?.tanggalLahir,
+          jenisKelamin: value?.jenisKelamin,
+          agama: value?.agama?.label,
+          anakKe: this.roleID === '4' ? value?.anakKe || '-' : null,
+          jumlahSaudara: this.roleID === '4' ? value?.jumlahSaudara || '-' : null,
+          hobi: this.roleID === '4' ? value?.hobi?.label || '-' : null,
+          citaCita: this.roleID === '4' ? value?.citaCita?.label || '-' : null,
+          kelas: this.roleID === '4' ? value?.kelas || '-' : null,
+          jenjang: this.roleID === '4' ? value?.dataSekolahSebelumnya?.jenjang?.label : null,
+          statusSekolah: this.roleID === '4' ? value?.dataSekolahSebelumnya?.statusSekolah?.label : null,
+          namaSekolah: this.roleID === '4' ? value?.dataSekolahSebelumnya?.namaSekolah : null,
+          npsn: this.roleID === '4' ? value?.dataSekolahSebelumnya.npsn || '-' : null,
+          alamatSekolah: this.roleID === '4' ? this.uppercaseLetterFirst2(value?.dataSekolahSebelumnya?.alamatSekolah || '-') : null,
+          kabkotSekolah: this.roleID === '4' ? `${value?.dataSekolahSebelumnya?.kabkotSekolah?.jenisKabKota} ${value?.dataSekolahSebelumnya?.kabkotSekolah?.nama}` : null,
+          noPesertaUN: this.roleID === '4' ? value?.dataSekolahSebelumnya?.noPesertaUN || '-': null,
+          noSKHUN: this.roleID === '4' ? value?.dataSekolahSebelumnya?.noSKHUN || '-' : null,
+          noIjazah: this.roleID === '4' ? value?.dataSekolahSebelumnya?.noSKHUN || '-' : null,
+          nilaiUN: this.roleID === '4' ? value?.dataSekolahSebelumnya?.noSKHUN || '-' : null,
+          noKK: this.roleID === '4' ? value?.noKK : null,
+          namaKK: this.roleID === '4' ? this.uppercaseLetterFirst2(value?.namaKK || '-') : null,
+          telp: this.roleID === '4' ? value?.dataAlamatOrangtua.telp || '-' : value?.telp || '-',
+          alamat: this.uppercaseLetterFirst2(this.roleID === '4' ? value?.dataAlamatOrangtua?.alamat || '-' : value?.alamat || '-'),
+          provinsi: this.roleID === '4' ? value?.dataAlamatOrangtua?.provinsi?.nama : value?.provinsi?.nama,
+          kabKota: this.roleID === '4' ? `${value?.dataAlamatOrangtua?.kabKota?.jenisKabKota} ${value?.dataAlamatOrangtua?.kabKota?.nama}` : `${value?.kabKota?.jenisKabKota} ${value?.kabKota?.nama}`,
+          kecamatan: this.roleID === '4' ? value?.dataAlamatOrangtua?.kecamatan?.nama : value?.kecamatan?.nama,
+          kelurahan: this.roleID === '4' ? `${value?.dataAlamatOrangtua?.kelurahan?.jenisKelDes} ${value?.dataAlamatOrangtua?.kelurahan?.nama}` : `${value?.kelurahan?.jenisKelDes} ${value?.kelurahan?.nama}`,
+          kodePos: this.roleID === '4' ? value?.dataAlamatOrangtua?.kodePos : value?.kodePos,
+          nikAyah: this.roleID === '4' ? value?.dataOrangtua?.dataAyah?.nikAyah : null,
+          namaAyah: this.roleID === '4' ? this.uppercaseLetterFirst2(value?.dataOrangtua?.dataAyah?.namaAyah || '-') : null,
+          tahunAyah: this.roleID === '4' ? value?.dataOrangtua?.dataAyah?.tahunAyah : null,
+          statusAyah: this.roleID === '4' ? value?.dataOrangtua?.dataAyah?.statusAyah?.label : null,
+          pendidikanAyah: this.roleID === '4' ? value?.dataOrangtua?.dataAyah?.pendidikanAyah?.label : null,
+          pekerjaanAyah: this.roleID === '4' ? value?.dataOrangtua?.dataAyah?.pekerjaanAyah?.label : null,
+          telpAyah: this.roleID === '4' ? value?.dataOrangtua?.dataAyah?.telpAyah : null,
+          nikIbu: this.roleID === '4' ? value?.dataOrangtua?.dataIbu?.nikIbu : null,
+          namaIbu: this.roleID === '4' ? this.uppercaseLetterFirst2(value?.dataOrangtua?.dataIbu?.namaIbu || '-') : null,
+          tahunIbu: this.roleID === '4' ? value?.dataOrangtua?.dataIbu?.tahunIbu : null,
+          statusIbu: this.roleID === '4' ? value?.dataOrangtua?.dataIbu?.statusIbu?.label : null,
+          pendidikanIbu: this.roleID === '4' ? value?.dataOrangtua?.dataIbu?.pendidikanIbu?.label : null,
+          pekerjaanIbu: this.roleID === '4' ? value?.dataOrangtua?.dataIbu?.pekerjaanIbu?.label : null,
+          telpIbu: this.roleID === '4' ? value?.dataOrangtua?.dataIbu?.telpIbu : null,
+          nikWali: this.roleID === '4' ? value?.dataOrangtua?.dataWali?.nikWali || '-' : null,
+          namaWali: this.roleID === '4' ? this.uppercaseLetterFirst2(value?.dataOrangtua?.dataWali?.namaWali || '-') : null,
+          tahunWali: this.roleID === '4' ? value?.dataOrangtua?.dataWali?.tahunWali || '-' : null,
+          pendidikanWali: this.roleID === '4' ? value?.dataOrangtua?.dataWali?.pendidikanWali?.label || '-' : null,
+          pekerjaanWali: this.roleID === '4' ? value?.dataOrangtua?.dataWali?.pekerjaanWali?.label || '-' : null,
+          telpWali: this.roleID === '4' ? value?.dataOrangtua?.dataWali?.telpWali || '-' : null,
+          penghasilan: this.roleID === '4' ? value?.penghasilan?.label || '-' : null,
+          statusTempatTinggal: this.roleID === '4' ? value?.dataLainnya?.statusTempatTinggal?.label || '-' : null,
+          jarakRumah: this.roleID === '4' ? value?.dataLainnya?.jarakRumah?.label || '-' : null,
+          transportasi: this.roleID === '4' ? value?.dataLainnya?.transportasi?.label || '-' : null,
+          pendidikanGuru: this.roleID === '3' ? value?.pendidikanGuru?.label : null,
+          jabatanGuru: this.roleID === '3' ? value?.jabatanGuru.map(str => { return str.label; }).sort().join(', ') || '-' : null,
+          mengajarBidang: this.roleID === '3' ? value?.mengajarBidang.map(str => { return str.label; }).sort().join(', ') || '-' : null,
+          mengajarKelas: this.roleID === '3' ? value?.mengajarKelas || '-' : null,
+          waliKelas: this.roleID === '3' ? value?.waliKelas : null,
+          fotoProfil: value?.fotoProfil,
+          fcIjazah: this.roleID === '4' ? value?.berkas?.fcIjazah : null,
+          fcSKHUN: this.roleID === '4' ? value?.berkas?.fcSKHUN : null,
+          fcKK: this.roleID === '4' ? value?.berkas?.fcKK : null,
+          fcKTPOrtu: this.roleID === '4' ? value?.berkas?.fcKTPOrtu : null,
+          fcAktaLahir: this.roleID === '4' ? value?.berkas?.fcAktaLahir : null,
+          fcSKL: this.roleID === '4' ? value?.berkas?.fcSKl : null,
         }
         this.dataBerkas = [
           { kode: 'ijazah', url: this.previewData.fcIjazah, title: 'FC Ijazah' },
@@ -2844,9 +2812,9 @@ export default {
           { kode: 'skl', url: this.previewData.fcSKL, title: 'FC SKL' },
         ]
         this.arrayData = {
-          jabatanGuru: this.roleID === '3' ? value.jabatanGuru === null ? '-' : value.jabatanGuru.map(str => { return str.label; }).sort() : null,
-          mengajarBidang: this.roleID === '3' ? value.mengajarBidang === null ? '-' : value.mengajarBidang.map(str => { return str.label; }).sort() : null,
-          mengajarKelas: this.roleID === '3' ? value.mengajarKelas === null ? '-' : value.mengajarKelas.split(', ') : null,
+          jabatanGuru: this.roleID === '3' ? value?.jabatanGuru.map(str => { return str.label; }).sort() || '-' : null,
+          mengajarBidang: this.roleID === '3' ? value.mengajarBidang.map(str => { return str.label; }).sort() || '-' : null,
+          mengajarKelas: this.roleID === '3' ? value?.mengajarKelas : null,
         }
         localStorage.setItem('fotoProfil', this.previewData.fotoProfil)
         this.getKelasSiswa({kelas: null, roleID: this.roleID})
@@ -2855,6 +2823,7 @@ export default {
     kelasSiswa: {
       deep: true,
 			handler(value) {
+        this.DataKelas = []
         if(!value.length) return this.DataKelas = value
         let result = [
           { kategori: '7'},
@@ -2885,7 +2854,7 @@ export default {
       deep: true,
 			handler(value){
 				if (value == '1') {
-          this.getProfile(localStorage.getItem("idLogin"))
+          this.getProfile()
           this.passType = true
           this.endecryptType = false
           this.clearForm()
@@ -2913,7 +2882,7 @@ export default {
 					this.inputGuru.kabKota = null
 					this.inputGuru.kecamatan = null
 					this.inputGuru.kelurahan = null
-					this.inputGuru.kodePos = ''
+					this.inputGuru.kodePos = null
 				}
       }
     },
@@ -2924,35 +2893,34 @@ export default {
 					this.inputAdministrator.kabKota = null
 					this.inputAdministrator.kecamatan = null
 					this.inputAdministrator.kelurahan = null
-					this.inputAdministrator.kodePos = ''
+					this.inputAdministrator.kodePos = null
 				}
       }
     },
     jadwalPelajaranAll: {
 			deep: true,
 			handler(value) {
-        this.DataJadwalPelajaran = value.result
-        this.dataKelasKumpul = this.roleID === '4' ? value.dataKelas.filter(val => val.kelas === localStorage.getItem("kelas")) : value.dataKelas
-        this.dataGuru = value.dataGuru
+        this.DataJadwalPelajaran = value?.jadwal
+        this.dataKelasKumpul = this.roleID === '4' ? value?.dataKelas.filter(val => val.kelas === localStorage.getItem("kelas")) || [] : value?.dataKelas
+        this.dataGuru = value?.struktural?.dataGuru
         this.dataTTD = {
           kepalasekolah: {
-            idUser: value.kepalaSekolah.idUser,
-            nama: value.kepalaSekolah.nama,
-            nomorInduk: value.kepalaSekolah.nomorInduk,
-            signature: value.kepalaSekolah.signature,
+            idUser: value?.struktural?.kepalaSekolah?.idUser,
+            nama: value?.struktural?.kepalaSekolah?.nama,
+            nomorInduk: value?.struktural?.kepalaSekolah?.nomorInduk,
+            signature: value?.struktural?.kepalaSekolah?.signature,
           },
           kurikulum: {
-            idUser: value.kurikulum.idUser,
-            nama: value.kurikulum.nama,
-            nomorInduk: value.kurikulum.nomorInduk,
-            signature: value.kurikulum.signature,
+            idUser: value?.struktural?.kurikulum?.idUser,
+            nama: value?.struktural?.kurikulum?.nama,
+            nomorInduk: value?.struktural?.kurikulum?.nomorInduk,
+            signature: value?.struktural?.kurikulum?.signature,
           },
           ttd: {
-            namasekolah: value.ttd.namasekolah,
-            tempat: value.ttd.tempat,
-            tanggal: value.ttd.tanggal,
+            namasekolah: value?.ttd?.namasekolah,
+            tempat: value?.ttd?.tempat,
+            tanggal: value?.ttd?.tanggal,
           },
-          url: value.url,
         }
       }
     },
@@ -2969,17 +2937,18 @@ export default {
     this.passTypeLama = false
     this.passTypeBaru = false
     this.passTypeConfBaru = false
+    this.getModulPelajaran({kelas: localStorage.getItem("kelas")})
   },
   methods: {
     ...mapActions({
       fetchData: 'fetchData',
       uploadFiles: 'upload/uploadFiles',
-      getAgama: 'setting/getAgama',
-      getPendidikan: 'setting/getPendidikan',
+			getDataMaster: 'setting/getDataMaster',
       getWilayah2023: 'setting/getWilayah2023',
       getKelasSiswa: 'kelas/getKelasSiswa',
       getProfile: 'auth/getProfile',
       getJadwalPelajaran: 'user/getJadwalPelajaran', 
+      getModulPelajaran: 'user/getModulPelajaran', 
     }),
     wilayah(kondisi, e){
 			if(kondisi === 'provinsi'){
@@ -2989,12 +2958,12 @@ export default {
             this.inputAdministrator.kabKota = null
             this.inputAdministrator.kecamatan = null
             this.inputAdministrator.kelurahan = null
-            this.inputAdministrator.kodePos = ''
+            this.inputAdministrator.kodePos = null
           }else if(this.roleID === '3'){
             this.inputGuru.kabKota = null
             this.inputGuru.kecamatan = null
             this.inputGuru.kelurahan = null
-            this.inputGuru.kodePos = ''
+            this.inputGuru.kodePos = null
           }
 				}
 			}else if(kondisi === 'kabkota'){
@@ -3003,23 +2972,23 @@ export default {
           if(this.roleID === '1' || this.roleID === '2'){
             if(e !== this.inputAdministrator.kecamatan) {
               this.inputAdministrator.kelurahan = null
-              this.inputAdministrator.kodePos = ''	
+              this.inputAdministrator.kodePos = null	
             }
           }else if(this.roleID === '3'){
             if(e !== this.inputGuru.kecamatan) {
               this.inputGuru.kelurahan = null
-              this.inputGuru.kodePos = ''	
+              this.inputGuru.kodePos = null	
             }
           }
 				}else{
 					if(this.roleID === '1' || this.roleID === '2'){
             this.inputAdministrator.kecamatan = null
             this.inputAdministrator.kelurahan = null
-            this.inputAdministrator.kodePos = ''
+            this.inputAdministrator.kodePos = null
           }else if(this.roleID === '3'){
             this.inputGuru.kecamatan = null
             this.inputGuru.kelurahan = null
-            this.inputGuru.kodePos = ''
+            this.inputGuru.kodePos = null
           }
 				}
 			}else if(kondisi === 'kecamatan'){
@@ -3027,20 +2996,20 @@ export default {
 					this.getWilayah2023({ bagian: 'kelurahan', KodeWilayah: e })
           if(this.roleID === '1' || this.roleID === '2'){
             if(e !== this.inputAdministrator.kelurahan) {
-              this.inputAdministrator.kodePos = ''	
+              this.inputAdministrator.kodePos = null	
             }
           }else if(this.roleID === '3'){
             if(e !== this.inputGuru.kelurahan) {
-              this.inputGuru.kodePos = ''	
+              this.inputGuru.kodePos = null	
             }
           }
 				}else{
 					if(this.roleID === '1' || this.roleID === '2'){
             this.inputAdministrator.kelurahan = null
-            this.inputAdministrator.kodePos = ''
+            this.inputAdministrator.kodePos = null
           }else if(this.roleID === '3'){
             this.inputGuru.kelurahan = null
-            this.inputGuru.kodePos = ''
+            this.inputGuru.kodePos = null
           }
 				}
 			}else if(kondisi === 'kelurahan'){
@@ -3053,9 +3022,9 @@ export default {
           }
 				}else{
 					if(this.roleID === '1' || this.roleID === '2'){
-            this.inputAdministrator.kodePos = ''
+            this.inputAdministrator.kodePos = null
           }else if(this.roleID === '3'){
-            this.inputGuru.kodePos = ''
+            this.inputGuru.kodePos = null
           }
 				}
 			}
@@ -3105,7 +3074,7 @@ export default {
       .then((res) => {
         this.kondisiForm = true
         this.clearForm()
-        this.getProfile(localStorage.getItem('idLogin'))
+        this.getProfile()
         this.notifikasi("success", res.data.message, "1")
 			})
 			.catch((err) => {
@@ -3123,7 +3092,7 @@ export default {
       .then((res) => {
         this.kondisiForm = true
         this.clearForm()
-        this.getProfile(localStorage.getItem('idLogin'))
+        this.getProfile()
         this.notifikasi("success", res.data.message, "1")
 			})
 			.catch((err) => {
@@ -3231,12 +3200,28 @@ export default {
       this.getJadwalPelajaran()
       this.DialogJadwalPelajaran = true
     },
+    async downloadModul(data) {
+      if(!data.modul.file) return this.notifikasi("warning", `Modul ${data.namaMapel} tidak ditemukan !`, "1") 
+      this.isLoadingModul[data.mapel] = true
+      const response = await axios.get(`${data.modul.file}`, { responseType: 'blob' });
+      setTimeout(() => {
+        console.log(response);
+        this.isLoadingModul[data.mapel] = false
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `Modul ${data.namaMapel} - ${data.modul.title}.${data.modul.ext}`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      }, 3000);
+    },
     onClickVisible(d) {
       this[d] = !this[d]
     },
     endecryptData(d) {
       this[d] = !this[d]
-      let url = this[d] ? 'decryptPass' : 'encryptPass' 
+      let url = this[d] ? 'decrypt-pass' : 'encrypt-pass' 
       let payload = {
 				method: "get",
 				url: `settings/${url}?kata=${this.previewData.password}`,
@@ -3400,24 +3385,26 @@ export default {
 </script>
 <style scoped>
 .tableClass, .tdClass, .thClass {
-  border: 2px solid #FFF;
   padding: 5px;
   text-align: center;
 	font-size: 7.5pt;
   font-weight: bold;
 }
+.tdClass {
+  border: 2px solid #000;
+}
 .tableClass, .tdSClass, .thSClass {
-  border: 2px solid #FFF;
   padding: 5px;
   text-align: center;
 	font-size: 7.5pt;
   font-weight: bold;
 }
 .tdSClass {
+  border: 2px solid #000;
   text-align: left;
 }
 .thClass, .thSClass {
-  border: 2px solid #FFF;
+  border: 2px solid #be1111;
   background-color: #000;
   color: #FFF;
 }
@@ -3446,7 +3433,7 @@ export default {
   justify-content: center;
 	font-size: 9pt;
 	font-weight: bold;
-	background-color: #0ACC75B1;
+	background-color: #4CAF50;
 	border: 1px solid #FFFFFF;
 	color: #FFFFFF;
 }
@@ -3463,7 +3450,7 @@ export default {
   justify-content: center;
 	font-size: 9pt;
 	font-weight: bold;
-	background-color: #0ACC75B1;
+	background-color: #4CAF50;
 	border: 1px solid #FFFFFF;
 	color: #FFFFFF;
 }
@@ -3514,8 +3501,8 @@ export default {
   text-align: center;
   vertical-align: middle;
   overflow: hidden;
-  width: 185px;
-  height: 185px;
+  width: 125px;
+  height: 125px;
   cursor: pointer;
 }
 .avatar:hover {
@@ -3539,11 +3526,11 @@ export default {
   position: absolute;
   background: #000000;
   color: #FFF;
-  font-size: 12px;
+  font-size: 7pt;
   visibility: visible;
   font-weight: bold;
   z-index: 100;
-  width: 185px;
+  width: 125px;
   height: 30px;
 }
 .cropper {
@@ -3586,7 +3573,7 @@ export default {
 }
 .customScrollRight {
   width: 100%;
-  height: 175px;
+  height: 245px;
   background: #272727;
   overflow-y: auto;
   overflow-x: hidden;
