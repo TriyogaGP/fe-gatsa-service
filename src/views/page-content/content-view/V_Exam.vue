@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="subheading grey--text text-decoration-underline">Data Ujian </h1>
+    <h2 class="subheading grey--text text-decoration-underline">Data Ujian </h2>
     <v-card class="pa-1 rounded" variant="outlined" elevation="4">
       <v-container fluid v-if="jadwal?.length">
         <v-row>
@@ -26,7 +26,7 @@
                   <v-col cols="12" class="pa-0 pr-2 text-end">
                     <Button
                       icon-append-button="mdi mdi-arrow-right-thick"
-                      nama-button="View"
+                      nama-button="Mulai Ujian"
                       :disabled-button="convertDateTime2(hasil.endDate) < convertDateTime2(now)"
                       @proses="gotoExam(hasil.idJadwalExam, hasil.kondisi)"
                     />

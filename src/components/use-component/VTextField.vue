@@ -9,7 +9,8 @@
     density="comfortable"
     color="light-black darken-3"
     bg-color="white"
-    hide-details
+    :rules="TFrules ? TFformatrules == 'text' ? [rules.required] : [rules.required, rules.emailRules] : []"
+    hide-details="auto"
     :clearable="TFclearable"
     :readonly="TFreadonly"
     :disabled="TFdisabled"
@@ -40,7 +41,7 @@
     density="comfortable"
     color="light-black darken-3"
     bg-color="white"
-    :rules="TFrules ? [rules.emailRules] : []"
+    :rules="TFrules ? TFformatrules == 'text' ? [rules.required] : [rules.required, rules.emailRules] : []"
     hide-details="auto"
     :clearable="TFclearable"
     :readonly="TFreadonly"
@@ -95,14 +96,19 @@ export default {
       type: Boolean,
       default: false
     },
+    formatrulesTf: {
+      type: String,
+      default: ""
+    },
   },
   data() {
     return{
       rules: {
         emailRules: value => {
           const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-          return pattern.test(value) || 'email tidak valid'
+          return pattern.test(value) || 'email tidak valid !'
         },
+        required: value => !!value || 'Field ini wajib diisi !'
       }
     }
   },
@@ -139,6 +145,9 @@ export default {
     },
     TFrules() {
       return this.rulesTf;
+    },
+    TFformatrules() {
+      return this.formatrulesTf;
     },
   },
   methods:{

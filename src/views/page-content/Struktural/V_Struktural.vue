@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="subheading grey--text text-decoration-underline">Data {{ roleID === '4' || roleID === '3' ? 'Guru' : 'Struktural' }}</h1>
+    <h2 class="subheading grey--text text-decoration-underline">Data {{ roleID === '4' || roleID === '3' ? 'Guru' : 'Struktural' }}</h2>
     <v-card class="pa-1 rounded" variant="outlined" elevation="4">
       <v-alert
         v-if="roleID === '1' || roleID === '2'"
@@ -14,7 +14,7 @@
         class="mb-2"
       >
         <template v-slot:text>
-          <ul style="font-size: 12px;">
+          <ul style="font-size: 9pt;">
             <li>- Tombol Delete ada 2 (Delete Soft & Delete Hard).</li>
             <li>- Tombol Delete Soft tidak menghapus data dari database hanya di jadikan nonaktif dan ditandai dengan flag merah.</li>
             <li>- Tombol Delete Hard menghapus data dari database secara permanen.</li>
@@ -35,7 +35,6 @@
         :sort-by="sortBy"
         density="comfortable"
         hide-default-footer
-        hide-default-header
         multi-sort
         class="elavation-3 rounded"
         sort-asc-icon="mdi mdi-sort-alphabetical-ascending"
@@ -60,50 +59,51 @@
         <template #loader>
           <LoaderDataTables />
         </template>
-        <template #[`item.number`]="{ item }">
-          {{ page > 1 ? ((page - 1)*limit) + item.index + 1 : item.index + 1 }}
+        <template #[`item.number`]="{ index }">
+          {{ page > 1 ? ((page - 1)*limit) + index + 1 : index + 1 }}
         </template>
         <template #[`item.nama`]="{ item }">
-          <span v-html="uppercaseLetterFirst2(item.raw.nama)" /><br>
-          <span v-html="item.raw.email" /> 
+          <span v-html="uppercaseLetterFirst2(item.nama)" /><br>
+          <span v-html="item.email" /> 
         </template>
         <template #[`item.jabatan`]="{ item }">
-          <span v-if="item.raw.jabatanGuru === null">-</span>
-          <ul v-else><li v-for="v in item.raw.jabatanGuru" :key="v.kode">{{ v.label === 'Wali Kelas' ? `${v.label} (${item.raw.waliKelas})` : v.label }}</li></ul>
+          <span v-if="item.jabatanGuru === null">-</span>
+          <ul v-else><li v-for="v in item.jabatanGuru" :key="v.kode">{{ v.label === 'Wali Kelas' ? `${v.label} (${item.waliKelas})` : v.label }}</li></ul>
         </template>
         <template #[`item.mapel`]="{ item }">
-          <span v-if="item.raw.mengajarBidang === null">-</span>
-          <ul v-else><li v-for="v in item.raw.mengajarBidang" :key="v.kode">{{ v.label }}</li></ul>
+          <span v-if="item.mengajarBidang === null">-</span>
+          <ul v-else><li v-for="v in item.mengajarBidang" :key="v.kode">{{ v.label }}</li></ul>
         </template>
         <template #[`item.kelas`]="{ item }">
-          <!-- <ul><li v-for="kelas in item.raw.mengajarKelas.split(', ')" :key="kelas">{{ kelas }}</li></ul> -->
-          <span v-if="item.raw.mengajarKelas === null">-</span>
-          <span v-else v-html="item.raw.mengajarKelas" />
+          <!-- <ul><li v-for="kelas in item.mengajarKelas.split(', ')" :key="kelas">{{ kelas }}</li></ul> -->
+          <span v-if="item.mengajarKelas === null">-</span>
+          <span v-else v-html="item.mengajarKelas" />
         </template>
         <template #[`item.statusAktif`]="{ item }">
-          <v-icon size="small" v-if="item.raw.statusAktif == true" color="green" icon="mdi mdi-check" />
-          <v-icon size="small" v-else-if="item.raw.statusAktif == false" color="red" icon="mdi mdi-close" />
+          <v-icon size="small" :color="item.statusAktif ? 'green' : 'red'" :icon="item.statusAktif ? 'mdi mdi-check' : 'mdi mdi-close'" />
         </template>
         <template #[`item.flag`]="{ item }">
-          <div class="flag" :style="item.raw.flag ? 'background-color: red;' : 'background-color: green;'" />
+          <div class="flag" :style="item.flag ? 'background-color: red;' : 'background-color: green;'" />
         </template>
         <template #expanded-row="{ columns, item }">
           <tr>
             <td :colspan="columns.length">
               <Button
                 v-if="roleID === '1' || roleID === '2' || (roleID === '3' && kondisiKepalaSekolah)"
-                color-button="#0bd369"
+                color-button="success"
+                size-button="x-small"
                 icon-prepend-button="mdi mdi-pencil"
                 nama-button="Ubah"
-                :disabled-button="item.raw.statusAktif === false"
-                @proses="ubahData(item.raw.idUser, 'ubahdata')"
+                :disabled-button="!item.statusAktif"
+                @proses="ubahData(item.idUser, 'ubahdata')"
               />
               <Button
                 v-if="roleID === '1' || roleID === '2' || (roleID === '3' && kondisiKepalaSekolah)"
-                color-button="#0bd369"
-                :icon-prepend-button="item.raw.statusAktif === false ? 'mdi mdi-eye' : 'mdi mdi-eye-off'"
-                :nama-button="item.raw.statusAktif === false ? 'Active' : 'Non Active'"
-                @proses="postRecord(item.raw, 'STATUSRECORD', !item.raw.statusAktif)"
+                color-button="success"
+                size-button="x-small"
+                :icon-prepend-button="!item.statusAktif ? 'mdi mdi-eye' : 'mdi mdi-eye-off'"
+                :nama-button="!item.statusAktif ? 'Active' : 'Non Active'"
+                @proses="postRecord(item, 'STATUSRECORD', !item.statusAktif)"
               />
               <v-menu
                 open-on-click
@@ -116,10 +116,11 @@
                   <Button 
                     v-if="roleID === '1' || roleID === '2' || (roleID === '3' && kondisiKepalaSekolah)"
                     v-bind="props"
-                    color-button="#bd3a07"
+                    color-button="error"
                     icon-prepend-button="mdi mdi-delete"
                     icon-append-button="mdi mdi-menu-down"
                     nama-button="Hapus"
+                    size-button="x-small"
                   />
                 </template>
 
@@ -131,11 +132,11 @@
                   class="listData"
                 >
                   <v-list-item
-                    @click="postRecord(item.raw, 'DELETESOFT', null)"
+                    @click="postRecord(item, 'DELETESOFT', null)"
                     class="SelectedMenu"
                     active-class="SelectedMenu-active"
                     title="Delete Soft"
-                    :disabled="item.raw.statusAktif === false"
+                    :disabled="!item.statusAktif"
                   >
                     <template v-slot:prepend>
                       <v-icon size="middle" icon="mdi mdi-delete" color="icon-white" />
@@ -145,7 +146,7 @@
                     </template>
                   </v-list-item>
                   <v-list-item
-                    @click="postRecord(item.raw, 'DELETEHARD', null)"
+                    @click="postRecord(item, 'DELETEHARD', null)"
                     class="SelectedMenu"
                     active-class="SelectedMenu-active"
                     title="Delete Hard"
@@ -161,59 +162,50 @@
               </v-menu>
               <Button
                 v-if="roleID === '1' || roleID === '2'"
-                color-button="#0bd369"
+                color-button="success"
                 icon-prepend-button="mdi mdi-signature-freehand"
                 nama-button="Signature"
-                :disabled-button="item.raw.statusAktif === false"
-                @proses="ubahData(item.raw.idUser, 'signature')"
+                size-button="x-small"
+                :disabled-button="!item.statusAktif"
+                @proses="ubahData(item.idUser, 'signature')"
               />
               <Button 
-                color-button="#04f7f7"
+                color-button="info"
                 icon-prepend-button="mdi mdi-information"
                 nama-button="Detail"
-                @proses="openDialog(item.raw)"
+                size-button="x-small"
+                @proses="openDialog(item)"
               />
             </td>
           </tr>
         </template>
         <template #top>
           <v-row no-gutters class="pa-2">
-            <v-col cols="12" md="6">
+            <v-col cols="12" md="6" class="d-flex align-center">
               <Button 
                 v-if="roleID === '1' || roleID === '2' || (roleID === '3' && kondisiKepalaSekolah)"
                 color-button="light-blue darken-3"
                 icon-prepend-button="mdi mdi-plus-thick"
                 nama-button="Tambah"
+                size-button="x-small"
                 @proses="getUID"
               />
             </v-col>
             <v-col cols="12" md="6">
-              <v-row no-gutters>
-                <v-col cols="12" md="9" class="pr-2">
-                  <TextField
-                    v-model="searchData"
-                    icon-prepend-tf="mdi mdi-magnify"
-                    label-tf="Pencarian..."
-                    :clearable-tf="true"
-                    @click:clear="() => {
-                      page = 1
-                      getStruktural({page: 1, limit: limit, keyword: ''})
-                    }"
-                    @keyup.enter="() => {
-                      page = 1
-                      getStruktural({page: 1, limit: limit, keyword: searchData})
-                    }"
-                  />
-                </v-col>
-                <v-col cols="12" md="3" class="d-flex justify-end align-center">
-                  <Autocomplete
-                    v-model="page"
-                    :data-a="pageOptions"
-                    label-a="Page"
-                    :disabled-a="DataStruktural.length ? false : true"
-                  />
-                </v-col>
-              </v-row>
+              <TextField
+                v-model="searchData"
+                icon-prepend-tf="mdi mdi-magnify"
+                label-tf="Pencarian..."
+                :clearable-tf="true"
+                @click:clear="() => {
+                  page = 1
+                  getStruktural({page: 1, limit: limit, keyword: ''})
+                }"
+                @keyup.enter="() => {
+                  page = 1
+                  getStruktural({page: 1, limit: limit, keyword: searchData})
+                }"
+              />
             </v-col>
           </v-row>
           <v-divider :thickness="2" class="border-opacity-100" color="white" />
@@ -224,14 +216,16 @@
             <v-col cols="12" class="pa-2 d-flex justify-start align-center">
               <Button
                 v-if="DataStruktural.length && selectRecord.length < DataStruktural.length"
-                color-button="#0bd369"
+                color-button="success"
+                size-button="x-small"
                 icon-prepend-button="mdi mdi-select-all"
                 :nama-button="`Choose All (${selectRecord.length})`"
                 @proses="allData(DataStruktural)"
               />
               <Button
                 v-if="selectRecord.length"
-                color-button="#0bd369"
+                color-button="success"
+                size-button="x-small"
                 icon-prepend-button="mdi mdi-select-remove"
                 :nama-button="`Remove Select`"
                 @proses="() => { selectRecord = [] }"
@@ -240,6 +234,7 @@
                 color-button="#bd3a07"
                 icon-prepend-button="mdi mdi-delete"
                 nama-button="Hapus Record Selected"
+                size-button="x-small"
                 :disabled-button="!DataStruktural.length"
                 @proses="hapusAllRecord()"
               />
@@ -248,7 +243,17 @@
           <v-divider :thickness="2" class="border-opacity-100" color="white" />
           <v-row no-gutters>
             <v-col cols="12" lg="10" class="pa-2 d-flex justify-start align-center">
-              <span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
+              <!-- <span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span> -->
+              <span style="font-size: 10pt;">Halaman</span>
+              <div style="width: 100px; margin-left: 3px; margin-right: 3px;">
+                <Autocomplete
+                  v-model="page"
+                  :data-a="pageOptions"
+                  label-a="Page"
+                  :disabled-a="DataStruktural.length ? false : true"
+                />
+              </div>
+              <span style="font-size: 10pt;">dari Total Halaman <strong>{{ pageSummary?.totalPages }}</strong> (Records {{ pageSummary?.total }})</span>
             </v-col>
             <v-col cols="12" lg="2" class="pa-2 text-right">
               <div class="d-flex justify-start align-center">
@@ -257,24 +262,24 @@
                   pilihan-a="select"
                   :data-a="limitPage"
                   label-a="Limit"
-                  :disabled-a="DataStruktural.length ? false : true"
+                  :disabled-a="!DataStruktural.length"
                 />
                 <Button
                   variant="plain"
                   size-button="large"
                   model-button="comfortable"
-                  color-button="#ffffff"
+                  color-button="success"
                   icon-button="mdi mdi-arrow-left-circle-outline"
-                  :disabled-button="DataStruktural.length ? pageSummary.page != 1 ? false : true : true"
+                  :disabled-button="!DataStruktural.length || !(pageSummary.page != 1)"
                   @proses="() => { page = pageSummary.page - 1 }"
                 />
                 <Button
                   variant="plain"
                   size-button="large"
                   model-button="comfortable"
-                  color-button="#ffffff"
+                  color-button="success"
                   icon-button="mdi mdi-arrow-right-circle-outline"
-                  :disabled-button="DataStruktural.length ? pageSummary.page != pageSummary.totalPages ? false : true : true"
+                  :disabled-button="!DataStruktural.length || !(pageSummary.page != pageSummary.totalPages)"
                   @proses="() => { page = pageSummary.page + 1 }"
                 />
               </div>
@@ -394,7 +399,7 @@
                 {{ previewData.password }}
                 <Button
                   variant="plain"
-                  color-button="#000000"
+                  color-button="#fff"
                   :icon-button="endecryptType ? 'mdi mdi-eye-lock' : 'mdi mdi-eye-lock-open'"
                   model-button="comfortable"
                   size-button="large"
@@ -765,17 +770,17 @@
               class="d-flex align-center justify-center"
             >
               <Button
-                color-button="#0bd369"
+                color-button="success"
                 nama-button="Clear"
                 @proses="clear()"
               />
               <Button
-                color-button="#0bd369"
+                color-button="success"
                 nama-button="Undo"
                 @proses="undo()"
               />
               <Button
-                color-button="#0bd369"
+                color-button="success"
                 nama-button="Proses"
                 @proses="save()"
               />
@@ -786,12 +791,12 @@
               class="d-flex align-center justify-center"
             >
               <Button
-                color-button="#0bd369"
+                color-button="success"
                 nama-button="Crop Signature"
                 @proses="crop()"
               />
               <Button
-                color-button="#0bd369"
+                color-button="success"
                 nama-button="Clear"
                 @proses="clearCrop()"
               />
@@ -886,30 +891,30 @@ export default {
     totalItems: 0,
     roleID: '',
     previewData: {
-      idUser: '',
-      namaRole: '',
-      nama: '',
-      username: '',
-      email: '',
-      password: '',
-      tempat: '',
-      tanggalLahir: '',
-      jenisKelamin: '',
-      agama: '',
-      telp: '',
-      alamat: '',
-      provinsi: '',
-      kabKota: '',
-      kecamatan: '',
-      kelurahan: '',
-      kodePos: '',
-      nomorInduk: '',
-      pendidikanGuru: '',
-      jabatanGuru: '',
-      mengajarBidang: '',
-      mengajarKelas: '',
-      waliKelas: '',
-      fotoProfil: '',
+      idUser: null,
+      namaRole: null,
+      nama: null,
+      username: null,
+      email: null,
+      password: null,
+      tempat: null,
+      tanggalLahir: null,
+      jenisKelamin: null,
+      agama: null,
+      telp: null,
+      alamat: null,
+      provinsi: null,
+      kabKota: null,
+      kecamatan: null,
+      kelurahan: null,
+      kodePos: null,
+      nomorInduk: null,
+      pendidikanGuru: null,
+      jabatanGuru: null,
+      mengajarBidang: null,
+      mengajarKelas: null,
+      waliKelas: null,
+      fotoProfil: null,
       signature: null,
     },
     DialogStruktural: false,
@@ -952,22 +957,14 @@ export default {
 		jabatanOptions(){
 			if(this.roleID === '3'){
 				let jabatan_guru = localStorage.getItem('jabatan_guru').split(', ')
-				let result = []
-				jabatan_guru.map(str => {
-					let hasil = this.jabatan.filter(val => { return val.kode == str })
-					result.push(hasil.length ? hasil[0].label : '')
-				})
+				let result = this.jabatan.filter(val => jabatan_guru.includes(val.value)).map(x => x?.label || '')
 				return result
 			}
 		},
     kondisiJabatan(){
 			if(this.roleID === '3'){
 				let jabatan_guru = localStorage.getItem('jabatan_guru').split(', ')
-				let result = []
-				jabatan_guru.map(str => {
-					let hasil = this.jabatan.filter(val => { return val.kode == str })
-					result.push(hasil.length ? hasil[0].label : '')
-				})
+				let result = this.jabatan.filter(val => jabatan_guru.includes(val.value)).map(x => x?.label || '')
         let kondisi = false
         if(result.includes('WaKaBid. Kurikulum')){
           kondisi = true
@@ -998,10 +995,10 @@ export default {
         this.pageOptions = []
         this.DataStruktural = value.records
 				this.pageSummary = {
-					page: this.DataStruktural.length ? value.pageSummary.page : 0,
-					limit: this.DataStruktural.length ? value.pageSummary.limit : 0,
-					total: this.DataStruktural.length ? value.pageSummary.total : 0,
-					totalPages: this.DataStruktural.length ? value.pageSummary.totalPages : 0
+					page: value?.pageSummary?.page,
+					limit: value?.pageSummary?.limit,
+					total: value?.pageSummary?.total,
+					totalPages: value?.pageSummary?.totalPages
 				}
         for (let index = 1; index <= this.pageSummary.totalPages; index++) {
           this.pageOptions.push(index)
@@ -1011,14 +1008,14 @@ export default {
     page: {
 			deep: true,
 			handler(value) {
-        if(value){
-          this.getStruktural({page: value, limit: this.limit, keyword: this.searchData, sorting: this.kumpulSort})
-        }
+        this.DataStruktural = []
+        this.getStruktural({page: value, limit: this.limit, keyword: this.searchData, sorting: this.kumpulSort})
 			}
 		},
     limit: {
 			deep: true,
 			handler(value) {
+        this.DataStruktural = []
         this.page = 1
 				this.getStruktural({page: 1, limit: value, keyword: this.searchData, sorting: this.kumpulSort})
 			}
@@ -1092,61 +1089,64 @@ export default {
     openDialog(item){
       // this.getAdminbyUID(uid)
       // console.log(item);
+      const jabatan = item?.jabatanGuru
+      const mengajarBidang = item?.mengajarBidang
+      const mengajarKelas = item?.mengajarKelas
       this.previewData = {
-        idUser: item.idUser,
-        namaRole: item.namaRole,
-        nama: item.nama,
-        username: item.username,
-        email: item.email,
-        password: item.kataSandi,
-        tempat: item.tempat,
-        tanggalLahir: item.tanggalLahir,
-        jenisKelamin: item.jenisKelamin,
-        agama: item.agama.label,
-        telp: item.telp,
-        alamat: item.alamat,
-        provinsi: item.provinsi.nama,
-        kabKota: `${item.kabKota.jenisKabKota} ${item.kabKota.nama}`,
-        kecamatan: item.kecamatan.nama,
-        kelurahan: `${item.kelurahan.jenisKelDes} ${item.kelurahan.nama}`,
-        kodePos: item.kodePos,
-        nomorInduk: item.nomorInduk,
-        pendidikanGuru: item.pendidikanGuru.label,
-        jabatanGuru: item.jabatanGuru === null ? '-' : item.jabatanGuru.map(str => { return str.label; }).sort().join(', '),
-        mengajarBidang: item.mengajarBidang === null ? '-' : item.mengajarBidang.map(str => { return str.label; }).sort().join(', '),
-        mengajarKelas: item.mengajarKelas === null ? '-' : item.mengajarKelas,
-        waliKelas: item.waliKelas,
-        fotoProfil: item.fotoProfil,
-        signature: item.signature,
+        idUser: item?.idUser,
+        namaRole: item?.namaRole,
+        nama: item?.nama,
+        username: item?.username,
+        email: item?.email,
+        password: item?.kataSandi,
+        tempat: item?.tempat,
+        tanggalLahir: item?.tanggalLahir,
+        jenisKelamin: item?.jenisKelamin,
+        agama: item?.agama?.label,
+        telp: item?.telp,
+        alamat: item?.alamat,
+        provinsi: item?.provinsi?.nama,
+        kabKota: `${item?.kabKota?.jenisKabKota} ${item?.kabKota?.nama}`,
+        kecamatan: item?.kecamatan?.nama,
+        kelurahan: `${item?.kelurahan?.jenisKelDes} ${item?.kelurahan?.nama}`,
+        kodePos: item?.kodePos,
+        nomorInduk: item?.nomorInduk,
+        pendidikanGuru: item?.pendidikanGuru?.label,
+        jabatanGuru: (jabatan || []).map(str => { return str.label; }).sort().join(', ') || '-',
+        mengajarBidang: (mengajarBidang || []).map(str => { return str.label; }).sort().join(', ') || '-',
+        mengajarKelas: (mengajarKelas || '-'),
+        waliKelas: item?.waliKelas,
+        fotoProfil: item?.fotoProfil,
+        signature: item?.signature,
       }
       this.DialogStruktural = true
     },
     clearData(){
       this.previewData = {
-        idUser: '',
-        namaRole: '',
-        nama: '',
-        username: '',
-        email: '',
-        password: '',
-        tempat: '',
-        tanggalLahir: '',
-        jenisKelamin: '',
-        agama: '',
-        telp: '',
-        alamat: '',
-        provinsi: '',
-        kabKota: '',
-        kecamatan: '',
-        kelurahan: '',
-        kodePos: '',
-        nomorInduk: '',
-        pendidikanGuru: '',
-        jabatanGuru: '',
-        mengajarBidang: '',
-        mengajarKelas: '',
-        waliKelas: '',
-        fotoProfil: '',
+        idUser: null,
+        namaRole: null,
+        nama: null,
+        username: null,
+        email: null,
+        password: null,
+        tempat: null,
+        tanggalLahir: null,
+        jenisKelamin: null,
+        agama: null,
+        telp: null,
+        alamat: null,
+        provinsi: null,
+        kabKota: null,
+        kecamatan: null,
+        kelurahan: null,
+        kodePos: null,
+        nomorInduk: null,
+        pendidikanGuru: null,
+        jabatanGuru: null,
+        mengajarBidang: null,
+        mengajarKelas: null,
+        waliKelas: null,
+        fotoProfil: null,
         signature: null,
       }
     },
@@ -1268,7 +1268,7 @@ export default {
     },
     endecryptData(d) {
       this[d] = !this[d]
-      let url = this[d] ? 'decryptPass' : 'encryptPass' 
+      let url = this[d] ? 'decrypt-pass' : 'encrypt-pass' 
       let payload = {
 				method: "get",
 				url: `settings/${url}?kata=${this.previewData.password}`,
@@ -1287,13 +1287,15 @@ export default {
 			this.kumpulSort = this.sortBy.map((val) => {
         return `${val.key}-${val.order === 'asc' ? 'ASC' : 'DESC'}`
       }).join(',')
+      this.DataStruktural = []
+      this.page = 1 
 		  this.getStruktural({page: this.page, limit: this.limit, keyword: this.searchData, sorting: this.kumpulSort});
 		},
     clickrow(event, data) {
-      const index = this.$data.expanded.find(i => i === data?.item?.raw?.idUser);
+      const index = this.$data.expanded.find(i => i === data?.item?.idUser);
       if(typeof index === 'undefined') return this.$data.expanded = [];
       this.$data.expanded.splice(0, 1)
-      this.$data.expanded.push(data?.item?.raw?.idUser);
+      this.$data.expanded.push(data?.item?.idUser);
     },
     notifikasi(kode, text, proses){
       this.dialogNotifikasi = true

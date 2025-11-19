@@ -19,7 +19,9 @@ export const GET_WALI_KELAS = "getWaliKelas";
 export const UPDATE_PERINGKAT = "updatePeringkat";
 export const GET_JADWAL_MENGAJAR = "getJadwalMengajar";
 export const GET_JADWAL_PELAJARAN = "getJadwalPelajaran";
+export const GET_MODUL_PELAJARAN = "getModulPelajaran";
 export const POST_JADWAL_MENGAJAR = "postJadwalMengajar";
+export const GET_KELAS_SISWA = "getKelasSiswa";
 export const GET_LIST_SISWASISWI = "listSiswaSiswi";
 export const GET_QUESTION_EXAM = "getQuestionExam";
 export const POST_QUESTION_EXAM = "postQuestionExam";
@@ -45,6 +47,8 @@ export const SET_NILAI = "SET_NILAI";
 export const SET_WALI_KELAS = "SET_WALI_KELAS";
 export const SET_JADWAL_MENGAJAR = "SET_JADWAL_MENGAJAR";
 export const SET_JADWAL_PELAJARAN = "SET_JADWAL_PELAJARAN";
+export const SET_MODUL_PELAJARAN = "SET_MODUL_PELAJARAN";
+export const SET_KELAS_SISWA = "SET_KELAS_SISWA";
 export const SET_LIST_SISWASISWI = "SET_LIST_SISWASISWI";
 export const SET_QUESTION_EXAM = "SET_QUESTION_EXAM";
 export const SET_JADWAL_EXAM = "SET_JADWAL_EXAM";
@@ -66,6 +70,8 @@ const state = {
   dataWaliKelas: [],
   dataJadwalMengajar: [],
   dataJadwalPelajaran: [],
+  dataModulPelajaran: [],
+  dataKelasSiswa: [],
   listSiswaSiswi: [],
   dataQuestionExam: [],
   dataListPick: [],
@@ -111,6 +117,12 @@ const mutations = {
   },
   [SET_JADWAL_PELAJARAN](state, data) {
     state.dataJadwalPelajaran = data
+  },
+  [SET_MODUL_PELAJARAN](state, data) {
+    state.dataModulPelajaran = data
+  },
+  [SET_KELAS_SISWA](state, data) {
+    state.dataKelasSiswa = data
   },
   [SET_LIST_SISWASISWI](state, data) {
     state.listSiswaSiswi = data
@@ -165,6 +177,12 @@ const getters = {
   },
   jadwalPelajaranAll(state) {
     return state.dataJadwalPelajaran;
+  },
+  modulPelajaranAll(state) {
+    return state.dataModulPelajaran;
+  },
+  kelasSiswa(state) {
+    return state.dataKelasSiswa;
   },
   listSiswaSiswiAll(state) {
     return state.listSiswaSiswi;
@@ -275,7 +293,7 @@ const actions = {
   [GET_SISWASISWI](context, data) {
     return new Promise((resolve, reject) => {
       context.commit('SET_LOADINGTABLE', true)
-      ApiService.get(`user/siswasiswi?page=${data.page}&limit=${data.limit}${data.keyword ? `&keyword=${data.keyword}` : ''}${typeof data.kelas !== 'undefined' || data.kelas ? `&kelas=${data.kelas}` : ''}${data.filter !== '' ? `&filter=${data.filter}` : ''}${data.sorting !== '' ? `&sort=${data.sorting}` : ''}`, token)
+      ApiService.get(`user/siswa-siswi?page=${data.page}&limit=${data.limit}${data.keyword ? `&keyword=${data.keyword}` : ''}${typeof data.kelas !== 'undefined' || data.kelas ? `&kelas=${data.kelas}` : ''}${data.filter !== '' ? `&filter=${data.filter}` : ''}${data.sorting !== '' ? `&sort=${data.sorting}` : ''}`, token)
       .then((response) => {
         context.commit('SET_LOADINGTABLE', false)
         context.commit('SET_SISWASISWI', response.data.result)
@@ -289,7 +307,7 @@ const actions = {
   },
   [GET_SISWASISWI_BY](context, data) {
     return new Promise((resolve, reject) => {
-      ApiService.get(`user/siswasiswi/${data.uid}${data.mapel ? `?mapel=${data.mapel}` : ''}`, token)
+      ApiService.get(`user/siswa-siswi/${data.uid}${data.mapel ? `?mapel=${data.mapel}` : ''}`, token)
       .then((response) => {
         context.commit('SET_SISWASISWIBY', response.data.result)
         resolve(response);
@@ -301,7 +319,7 @@ const actions = {
   },
   [POST_SISWASISWI](context, bodyData) {
     return new Promise((resolve, reject) => {
-      ApiService.post(`user/siswasiswi`, token, bodyData)
+      ApiService.post(`user/siswa-siswi`, token, bodyData)
       .then((response) => {
         resolve(response);
       })
@@ -341,7 +359,7 @@ const actions = {
   },
   [GET_WALI_KELAS](context, data) {
     return new Promise((resolve, reject) => {
-      ApiService.get(`user/walikelas?page=${data.page}&kelas=${data.kelas}`, token)
+      ApiService.get(`user/wali-kelas?page=${data.page}&kelas=${data.kelas}`, token)
       .then((response) => {
         context.commit('SET_WALI_KELAS', response.data.result)
         resolve(response);
@@ -379,11 +397,22 @@ const actions = {
   },
   [GET_JADWAL_PELAJARAN](context, data) {
     return new Promise((resolve, reject) => {
-      // let url = data.untuk === 'admin' ? `?untuk=${data.untuk}` : `?untuk=${data.untuk}&mapel=${data.kode}`
-      // ApiService.get(`user/jadwalpelajaran${url}`, token)
-      ApiService.get(`user/jadwalpelajaran`, token)
+      ApiService.get(`user/jadwal-pelajaran`, token)
       .then((response) => {
         context.commit('SET_JADWAL_PELAJARAN', response.data.result)
+        resolve(response);
+      })
+      .catch((error) => {
+        context.commit('SET_LOADINGTABLE', false)
+        reject(error);
+      })
+    });
+  },
+  [GET_MODUL_PELAJARAN](context, data) {
+    return new Promise((resolve, reject) => {
+      ApiService.get(`user/modul?kelas=${data.kelas}`, token)
+      .then((response) => {
+        context.commit('SET_MODUL_PELAJARAN', response.data.result)
         resolve(response);
       })
       .catch((error) => {
@@ -401,6 +430,24 @@ const actions = {
       .catch((error) => {
         reject(error);
       })
+    });
+  },
+  [GET_KELAS_SISWA](context, data) {
+    return new Promise((resolve, reject) => {
+      let url
+      if(data.kelas){
+        url = `?kelas=${data.kelas}${data.roleID === '3' ? `&mengajar=${localStorage.getItem('mengajar_kelas')}` : ''}`
+      }else{
+        url = `${data.roleID === '3' ? `?mengajar=${localStorage.getItem('mengajar_kelas')}` : ''}`
+      }
+      ApiService.get(`user/kelas-siswa${url}`, token)
+      .then((response) => {
+          context.commit('SET_KELAS_SISWA', response.data.result)
+          resolve(response);
+        })
+        .catch((error) => {
+          reject(error);
+        })
     });
   },
   [GET_LIST_SISWASISWI](context, data) {
@@ -468,9 +515,9 @@ const actions = {
       })
     });
   },
-  [GET_RANDOM_QUESTION](context, data) {
+  [GET_RANDOM_QUESTION](context, bodyData) {
     return new Promise((resolve, reject) => {
-      ApiService.get(`user/kode-soal-random?mapel=${data.mapel}&kelas=${data.kelas}&limitSoal=${data.limitSoal}`, token)
+      ApiService.post(`user/kode-soal-random`, token, bodyData)
       .then((response) => {
         context.commit('SET_RANDOM_QUESTION', response.data.result)
         resolve(response);
@@ -493,7 +540,7 @@ const actions = {
   },
   [POST_JAWABAN_EXAM](context, bodyData) {
     return new Promise((resolve, reject) => {
-      ApiService.post(`user/simpan-jwaban-exam`, token, bodyData)
+      ApiService.post(`user/simpan-jawaban-exam`, token, bodyData)
       .then((response) => {
         resolve(response);
       })
@@ -516,7 +563,7 @@ const actions = {
   },
   [GET_LIST_PICK](context, data) {
     return new Promise((resolve, reject) => {
-      ApiService.get(`user/list-pick?page=${data.page}&limit=${data.limit}&jenis=${data.jenis}${data.keyword ? `&keyword=${data.keyword}` : ''}`, token)
+      ApiService.get(`user/list-pick?page=${data.page}&limit=${data.limit}&kelas=${data.kelas}&mapel=${data.mapel}&jenis=${data.jenis}${data.keyword ? `&keyword=${data.keyword}` : ''}`, token)
       .then((response) => {
         context.commit('SET_LIST_PICK', response.data.result)
         resolve(response);

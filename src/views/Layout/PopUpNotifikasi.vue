@@ -19,7 +19,7 @@
       </v-row>
       <v-row>
         <v-col cols="12" class="textnotif">
-          <h3><strong>{{ text }}</strong></h3>
+          <h3><strong><span v-html="text" /></strong></h3>
         </v-col>
       </v-row>
       <v-row>

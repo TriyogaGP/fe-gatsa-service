@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="subheading grey--text text-decoration-underline">Dashboard</h1>
+    <h2 class="subheading grey--text text-decoration-underline">Dashboard</h2>
     <v-card class="pa-1 rounded" variant="outlined" elevation="4">
       <v-container fluid>
         <v-row>
@@ -156,8 +156,8 @@
                 <v-icon icon="mdi mdi-view-list" size="large" />
                 <v-card-title class="text-white" style="font-weight: bold; font-size: 15px; margin-left: 5px;">Kelas</v-card-title>
               </v-sheet>
-              <v-card-text style="height: 160px;" class="d-flex flex-column justify-center align-center">
-                <v-chip-group>
+              <v-card-text style="height: 160px;"  class="d-flex justify-center align-start flex-wrap">
+                <!-- <v-chip-group> -->
                   <v-chip class="box">
                     Kelas 7<br>
                     {{ dataDashboard?.jmlKelas?.kelas_7 }} Kelas
@@ -170,7 +170,7 @@
                     Kelas 9<br>
                     {{ dataDashboard?.jmlKelas?.kelas_9 }} Kelas
                   </v-chip>
-                </v-chip-group>
+                <!-- </v-chip-group> -->
               </v-card-text>
               <v-divider :thickness="2" class="border-opacity-75" />
               <v-card-actions>
@@ -192,8 +192,8 @@
                 <v-icon icon="mdi mdi-table-question" size="large" />
                 <v-card-title class="text-white" style="font-weight: bold; font-size: 15px; margin-left: 5px;">Question Exam</v-card-title>
               </v-sheet>
-              <v-card-text style="height: 160px;" class="d-flex flex-column justify-center align-center">
-                <v-chip-group>
+              <v-card-text style="height: 160px;"  class="d-flex justify-center align-start flex-wrap">
+                <!-- <v-chip-group> -->
                   <v-chip class="box">
                     Pilihan Ganda<br>
                     {{ dataDashboard?.jmlQuestionExam?.jenisPG }} Soal
@@ -210,7 +210,7 @@
                     Essay<br>
                     {{ dataDashboard?.jmlQuestionExam?.jenisEssay }} Soal
                   </v-chip>
-                </v-chip-group>
+                <!-- </v-chip-group> -->
               </v-card-text>
               <v-divider :thickness="2" class="border-opacity-75" />
               <v-card-actions>
@@ -288,16 +288,12 @@ export default {
       dataDashboard: state => state.user.dataDashboard,
     }),
     jabatanOptions(){
-      if(this.roleID === '3'){
-        let jabatan_guru = localStorage.getItem('jabatan_guru').split(', ')
-        let result = []
-        jabatan_guru.map(str => {
-          let hasil = this.jabatan.filter(val => { return val.kode == str })
-          result.push(hasil.length ? hasil[0].label : '')
-        })
-        return result
-      }
-    },
+			if(this.roleID === '3'){
+				let jabatan_guru = localStorage.getItem('jabatan_guru').split(', ')
+				let result = this.jabatan.filter(val => jabatan_guru.includes(val.value)).map(x => x?.label || '')
+				return result
+			}
+		},
   },
   watch: {
     jabatanOptions: {
@@ -316,7 +312,7 @@ export default {
     if(!localStorage.getItem('user_token')) return this.$router.push({name: 'LogIn'});
     this.roleID = localStorage.getItem('roleID')
     this.mengajarKelas = localStorage.getItem('mengajar_kelas')
-    if(this.kondisiJabatanTertentu === false && this.mengajarKelas !== 'null') {
+    if(this.kondisiJabatanTertentu === false && this.mengajarKelas !== '') {
       this.getDashboard({kelas: this.mengajarKelas})
     }
     this.overlay = true

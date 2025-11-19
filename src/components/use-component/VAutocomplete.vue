@@ -1,6 +1,7 @@
 <template>
   <v-select
     v-if="pilihanA === 'select'"
+    no-data-text="Tidak ada data"
     :items="AData"
     :label="ALabel"
     variant="solo"
@@ -25,13 +26,15 @@
   </v-select>
   <v-autocomplete
     v-else-if="pilihanA === 'autocomplete'"
+    no-data-text="Tidak ada data"
     :items="AData"
     :label="ALabel"
     variant="solo"
     density="comfortable"
     color="light-black darken-3"
     bg-color="white"
-    hide-details
+    hide-details="auto"
+    :rules="ARules ? [rules.required] : []"
     :clearable="AClearable"
     :disabled="ADisable"
     :readonly="AReadonly"
@@ -40,7 +43,7 @@
     <template v-slot:item="{ props, item }">
       <div class="scroll-select">
         <v-list :lines="false" density="comfortable" nav class="list-menu">
-          <v-list-item v-bind="props" style="width: 100%;">
+          <v-list-item v-bind="props" style="width: 100%;" :disabled="item.raw.disabled">
             <template v-slot:title>
               <span class="textPilihan" v-html="item.title" />
             </template>
@@ -51,6 +54,7 @@
   </v-autocomplete>
   <v-autocomplete
     v-else-if="pilihanA === 'autocompleteslot'"
+    no-data-text="Tidak ada data"
     :items="AData"
     :label="ALabel"
     variant="solo"
@@ -91,7 +95,7 @@
 
     <template v-slot:item="{ props, item }">
       <v-list v-if="slotA === 'first'" density="compact">
-        <v-list-subheader v-if="item.raw.type === 'subheader'">{{ item.raw.title }}</v-list-subheader>
+        <v-list-subheader v-if="item.raw.type === 'subheader'">{{ item.raw.text }}</v-list-subheader>
     		<v-divider v-if="item.raw.divider" :thickness="2" color="white" class="border-opacity-100" />
         <v-list-item
           v-if="item.raw.type !== 'subheader' && !item.raw.divider"
@@ -166,10 +170,18 @@ export default {
       type: Boolean,
       default: false
     },
+    rulesA: {
+      type: Boolean,
+      default: false
+    },
   },
   data() {
     return{
       API_URL: process.env.VUE_APP_BASE_URL_VIEW,
+      rules: {
+        required: value => !!value || 'Field ini wajib diisi !'
+      },
+      focus: false,
     }
   },
   computed: {
@@ -194,11 +206,14 @@ export default {
     AReadonly() {
       return this.readonlyA;
     },
+    ARules() {
+      return this.rulesA;
+    },
   },
   methods:{
     changed(e){
       this.$emit("ubah", e);
-    }
+    },
   },
 }
 </script>

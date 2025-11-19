@@ -2,8 +2,26 @@
   background: #272727 !important;
   opacity: 0.2 !important;
 }
+.v-toolbar-title {
+  font-size: 10pt !important;
+}
+.v-toolbar-title__placeholder {
+	overflow: visible !important;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
 .dp__input {
 	height: 50px !important;
+  font-size: 9pt !important;
+  font-weight: 500 !important;
+  color: #908d8d !important;
+  font-family: "Roboto", sans-serif !important;
+  /* border-radius: 5px !important; */
+}
+.dp__disabled {
+  opacity: 0.4 !important;
+  font-weight: bold !important;
+  color: #000000 !important;
 }
 .v-dialog > .v-overlay__content > .v-card > .v-card-text, .v-dialog > .v-overlay__content > form > .v-card > .v-card-text {
   padding: 15px !important;
@@ -27,6 +45,12 @@
   font-weight: bold;
   color: white;
   font-size: 9pt;
+  border-bottom: 2px solid white;
+}
+.tableHeadernd {
+  font-weight: bold;
+  color: white;
+  font-size: 7pt;
   border-bottom: 2px solid white;
 }
 .v-table .v-table__wrapper > table > tbody > tr:not(:last-child) > td, .v-table .v-table__wrapper > table > tbody > tr:not(:last-child) > th {
@@ -260,6 +284,72 @@
 .v-label--clickable {
   cursor: pointer;
   font-size: 10pt !important;
+}
+
+.v-text-field .v-input__details {
+  padding-inline-start: 0px !important;
+  padding-inline-end: 0px !important;
+}
+.v-input--error:not(.v-input--disabled) .v-input__details .v-messages {
+  color: red;
+  padding: 5px;
+  font-size: 9pt;
+  font-weight: bold;
+  border-radius: 3px;
+}
+.v-field--error:not(.v-field--disabled) .v-label.v-field-label {
+  color: red;
+}
+
+.v-input_control_tanggal {
+	display: flex;
+	width: 100%;
+}
+.v-messages-tanggal {
+	width: 100%;
+	margin-top: 6px;
+	color: red;
+  font-size: 9pt;
+  font-weight: bold;
+  border-radius: 3px;
+}
+
+.v-list-item-title {
+  font-size: 9pt;
+  font-weight: 400;
+  letter-spacing: 0.009375em;
+  line-height: 1.5;
+  text-transform: none;
+}
+.v-list-item-subtitle {
+  font-size: 8pt;
+  font-weight: 200;
+  letter-spacing: 0.0178571429em;
+  line-height: 1rem;
+  text-transform: none;
+}
+.v-virtual-scroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-top: 5px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  padding: 8px;
+	border-radius: 5px;
+}
+.v-virtual-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.v-virtual-scroll::-webkit-scrollbar-thumb {
+  background-color: #4CAF50;
+  border: 1px solid #272727;
+  border-radius: 10rem;
+}
+.v-virtual-scroll::-webkit-scrollbar-track {
+  position: absolute;
+  right: -3rem;
+  top: -50rem;
+  background: transparent;
 }
 @keyframes fadeInAnimation {
   0% {

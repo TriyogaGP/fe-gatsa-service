@@ -1,6 +1,6 @@
 <template>
   <div>
-		<h1 class="subheading grey--text text-decoration-underline">Panel Hak Akses Menu</h1>
+		<h2 class="subheading grey--text text-decoration-underline">Panel Hak Akses Menu</h2>
 		<v-data-table
 			loading-text="Sedang memuat... Harap tunggu"
 			no-data-text="Tidak ada data yang tersedia"
@@ -12,7 +12,6 @@
 			item-value="idRoleMenu"
 			density="comfortable"
 			hide-default-footer
-			hide-default-header
 			class="elavation-3 rounded"
 			:items-per-page="itemsPerPage"
 			@page-count="pageCount = $event"
@@ -28,25 +27,27 @@
 			<template #loader>
 				<LoaderDataTables />
 			</template>
-			<template #[`item.number`]="{ item }">
-				{{ page > 1 ? ((page - 1)*limit) + item.index + 1 : item.index + 1 }}
+			<template #[`item.number`]="{ index }">
+				{{ page > 1 ? ((page - 1)*limit) + index + 1 : index + 1 }}
 			</template>
 			<template #[`item.menu`]="{ item }">
 				<Button 
-					color-button="#04f7f7"
+					color-button="info"
 					icon-prepend-button="mdi mdi-information"
 					nama-button="Detail"
-					@proses="openDetail(item.raw.menu)"
+					size-button="x-small"
+					@proses="openDetail(item.menu)"
 				/>
 			</template>
 			<template #expanded-row="{ columns, item }">
 				<tr>
 					<td :colspan="columns.length">
 						<Button 
-							color-button="#0bd369"
+							color-button="success"
 							icon-prepend-button="mdi mdi-pencil"
 							nama-button="Ubah"
-							@proses="bukaDialog(item.raw)"
+							size-button="x-small"
+							@proses="bukaDialog(item)"
 						/>
 					</td>
 				</tr>
@@ -55,26 +56,14 @@
 				<v-row no-gutters class="pa-2">
 					<v-col cols="12" md="6" />
 					<v-col cols="12" md="6">
-						<v-row no-gutters>
-							<v-col cols="12" md="9">
-								<TextField
-									v-model="searchData"
-									icon-prepend-tf="mdi mdi-magnify"
-									label-tf="Pencarian..."
-									:clearable-tf="true"
-									@click:clear="() => { page = 1; getRoleMenu({page: 1, limit: limit, keyword: ''}); }"
-									@keyup.enter="(e) => { page = 1; getRoleMenu({page: 1, limit: limit, keyword: e}); }"
-								/>
-							</v-col>
-							<v-col cols="12" md="3" class="pl-2 d-flex justify-end align-center">
-								<Autocomplete
-									v-model="page"
-									:data-a="pageOptions"
-									label-a="Page"
-									:disabled-a="DataHakAksesMenu.length ? false : true"
-								/>
-							</v-col>
-						</v-row>
+						<TextField
+							v-model="searchData"
+							icon-prepend-tf="mdi mdi-magnify"
+							label-tf="Pencarian..."
+							:clearable-tf="true"
+							@click:clear="() => { page = 1; getRoleMenu({page: 1, limit: limit, keyword: ''}); }"
+							@keyup.enter="(e) => { page = 1; getRoleMenu({page: 1, limit: limit, keyword: e}); }"
+						/>
 					</v-col>
 				</v-row>
 				<v-divider :thickness="2" class="border-opacity-100" color="white" />
@@ -83,7 +72,17 @@
 				<v-divider :thickness="2" class="border-opacity-100" color="white" />
 				<v-row no-gutters>
 					<v-col cols="12" lg="10" class="pa-2 d-flex justify-start align-center">
-						<span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
+						<!-- <span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span> -->
+						<span style="font-size: 10pt;">Halaman</span>
+						<div style="width: 100px; margin-left: 3px; margin-right: 3px;">
+							<Autocomplete
+								v-model="page"
+								:data-a="pageOptions"
+								label-a="Page"
+								:disabled-a="DataHakAksesMenu.length ? false : true"
+							/>
+						</div>
+						<span style="font-size: 10pt;">dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
 					</v-col>
 					<v-col cols="12" lg="2" class="pa-2 text-right">
 						<div class="d-flex justify-start align-center">
@@ -98,7 +97,7 @@
 								variant="plain"
 								size-button="large"
 								model-button="comfortable"
-								color-button="#ffffff"
+								color-button="success"
 								icon-button="mdi mdi-arrow-left-circle-outline"
 								:disabled-button="DataHakAksesMenu.length ? pageSummary.page != 1 ? false : true : true"
 								@proses="() => { page = pageSummary.page - 1 }"
@@ -107,7 +106,7 @@
 								variant="plain"
 								size-button="large"
 								model-button="comfortable"
-								color-button="#ffffff"
+								color-button="success"
 								icon-button="mdi mdi-arrow-right-circle-outline"
 								:disabled-button="DataHakAksesMenu.length ? pageSummary.page != pageSummary.totalPages ? false : true : true"
 								@proses="() => { page = pageSummary.page + 1 }"
@@ -141,7 +140,7 @@
 				</v-toolbar>
 				<v-card-text class="pt-4 v-dialog--custom">
 					<div
-            style="background-color: #4CAF50; border-radius: 5px; border: 2px solid #000;"
+            style="background-color: #4CAF50; border-radius: 5px; border: 2px solid #000; color: white;"
             class="pa-2 mb-2"
 						v-for="i in (1 + jumlahMenuHakAkses)"
 						:key="i"
@@ -151,7 +150,7 @@
 								<Button
 									v-if="i !== (1 + jumlahMenuHakAkses)"
 									variant="plain"
-									color-button="#000"
+									color-button="#fff"
 									icon-button="mdi mdi-close"
 									model-button="comfortable"
 									size-button="large"
@@ -524,10 +523,10 @@ export default {
 			this.DetailMenu = true
 		},
 		clickrow(event, data) {
-      const index = this.$data.expanded.find(i => i === data?.item?.raw?.idRoleMenu);
+      const index = this.$data.expanded.find(i => i === data?.item?.idRoleMenu);
       if(typeof index === 'undefined') return this.$data.expanded = [];
       this.$data.expanded.splice(0, 1)
-      this.$data.expanded.push(data?.item?.raw?.idRoleMenu);
+      this.$data.expanded.push(data?.item?.idRoleMenu);
     },
 		notifikasi(kode, text, proses){
       this.dialogNotifikasi = true

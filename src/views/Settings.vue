@@ -1,39 +1,42 @@
 <template>
   <div>
-    <h1 class="subheading grey--text text-decoration-underline">Pengaturan</h1>
+    <h2 class="subheading grey--text text-decoration-underline">Pengaturan</h2>
     <v-card class="mb-2 pa-1 rounded" variant="outlined" elevation="4">
-      <v-container fluid>
-        <v-row>
-          <v-col
-            v-for="hasil in pengaturan"
-            :key="hasil.link"
-            cols="12"
-            lg="4"
-          >
-            <v-card color="white" style="border: 2px solid #000;" @click="LinkRoute(hasil.link)">
-              <v-sheet color="green" class="sheetData" elevation="2">
-                <v-icon :icon="hasil.icon" size="large" />
-              </v-sheet>
-              <v-card-actions>
-                <v-divider :thickness="2" class="border-opacity-75" />
-                <v-card-title class="text-black">{{ hasil.title }}</v-card-title>
-              </v-card-actions>
-            </v-card>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-card>
-		<v-divider :thickness="2" color="black" class="border-opacity-100" />
-		<v-card v-if="settingPanel != 0" class="mt-2 mb-2 pa-1 rounded" variant="outlined" elevation="4">
-			<V_GeneralCMS v-if="settingPanel == 1" />
-			<V_HakAkses v-if="settingPanel == 2" />
-			<V_Menu v-if="settingPanel == 3" />
-			<V_HakAksesMenu v-if="settingPanel == 4" />
-			<V_RFID v-if="settingPanel == 5" />
-			<V_Kelas v-if="settingPanel == 6" />
-			<!-- <V_Wilayah v-if="settingPanel == 6" /> -->
-			<V_Wilayah2023 v-if="settingPanel == 7" />
-			<!-- <V_MapWilayah v-if="settingPanel == 8" /> -->
+      <v-tabs
+        v-model="tab"
+        align-tabs="center"
+        color="#4CAF50"
+        bg-color="surface"
+        slider-color="#4CAF50"
+        density="compact"
+        show-arrows
+        stacked
+      >
+        <v-tab
+          v-for="hasil in pengaturan"
+          :key="hasil.link"
+          :value="hasil.link"
+        >
+          <v-icon :icon="hasil.icon" size="large" />
+          {{ hasil.title }}
+        </v-tab>
+      </v-tabs>
+      <v-divider :thickness="3" color="#4CAF50" class="border-opacity-100" />
+      <v-tabs-window v-model="tab">
+        <v-tabs-window-item
+          v-for="n in pengaturan.length"
+          :key="n"
+          :value="n"
+        >
+          <V_GeneralCMS v-if="n == 1" />
+          <V_HakAkses v-if="n == 2" />
+          <V_Menu v-if="n == 3" />
+          <V_HakAksesMenu v-if="n == 4" />
+          <V_RFID v-if="n == 5" />
+          <V_Kelas v-if="n == 6" />
+          <V_Wilayah2023 v-if="n == 7" />
+        </v-tabs-window-item>
+      </v-tabs-window>
 		</v-card>
   </div>
 </template>
@@ -54,6 +57,7 @@ export default {
 	name: "Pengaturan",
 	components: { V_GeneralCMS, V_HakAkses, V_Menu, V_HakAksesMenu, V_RFID, V_Kelas, V_Wilayah, V_Wilayah2023, V_MapWilayah },
 	data: () => ({
+		tab: null,
 		settingPanel: 0,
     pengaturan: [
       { title: 'General CMS', icon: 'mdi mdi-wrench-cog', link: 1 },

@@ -19,11 +19,13 @@
 						<v-col
 							cols="12"
 							md="6"
-							class="d-flex justify-center align-center"
+							class="d-flex justify-center align-start"
 						>
               <TextField
                 v-model="inputDataDetailOrangtua.no_kk"
                 label-tf="No Kartu Keluarga"
+								formatrulesTf="text"
+								:rules-tf="inputDataDetailOrangtua.no_kk != '' ? true : false"
                 @keypress="onlyNumber($event,25, inputDataDetailOrangtua.no_kk)"
                 :clearable-tf="true"
               />
@@ -31,11 +33,13 @@
 						<v-col
 							cols="12"
 							md="6"
-							class="d-flex justify-end align-center pl-2"
+							class="d-flex justify-end align-start pl-2"
 						>
               <TextField
 								v-model="inputDataDetailOrangtua.nama_kk"
 								label-tf="Nama Kepala Keluarga"
+								formatrulesTf="text"
+								:rules-tf="inputDataDetailOrangtua.nama_kk != '' ? true : false"
 								:clearable-tf="true"
 							/>
 						</v-col>
@@ -58,6 +62,8 @@
 					<TextField
 						v-model="inputDataDetailOrangtua.telp"
 						label-tf="Telepon"
+						formatrulesTf="text"
+						:rules-tf="inputDataDetailOrangtua.telp != '' ? true : false"
 						@keypress="onlyNumber($event, 15, inputDataDetailOrangtua.telp)"
 						:clearable-tf="true"
 					/>
@@ -104,6 +110,7 @@
 						item-value="kode"
 						label-a="Provinsi"
 						:clearable-a="true"
+						:rules-a="inputDataDetailOrangtua.provinsi != '' ? true : false"
 						@ubah="wilayah('provinsi', $event)"
 					/>
 				</v-col>
@@ -127,6 +134,7 @@
 						item-title="nama"
 						item-value="kode"
 						label-a="Kabupaten / Kota"
+						:rules-a="inputDataDetailOrangtua.kabkota != '' ? true : false"
 						:clearable-a="true"
 						:disabled-a="inputDataDetailOrangtua.provinsi ? false : true"
 						@ubah="wilayah('kabkota', $event)"
@@ -152,6 +160,7 @@
 						item-title="nama"
 						item-value="kode"
 						label-a="Kecamatan"
+						:rules-a="inputDataDetailOrangtua.kecamatan != '' ? true : false"
 						:clearable-a="true"
 						:disabled-a="inputDataDetailOrangtua.kabkota ? false : true"
 						@ubah="wilayah('kecamatan', $event)"
@@ -177,6 +186,7 @@
 						item-title="nama"
 						item-value="kode"
 						label-a="Kelurahan / Desa"
+						:rules-a="inputDataDetailOrangtua.kelurahan != '' ? true : false"
 						:clearable-a="true"
 						:disabled-a="inputDataDetailOrangtua.kecamatan ? false : true"
 						@ubah="wilayah('kelurahan', $event)"
@@ -220,8 +230,9 @@
 						v-model="inputDataDetailOrangtua.penghasilan"
 						:data-a="penghasilanOptions"
 						item-title="label"
-						item-value="kode"
+						item-value="value"
 						label-a="Penghasilan"
+						:rules-a="inputDataDetailOrangtua.penghasilan != '' ? true : false"
 						:clearable-a="true"
 					/>
 				</v-col>
@@ -243,7 +254,7 @@
 						v-model="inputDataDetailOrangtua.status_tempat_tinggal"
 						:data-a="statustempattinggalOptions"
 						item-title="label"
-						item-value="kode"
+						item-value="value"
 						label-a="Status Tempat Tinggal"
 						:clearable-a="true"
 					/>
@@ -266,7 +277,7 @@
 						v-model="inputDataDetailOrangtua.jarak_rumah"
 						:data-a="jarakrumahOptions"
 						item-title="label"
-						item-value="kode"
+						item-value="value"
 						label-a="Jarak Rumah"
 						:clearable-a="true"
 					/>
@@ -289,7 +300,7 @@
 						v-model="inputDataDetailOrangtua.transportasi"
 						:data-a="transportasiOptions"
 						item-title="label"
-						item-value="kode"
+						item-value="value"
 						label-a="Transportasi"
 						:clearable-a="true"
 					/>
@@ -313,11 +324,13 @@
 						<v-col
 							cols="12"
 							md="6"
-							class="d-flex justify-center align-center"
+							class="d-flex justify-center align-start"
 						>
               <TextField
                 v-model="inputDataDetailOrangtua.nik_ayah"
                 label-tf="NIK Ayah"
+								formatrulesTf="text"
+								:rules-tf="inputDataDetailOrangtua.nik_ayah != '' ? true : false"
                 @keypress="onlyNumber($event, 18, inputDataDetailOrangtua.nik_ayah)"
                 :clearable-tf="true"
               />
@@ -325,11 +338,13 @@
 						<v-col
 							cols="12"
 							md="6"
-							class="d-flex justify-end align-center pl-2"
+							class="d-flex justify-end align-start pl-2"
 						>
               <TextField
 								v-model="inputDataDetailOrangtua.nama_ayah"
 								label-tf="Nama Ayah"
+								formatrulesTf="text"
+								:rules-tf="inputDataDetailOrangtua.nama_ayah != '' ? true : false"
 								:clearable-tf="true"
 							/>
 						</v-col>
@@ -340,7 +355,7 @@
 				<v-col
 					cols="12"
 					md="4"
-					class="pt-2 d-flex align-center font-weight-bold"
+					class="pt-2 d-flex align-start font-weight-bold"
 				>
 					Status & Tahun Ayah
 				</v-col>
@@ -353,26 +368,28 @@
 						<v-col
 							cols="12"
 							md="6"
-							class="d-flex justify-center align-center"
+							class="d-flex justify-center align-start"
 						>
               <Autocomplete
                 v-model="inputDataDetailOrangtua.status_ayah"
                 :data-a="statusorangtuaOptions"
                 item-title="label"
-                item-value="kode"
+                item-value="value"
                 label-a="Status Ayah"
+								:rules-a="inputDataDetailOrangtua.status_ayah != '' ? true : false"
                 :clearable-a="true"
               />
 						</v-col>
 						<v-col
 							cols="12"
 							md="6"
-							class="d-flex justify-end align-center pl-2"
+							class="d-flex justify-end align-start pl-2"
 						>
               <Autocomplete
                 v-model="inputDataDetailOrangtua.tahun_ayah"
                 :data-a="tahunOptions"
                 label-a="Tahun Ayah"
+								:rules-a="inputDataDetailOrangtua.tahun_ayah != '' ? true : false"
                 :clearable-a="true"
               />
 						</v-col>
@@ -383,7 +400,7 @@
 				<v-col
 					cols="12"
 					md="4"
-					class="pt-2 d-flex align-center font-weight-bold"
+					class="pt-2 d-flex align-start font-weight-bold"
 				>
 					Pendidikan & Pekerjaan Ayah
 				</v-col>
@@ -396,28 +413,30 @@
 						<v-col
 							cols="12"
 							md="6"
-							class="d-flex justify-center align-center"
+							class="d-flex justify-center align-start"
 						>
               <Autocomplete
                 v-model="inputDataDetailOrangtua.pendidikan_ayah"
                 :data-a="pendidikanOptions"
                 item-title="label"
-                item-value="kode"
+                item-value="value"
                 label-a="Pendidikan Ayah"
+								:rules-a="inputDataDetailOrangtua.pendidikan_ayah != '' ? true : false"
                 :clearable-a="true"
               />
 						</v-col>
 						<v-col
 							cols="12"
 							md="6"
-							class="d-flex justify-end align-center pl-2"
+							class="d-flex justify-end align-start pl-2"
 						>
               <Autocomplete
                 v-model="inputDataDetailOrangtua.pekerjaan_ayah"
                 :data-a="pekerjaanOptions"
                 item-title="label"
-                item-value="kode"
+                item-value="value"
                 label-a="Pekerjaan Ayah"
+								:rules-a="inputDataDetailOrangtua.pekerjaan_ayah != '' ? true : false"
                 :clearable-a="true"
               />
 						</v-col>
@@ -463,11 +482,13 @@
 						<v-col
 							cols="12"
 							md="6"
-							class="d-flex justify-center align-center"
+							class="d-flex justify-center align-start"
 						>
               <TextField
                 v-model="inputDataDetailOrangtua.nik_ibu"
                 label-tf="NIK Ibu"
+								formatrulesTf="text"
+								:rules-tf="inputDataDetailOrangtua.nik_ibu != '' ? true : false"
                 @keypress="onlyNumber($event, 18, inputDataDetailOrangtua.nik_ibu)"
                 :clearable-tf="true"
               />
@@ -475,11 +496,13 @@
 						<v-col
 							cols="12"
 							md="6"
-							class="d-flex justify-end align-center pl-2"
+							class="d-flex justify-end align-start pl-2"
 						>
               <TextField
 								v-model="inputDataDetailOrangtua.nama_ibu"
 								label-tf="Nama Ibu"
+								formatrulesTf="text"
+								:rules-tf="inputDataDetailOrangtua.nama_ibu != '' ? true : false"
 								:clearable-tf="true"
 							/>
 						</v-col>
@@ -503,26 +526,28 @@
 						<v-col
 							cols="12"
 							md="6"
-							class="d-flex justify-center align-center"
+							class="d-flex justify-center align-start"
 						>
               <Autocomplete
                 v-model="inputDataDetailOrangtua.status_ibu"
                 :data-a="statusorangtuaOptions"
                 item-title="label"
-                item-value="kode"
+                item-value="value"
                 label-a="Status Ibu"
+								:rules-a="inputDataDetailOrangtua.status_ibu != '' ? true : false"
                 :clearable-a="true"
               />
 						</v-col>
 						<v-col
 							cols="12"
 							md="6"
-							class="d-flex justify-end align-center pl-2"
+							class="d-flex justify-end align-start pl-2"
 						>
               <Autocomplete
                 v-model="inputDataDetailOrangtua.tahun_ibu"
                 :data-a="tahunOptions"
                 label-a="Tahun Ibu"
+								:rules-a="inputDataDetailOrangtua.tahun_ibu != '' ? true : false"
                 :clearable-a="true"
               />
 						</v-col>
@@ -546,28 +571,30 @@
 						<v-col
 							cols="12"
 							md="6"
-							class="d-flex justify-center align-center"
+							class="d-flex justify-center align-start"
 						>
               <Autocomplete
                 v-model="inputDataDetailOrangtua.pendidikan_ibu"
                 :data-a="pendidikanOptions"
                 item-title="label"
-                item-value="kode"
+                item-value="value"
                 label-a="Pendidikan Ibu"
+								:rules-a="inputDataDetailOrangtua.pendidikan_ibu != '' ? true : false"
                 :clearable-a="true"
               />
 						</v-col>
 						<v-col
 							cols="12"
 							md="6"
-							class="d-flex justify-end align-center pl-2"
+							class="d-flex justify-end align-start pl-2"
 						>
               <Autocomplete
                 v-model="inputDataDetailOrangtua.pekerjaan_ibu"
                 :data-a="pekerjaanOptions"
                 item-title="label"
-                item-value="kode"
+                item-value="value"
                 label-a="Pekerjaan Ibu"
+								:rules-a="inputDataDetailOrangtua.pekerjaan_ibu != '' ? true : false"
                 :clearable-a="true"
               />
 						</v-col>
@@ -700,7 +727,7 @@
                 v-model="inputDataDetailOrangtua.pendidikan_wali"
                 :data-a="pendidikanOptions"
                 item-title="label"
-                item-value="kode"
+                item-value="value"
                 label-a="Pendidikan Wali"
                 :clearable-a="true"
               />
@@ -714,7 +741,7 @@
                 v-model="inputDataDetailOrangtua.pekerjaan_wali"
                 :data-a="pekerjaanOptions"
                 item-title="label"
-                item-value="kode"
+                item-value="value"
                 label-a="Pekerjaan Wali"
                 :clearable-a="true"
               />
@@ -772,40 +799,40 @@ export default {
   },
   data: () => ({
 		inputDataDetailOrangtua: {
-      id_user: '',
-      no_kk: '',
-      nama_kk: '',
-      nama_ayah: '',
+      id_user: null,
+      no_kk: null,
+      nama_kk: null,
+      nama_ayah: null,
       tahun_ayah: null,
       status_ayah: null,
-      nik_ayah: '',
+      nik_ayah: null,
       pendidikan_ayah: null,
       pekerjaan_ayah: null,
-      telp_ayah: '',
-      nama_ibu: '',
+      telp_ayah: null,
+      nama_ibu: null,
       tahun_ibu: null,
       status_ibu: null,
-      nik_ibu: '',
+      nik_ibu: null,
       pendidikan_ibu: null,
       pekerjaan_ibu: null,
-      telp_ibu: '',
-      nama_wali: '',
+      telp_ibu: null,
+      nama_wali: null,
       tahun_wali: null,
-      nik_wali: '',
+      nik_wali: null,
       pendidikan_wali: null,
       pekerjaan_wali: null,
-      telp_wali: '',
+      telp_wali: null,
       penghasilan: null,
       status_tempat_tinggal: null,
       jarak_rumah: null,
       transportasi: null,
-      telp: '',
-      alamat: '',
+      telp: null,
+      alamat: null,
       provinsi: null,
       kabkota: null,
       kecamatan: null,
       kelurahan: null,
-      kode_pos: '',
+      kode_pos: null,
     },
 		kondisiTombol: true,
 
@@ -876,47 +903,46 @@ export default {
 					this.kondisiTombol = true
 				}
 				localStorage.setItem('stepFour', JSON.stringify(this.inputDataDetailOrangtua))
-				// this.wadahInput()
 			}
 		},
 		dataStepFour: {
 			deep: true,
 			handler(value) {
 				this.inputDataDetailOrangtua = {
-					id_user: value.id_user ? value.id_user : null,
-          no_kk: value.no_kk ? value.no_kk : null,
-          nama_kk: value.nama_kk ? value.nama_kk : null,
-          nama_ayah: value.nama_ayah ? value.nama_ayah : null,
-          tahun_ayah: value.tahun_ayah ? value.tahun_ayah : null,
-          status_ayah: value.status_ayah ? value.status_ayah.kode : null,
-          nik_ayah: value.nik_ayah ? value.nik_ayah : null,
-          pendidikan_ayah: value.pendidikan_ayah ? value.pendidikan_ayah.kode : null,
-          pekerjaan_ayah: value.pekerjaan_ayah ? value.pekerjaan_ayah.kode : null,
-          telp_ayah: value.telp_ayah ? value.telp_ayah : null,
-          nama_ibu: value.nama_ibu ? value.nama_ibu : null,
-          tahun_ibu: value.tahun_ibu ? value.tahun_ibu : null,
-          status_ibu: value.status_ibu ? value.status_ibu.kode : null,
-          nik_ibu: value.nik_ibu ? value.nik_ibu : null,
-          pendidikan_ibu: value.pendidikan_ibu ? value.pendidikan_ibu.kode : null,
-          pekerjaan_ibu: value.pekerjaan_ibu ? value.pekerjaan_ibu.kode : null,
-          telp_ibu: value.telp_ibu ? value.telp_ibu : null,
-          nama_wali: value.nama_wali ? value.nama_wali : null,
-          tahun_wali: value.tahun_wali ? value.tahunWali : null,
-          nik_wali: value.nik_wali ? value.nik_wali : null,
-          pendidikan_wali: value.pendidikan_wali ? value.pendidikan_wali.kode : null,
-          pekerjaan_wali: value.pekerjaan_wali ? value.pekerjaan_wali.kode : null,
-          telp_wali: value.telp_wali ? value.telp_wali : null,
-          penghasilan: value.penghasilan ? value.penghasilan.kode : null,
-          status_tempat_tinggal: value.status_tempat_tinggal ? value.status_tempat_tinggal.kode : null,
-          jarak_rumah: value.jarak_rumah ? value.jarak_rumah.kode : null,
-          transportasi: value.transportasi ? value.transportasi.kode : null,
-					telp: value.telp ? value.telp : null,
-					alamat: value.alamat ? value.alamat : null,
-					provinsi: value.provinsi ? value.provinsi.kode : null,
-					kabkota: value.kabkota ? value.kabkota.kode : null,
-					kecamatan: value.kecamatan ? value.kecamatan.kode : null,
-					kelurahan: value.kelurahan ? value.kelurahan.kode : null,
-					kode_pos: value.kode_pos ? value.kode_pos : null,
+					id_user: value?.id_user,
+          no_kk: value?.no_kk,
+          nama_kk: value?.nama_kk,
+          nama_ayah: value?.nama_ayah,
+          tahun_ayah: value?.tahun_ayah,
+          status_ayah: value?.status_ayah,
+          nik_ayah: value?.nik_ayah,
+          pendidikan_ayah: value?.pendidikan_ayah,
+          pekerjaan_ayah: value?.pekerjaan_ayah,
+          telp_ayah: value?.telp_ayah,
+          nama_ibu: value?.nama_ibu,
+          tahun_ibu: value?.tahun_ibu,
+          status_ibu: value?.status_ibu,
+          nik_ibu: value?.nik_ibu,
+          pendidikan_ibu: value?.pendidikan_ibu,
+          pekerjaan_ibu: value?.pekerjaan_ibu,
+          telp_ibu: value?.telp_ibu,
+          nama_wali: value?.nama_wali,
+          tahun_wali: value?.tahun_wali,
+          nik_wali: value?.nik_wali,
+          pendidikan_wali: value?.pendidikan_wali,
+          pekerjaan_wali: value?.pekerjaan_wali,
+          telp_wali: value?.telp_wali,
+          penghasilan: value?.penghasilan,
+          status_tempat_tinggal: value?.status_tempat_tinggal,
+          jarak_rumah: value?.jarak_rumah,
+          transportasi: value?.transportasi,
+					telp: value?.telp,
+					alamat: value?.alamat,
+					provinsi: value?.provinsi,
+					kabkota: value?.kabkota,
+					kecamatan: value?.kecamatan,
+					kelurahan: value?.kelurahan,
+					kode_pos: value?.kode_pos,
 				}
 				this.getWilayah2023({ bagian: 'kabkota', KodeWilayah: this.inputDataDetailOrangtua.provinsi })
 				this.getWilayah2023({ bagian: 'kecamatan', KodeWilayah: this.inputDataDetailOrangtua.kabkota })
@@ -926,65 +952,20 @@ export default {
 	},
 	mounted() {
 		this.inputDataDetailOrangtua.id_user = this.$route.params.uid;
-		this.getPendidikan()
-		this.getPekerjaan()
-		this.getPenghasilan()
-		this.getStatusOrangTua()
-		this.getStatusTempatTinggal()
-		this.getJarakRumah()
-		this.getTransportasi()
+		this.getDataMaster({ kode: 'pendidikan' })
+		this.getDataMaster({ kode: 'pekerjaan' })
+		this.getDataMaster({ kode: 'penghasilan' })
+		this.getDataMaster({ kode: 'statusorangtua' })
+		this.getDataMaster({ kode: 'statustempattinggal' })
+		this.getDataMaster({ kode: 'jarakrumah' })
+		this.getDataMaster({ kode: 'transportasi' })
 		this.getWilayah2023({ bagian: 'provinsi', KodeWilayah: null })
 	},
 	methods: {
 		...mapActions({
-			getPendidikan: 'setting/getPendidikan', 
-			getPekerjaan: 'setting/getPekerjaan', 
-			getPenghasilan: 'setting/getPenghasilan', 
-			getStatusOrangTua: 'setting/getStatusOrangTua', 
-			getStatusTempatTinggal: 'setting/getStatusTempatTinggal', 
-			getJarakRumah: 'setting/getJarakRumah', 
-			getTransportasi: 'setting/getTransportasi', 
+			getDataMaster: 'setting/getDataMaster',
 			getWilayah2023: 'setting/getWilayah2023',
 		}),
-		wadahInput(){
-			let inputFormFour = {
-				idUser: this.inputDataDetailOrangtua.id_user,
-				noKK: this.inputDataDetailOrangtua.no_kk,
-				namaKK: this.inputDataDetailOrangtua.nama_kk,
-				namaAyah: this.inputDataDetailOrangtua.nama_ayah,
-				tahunAayah: this.inputDataDetailOrangtua.tahun_ayah,
-				statusAyah: this.inputDataDetailOrangtua.status_ayah,
-				nikAyah: this.inputDataDetailOrangtua.nik_ayah,
-				pendidikanAyah: this.inputDataDetailOrangtua.pendidikan_ayah,
-				pekerjaanAyah: this.inputDataDetailOrangtua.pekerjaan_ayah,
-				telpAyah: this.inputDataDetailOrangtua.telp_ayah,
-				namaIbu: this.inputDataDetailOrangtua.nama_ibu,
-				tahunIbu: this.inputDataDetailOrangtua.tahun_ibu,
-				statusIbu: this.inputDataDetailOrangtua.status_ibu,
-				nikIbu: this.inputDataDetailOrangtua.nik_ibu,
-				pendidikanIbu: this.inputDataDetailOrangtua.pendidikan_ibu,
-				pekerjaanIbu: this.inputDataDetailOrangtua.pekerjaan_ibu,
-				telpIbu: this.inputDataDetailOrangtua.telp_ibu,
-				namaWali: this.inputDataDetailOrangtua.nama_wali,
-				tahunWali: this.inputDataDetailOrangtua.tahun_wali,
-				nikWali: this.inputDataDetailOrangtua.nik_wali,
-				pendidikanWali: this.inputDataDetailOrangtua.pendidikan_wali,
-				pekerjaanWali: this.inputDataDetailOrangtua.pekerjaan_wali,
-				telpWali: this.inputDataDetailOrangtua.telp_wali,
-				penghasilan: this.inputDataDetailOrangtua.penghasilan,
-				statusTempatTinggal: this.inputDataDetailOrangtua.status_tempat_tinggal,
-				jarakRumah: this.inputDataDetailOrangtua.jarak_rumah,
-				transportasi: this.inputDataDetailOrangtua.transportasi,
-				telp: this.inputDataDetailOrangtua.telp,
-				alamat: this.inputDataDetailOrangtua.alamat,
-				provinsi: this.inputDataDetailOrangtua.provinsi,
-				kabKota: this.inputDataDetailOrangtua.kabkota,
-				kecamatan: this.inputDataDetailOrangtua.kecamatan,
-				kelurahan: this.inputDataDetailOrangtua.kelurahan,
-				kodePos: this.inputDataDetailOrangtua.kode_pos,
-			}
-      this.$emit("DataStepFour", inputFormFour)
-    },
 		wilayah(kondisi, e){
 			if(kondisi === 'provinsi'){
 				if(e){
@@ -992,7 +973,7 @@ export default {
 					this.inputDataDetailOrangtua.kabkota = null
 					this.inputDataDetailOrangtua.kecamatan = null
 					this.inputDataDetailOrangtua.kelurahan = null
-					this.inputDataDetailOrangtua.kode_pos = ''
+					this.inputDataDetailOrangtua.kode_pos = null
 				}
 			}else if(kondisi === 'kabkota'){
 				if(e){
@@ -1000,23 +981,23 @@ export default {
 					if(e !== this.inputDataDetailOrangtua.kecamatan) {
 						this.inputDataDetailOrangtua.kecamatan = null
 						this.inputDataDetailOrangtua.kelurahan = null
-						this.inputDataDetailOrangtua.kode_pos = ''
+						this.inputDataDetailOrangtua.kode_pos = null
 					}
 				}else{
 					this.inputDataDetailOrangtua.kecamatan = null
 					this.inputDataDetailOrangtua.kelurahan = null
-					this.inputDataDetailOrangtua.kode_pos = ''
+					this.inputDataDetailOrangtua.kode_pos = null
 				}
 			}else if(kondisi === 'kecamatan'){
 				if(e){
 					this.getWilayah2023({ bagian: 'kelurahan', KodeWilayah: e })
 					if(e !== this.inputDataDetailOrangtua.kelurahan) {
 						this.inputDataDetailOrangtua.kelurahan = null
-						this.inputDataDetailOrangtua.kode_pos = ''	
+						this.inputDataDetailOrangtua.kode_pos = null
 					}
 				}else{
 					this.inputDataDetailOrangtua.kelurahan = null
-					this.inputDataDetailOrangtua.kode_pos = ''
+					this.inputDataDetailOrangtua.kode_pos = null
 				}
 			}else if(kondisi === 'kelurahan'){
 				if(e){
@@ -1027,7 +1008,7 @@ export default {
 						this.inputDataDetailOrangtua.kode_pos = this.inputDataDetailOrangtua.kode_pos ? data.length ? data[0].kodePos : this.inputDataDetailOrangtua.kode_pos : data[0].kodePos
 					}
 				}else{
-					this.inputDataDetailOrangtua.kode_pos = ''
+					this.inputDataDetailOrangtua.kode_pos = null
 				}
 			}
 		},

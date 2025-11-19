@@ -46,7 +46,7 @@ const myPlugin = {
 				if (lengthData == null) {
 					return event;
 				} else {
-					if (data.length < lengthData) return event;
+					if (String(data).length < lengthData) return event;
 					else event.preventDefault();
 				}
 			} else event.preventDefault();

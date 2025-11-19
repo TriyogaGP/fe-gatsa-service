@@ -18,6 +18,8 @@
 					<TextField
 						v-model="inputDataSiswaSiswi.nik_siswa"
 						label-tf="NIK Siswa/i"
+						formatrulesTf="text"
+						:rules-tf="inputDataSiswaSiswi.nik_siswa != '' ? true : false"
 						@keypress="onlyNumber($event, 25, inputDataSiswaSiswi.nik_siswa)"
 						:clearable-tf="true"
 					/>
@@ -39,6 +41,8 @@
 					<TextField
 						v-model="inputDataSiswaSiswi.nomor_induk"
 						label-tf="Nomor Induk"
+						formatrulesTf="text"
+						:rules-tf="inputDataSiswaSiswi.nomor_induk != '' ? true : false"
 						@keypress="onlyNumber($event, 25, inputDataSiswaSiswi.nomor_induk)"
 						:clearable-tf="true"
 					/>
@@ -61,26 +65,37 @@
 						<v-col
 							cols="12"
 							md="6"
-							class="d-flex justify-center align-center"
+							class="d-flex justify-center align-start"
 						>
 							<TextField
 								v-model="inputDataSiswaSiswi.tempat"
 								label-tf="Tempat Lahir"
+								formatrulesTf="text"
+								:rules-tf="inputDataSiswaSiswi.tempat != '' ? true : false"
 								:clearable-tf="true"
 							/>
 						</v-col>
 						<v-col
 							cols="12"
 							md="6"
-							class="pl-2 d-flex justify-end align-center"
+							class="pl-2 d-flex justify-center align-start flex-wrap"
 						>
-							<vue-date-picker
-								v-model="inputDataSiswaSiswi.tanggal_lahir"
-								placeholder="Tanggal Lahir"
-								format="dd-MM-yyyy"
-								:enable-time-picker="false"
-								auto-apply
-							/>
+							<div class="v-input_control_tanggal">
+								<vue-date-picker
+									v-model="inputDataSiswaSiswi.tanggal_lahir"
+									placeholder="Tanggal Lahir"
+									format="dd-MM-yyyy"
+									:enable-time-picker="false"
+									:teleport="true"
+									:auto-position="false"
+									:input-class="{ 'dp__input': showError }"
+									position="left"
+									auto-apply
+									@update:model-value="validateTanggal(inputDataSiswaSiswi.tanggal_lahir)"
+									@blur="validateTanggal(inputDataSiswaSiswi.tanggal_lahir)"
+								/>
+							</div>
+							<span v-if="showError" class="v-messages-tanggal">Field ini wajib diisi !</span>
 						</v-col>
 					</v-row>
 				</v-col>
@@ -102,6 +117,7 @@
 						v-model="inputDataSiswaSiswi.jenis_kelamin"
 						:data-a="jenisKelaminOptions"
 						label-a="Jenis Kelamin"
+						:rules-a="inputDataSiswaSiswi.jenis_kelamin != '' ? true : false"
 						:clearable-a="true"
 					/>
 				</v-col>
@@ -123,8 +139,9 @@
 						v-model="inputDataSiswaSiswi.agama"
 						:data-a="agamaOptions"
 						item-title="label"
-						item-value="kode"
+						item-value="value"
 						label-a="Agama"
+						:rules-a="inputDataSiswaSiswi.agama != '' ? true : false"
 						:clearable-a="true"
 					/>
 				</v-col>
@@ -187,7 +204,7 @@
 						v-model="inputDataSiswaSiswi.hobi"
 						:data-a="hobiOptions"
 						item-title="label"
-						item-value="kode"
+						item-value="value"
 						label-a="Hobi"
 						:clearable-a="true"
 					/>
@@ -210,7 +227,7 @@
 						v-model="inputDataSiswaSiswi.cita_cita"
 						:data-a="citacitaOptions"
 						item-title="label"
-						item-value="kode"
+						item-value="value"
 						label-a="Cita - Cita"
 						:clearable-a="true"
 					/>
@@ -235,6 +252,7 @@
 						item-title="kelas"
 						item-value="kelas"
 						label-a="Kelas"
+						:rules-a="inputDataSiswaSiswi.kelas != '' ? true : false"
 						:clearable-a="true"
 					/>
 				</v-col>
@@ -289,19 +307,20 @@ export default {
   },
   data: () => ({
 		inputDataSiswaSiswi: {
-      id_user: '',
-      nik_siswa: '',
-      nomor_induk: '',
-      tempat: '',
-      tanggal_lahir: '',
+      id_user: null,
+      nik_siswa: null,
+      nomor_induk: null,
+      tempat: null,
+      tanggal_lahir: null,
       jenis_kelamin: null,
       agama: null,
-      anakke: '',
-      jumlah_saudara: '',
+      anakke: null,
+      jumlah_saudara: null,
       hobi: null,
       cita_cita: null,
       kelas: null,
     },
+		showError: false,
 		kondisiTombol: true,
     jenisKelaminOptions: ['Laki - Laki', 'Perempuan'],
 
@@ -323,65 +342,50 @@ export default {
 		inputDataSiswaSiswi:{
 			deep: true,
 			handler(value) {
-				if(value.nomor_induk != '' && value.tempat != '' && value.tanggal_lahir != '' && value.jenis_kelamin != '' && value.agama != '' && value.kelas != ''){
+				if(value.nomor_induk != null && value.tempat != null && value.tanggal_lahir != null && value.jenis_kelamin != null && value.agama != null && value.kelas != null){
 					this.kondisiTombol = false
 				}else{
 					this.kondisiTombol = true
 				}
 				localStorage.setItem('stepTwo', JSON.stringify(this.inputDataSiswaSiswi))
-				// this.wadahInput()
 			}
 		},
 		dataStepTwo: {
 			deep: true,
 			handler(value) {
 				this.inputDataSiswaSiswi = {
-					id_user: value.id_user ? value.id_user : null,
-					nik_siswa: value.nik_siswa ? value.nik_siswa : null,
-					nomor_induk: value.nomor_induk ? value.nomor_induk : null,
-					tempat: value.tempat ? value.tempat : null,
-					tanggal_lahir: value.tanggal_lahir ? value.tanggal_lahir : null,
-					jenis_kelamin: value.jenis_kelamin ? value.jenis_kelamin : null,
-					agama: value.agama ? value.agama.kode : null,
-					anakke: value.anakke ? value.anakke : null,
-					jumlah_saudara: value.jumlah_saudara ? value.jumlah_saudara : null,
-					hobi: value.hobi ? value.hobi.kode : null,
-					cita_cita: value.cita_cita ? value.cita_cita.kode : null,
-					kelas: value.kelas ? value.kelas : null,
+					id_user: value?.id_user,
+					nik_siswa: value?.nik_siswa,
+					nomor_induk: value?.nomor_induk,
+					tempat: value?.tempat,
+					tanggal_lahir: value?.tanggal_lahir,
+					jenis_kelamin: value?.jenis_kelamin,
+					agama: value?.agama,
+					anakke: value?.anakke,
+					jumlah_saudara: value?.jumlah_saudara,
+					hobi: value?.hobi,
+					cita_cita: value?.cita_cita,
+					kelas: value?.kelas,
 				}
+				this.validateTanggal(this.inputDataSiswaSiswi.tanggal_lahir)
 			}
 		},
 	},
 	mounted() {
 		this.inputDataSiswaSiswi.id_user = this.$route.params.uid;
-		this.getAgama()
-		this.getHobi()
-		this.getCitaCita()
+		this.getDataMaster({ kode: 'agama' })
+		this.getDataMaster({ kode: 'hobi' })
+		this.getDataMaster({ kode: 'citacita' })
 		this.getKelas({kondisi: 'All'})
 	},
 	methods: {
 		...mapActions({
-			getAgama: 'setting/getAgama',
-			getHobi: 'setting/getHobi',
-			getCitaCita: 'setting/getCitaCita',
+			getDataMaster: 'setting/getDataMaster',
 			getKelas: 'setting/getKelas',
 		}),
-		wadahInput(){
-			let inputFormTwo = {
-				nikSiswa: this.inputDataSiswaSiswi.nik_siswa,
-				nomorInduk: this.inputDataSiswaSiswi.nomor_induk,
-				tempat: this.inputDataSiswaSiswi.tempat,
-				tanggalLahir: this.inputDataSiswaSiswi.tanggal_lahir,
-				jenisKelamin: this.inputDataSiswaSiswi.jenis_kelamin,
-				agama: this.inputDataSiswaSiswi.agama,
-				anakKe: this.inputDataSiswaSiswi.anakke,
-				jumlahSaudara: this.inputDataSiswaSiswi.jumlah_saudara,
-				hobi: this.inputDataSiswaSiswi.hobi,
-				citaCita: this.inputDataSiswaSiswi.cita_cita,
-				kelas: this.inputDataSiswaSiswi.kelas,
-			}
-      this.$emit("DataStepTwo", inputFormTwo)
-    },
+		validateTanggal(val) {
+			this.showError = !val
+		},
 		backStep() {
       this.$emit("backStep");
     },

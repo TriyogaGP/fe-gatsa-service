@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="subheading grey--text text-decoration-underline">Data Question Exam</h1>
+    <h2 class="subheading grey--text text-decoration-underline">Data Question Exam</h2>
     <v-card class="pa-1 rounded" variant="outlined" elevation="4">
       <v-alert
         color="surface"
@@ -13,7 +13,7 @@
         class="mb-2"
       >
         <template v-slot:text>
-          <ul style="font-size: 12px;">
+          <ul style="font-size: 9pt;">
             <li>- Tombol Delete ada 2 (Delete Soft & Delete Hard).</li>
             <li>- Tombol Delete Soft tidak menghapus data dari database hanya di jadikan nonaktif dan ditandai dengan flag merah.</li>
             <li>- Tombol Delete Hard menghapus data dari database secara permanen.</li>
@@ -31,7 +31,6 @@
         item-value="kode"
         density="comfortable"
         hide-default-footer
-        hide-default-header
         class="elavation-3 rounded"
         :items-per-page="itemsPerPage"
         @page-count="pageCount = $event"
@@ -47,72 +46,73 @@
         <template #loader>
           <LoaderDataTables />
         </template>
-        <template #[`item.number`]="{ item }">
-          {{ page > 1 ? ((page - 1)*limit) + item.index + 1 : item.index + 1 }}
+        <template #[`item.number`]="{ index }">
+          {{ page > 1 ? ((page - 1)*limit) + index + 1 : index + 1 }}
         </template>
         <template #[`item.jeniskode`]="{ item }">
-          <span v-html="`${item.raw.jenis} / ${item.raw.kode}`" /> 
+          <span v-html="`${item.jenis} / ${item.kode}`" /> 
         </template>
         <template #[`item.mapelkelas`]="{ item }">
-          <span v-html="`${item.raw.namamapel} / ${item.raw.kelas}`" /> 
+          <span v-html="`${item.namamapel} / ${item.kelas}`" /> 
         </template>
         <template #[`item.pertanyaan`]="{ item }">
-          <span v-if="item.raw.pertanyaan.file === null" v-html="item.raw.pertanyaan.text" /> 
+          <span v-if="item.pertanyaan.file === null" v-html="item.pertanyaan.text" /> 
           <div v-else>
-            <v-img :src="item.raw.pertanyaan.file" width="40" />
+            <v-img :src="item.pertanyaan.file" width="40" />
               <v-tooltip
                 activator="parent"
                 location="top"
-              ><v-img :src="item.raw.pertanyaan.file" width="150" /></v-tooltip>
-            <span v-html="item.raw.pertanyaan.text" />
+              ><v-img :src="item.pertanyaan.file" width="150" /></v-tooltip>
+            <span v-html="item.pertanyaan.text" />
           </div>
         </template>
         <template #[`item.pilihan`]="{ item }">
           <Button
-            v-if="item.raw.jenis === 'pilihan ganda' || item.raw.jenis === 'benar salah'"
-            color-button="#04f7f7"
+            v-if="item.jenis === 'pilihan ganda' || item.jenis === 'benar salah'"
+            color-button="info"
             icon-prepend-button="mdi mdi-information"
             size-button="x-small"
             nama-button="Detail"
-            @proses="openDetail(item.raw.pilihan)"
+            @proses="openDetail(item.pilihan)"
           />
-          <span v-else-if="item.raw.jenis === 'menjodohkan'">
-            <span v-if="item.raw.pilihan.jenis === 'text'" v-html="item.raw.pilihan.text" /> 
+          <span v-else-if="item.jenis === 'menjodohkan'">
+            <span v-if="item.pilihan.jenis === 'text'" v-html="item.pilihan.text" /> 
             <div v-else>
-              <v-img :src="item.raw.pilihan.file" width="40" />
+              <v-img :src="item.pilihan.file" width="40" />
                 <v-tooltip
                   activator="parent"
                   location="top"
-                ><v-img :src="item.raw.pilihan.file" width="150" /></v-tooltip>
+                ><v-img :src="item.pilihan.file" width="150" /></v-tooltip>
             </div>
           </span>
           <span v-else>-</span>
         </template>
         <template #[`item.kunci`]="{ item }">
-          <span v-html="item.raw.jenis === 'pilihan ganda' || item.raw.jenis === 'menjodohkan' || item.raw.jenis === 'benar salah' ? item.raw.kunci : '-'" /> 
+          <span v-html="item.jenis === 'pilihan ganda' || item.jenis === 'menjodohkan' || item.jenis === 'benar salah' ? item.kunci : '-'" /> 
         </template>
         <template #[`item.statusAktif`]="{ item }">
-          <v-icon size="small" v-if="item.raw.statusAktif == true" color="green" icon="mdi mdi-check" />
-          <v-icon size="small" v-else-if="item.raw.statusAktif == false" color="red" icon="mdi mdi-close" />
+          <v-icon size="small" :color="item.statusAktif ? 'green' : 'red'" :icon="item.statusAktif ? 'mdi mdi-check' : 'mdi mdi-close'" />
         </template>
         <template #[`item.flag`]="{ item }">
-          <div class="flag" :style="item.raw.flag ? 'background-color: red;' : 'background-color: green;'" />
+          <div class="flag" :style="item.flag ? 'background-color: red;' : 'background-color: green;'" />
         </template>
         <template #expanded-row="{ columns, item }">
           <tr>
             <td :colspan="columns.length">
               <Button 
-                color-button="#0bd369"
+                color-button="success"
                 icon-prepend-button="mdi mdi-pencil"
                 nama-button="Ubah"
-                :disabled-button="item.raw.statusAktif === false"
-                @proses="openDialog(item.raw, 1)"
+                size-button="x-small"
+                :disabled-button="item.statusAktif === false"
+                @proses="openDialog(item, 'ubah')"
               />
               <Button 
-                color-button="#0bd369"
-                :icon-prepend-button="item.raw.statusAktif === false ? 'mdi mdi-eye' : 'mdi mdi-eye-off'"
-                :nama-button="item.raw.statusAktif === false ? 'Active' : 'Non Active'"
-                @proses="postRecordTwo(item.raw, 'STATUSRECORD', !item.raw.statusAktif)"
+                color-button="success"
+                size-button="x-small"
+                :icon-prepend-button="item.statusAktif === false ? 'mdi mdi-eye' : 'mdi mdi-eye-off'"
+                :nama-button="item.statusAktif === false ? 'Active' : 'Non Active'"
+                @proses="postRecordTwo(item, 'STATUSRECORD', !item.statusAktif)"
               />
               <v-menu
                 open-on-click
@@ -124,10 +124,11 @@
                 <template v-slot:activator="{ props }">
                   <Button 
                     v-bind="props"
-                    color-button="#bd3a07"
+                    color-button="error"
                     icon-prepend-button="mdi mdi-delete"
                     icon-append-button="mdi mdi-menu-down"
                     nama-button="Hapus"
+                    size-button="x-small"
                   />
                 </template>
 
@@ -139,11 +140,11 @@
                   class="listData"
                 >
                   <v-list-item
-                    @click="postRecordTwo(item.raw, 'DELETESOFT', null)"
+                    @click="postRecordTwo(item, 'DELETESOFT', null)"
                     class="SelectedMenu"
                     active-class="SelectedMenu-active"
                     title="Delete Soft"
-                    :disabled="item.raw.statusAktif === false"
+                    :disabled="item.statusAktif === false"
                   >
                     <template v-slot:prepend>
                       <v-icon size="middle" icon="mdi mdi-delete" color="icon-white" />
@@ -153,7 +154,7 @@
                     </template>
                   </v-list-item>
                   <v-list-item
-                    @click="postRecordTwo(item.raw, 'DELETEHARD', null)"
+                    @click="postRecordTwo(item, 'DELETEHARD', null)"
                     class="SelectedMenu"
                     active-class="SelectedMenu-active"
                     title="Delete Hard"
@@ -172,45 +173,37 @@
         </template>
         <template #top>
           <v-row no-gutters class="pa-2">
-            <v-col cols="12" md="6">
+            <v-col cols="12" md="6" class="d-flex align-center">
               <Button 
                 color-button="light-blue darken-3"
                 icon-prepend-button="mdi mdi-plus-thick"
                 nama-button="Tambah"
-                @proses="openDialog(null, 0)"
+                size-button="x-small"
+                @proses="openDialog(null, 'tambah')"
               />
             </v-col>
             <v-col cols="12" md="6">
               <v-row no-gutters>
-                <v-col cols="12" md="4" class="pr-2">
+                <v-col cols="12" md="6" class="pr-2">
                   <Autocomplete
                     v-model="pencarian"
                     :data-a="pencarianOptions"
-                    label-a="Pilih Pencarian"
-                    item-title="label"
-                    item-value="kode"
+                    label-a="Pilih Jenis"
                     :clearable-a="true"
-                    @click:clear="() => { page = 1; pencarian = null; searchData = null; getQuestionExam({page: 1, limit: limit, keyword: ''}); }"
                     @ubah="() => { page = 1; searchData = null; }"
+                    @click:clear="() => { page = 1; pencarian = null; searchData = null; getQuestionExam({page: 1, limit: limit, keyword: ''}); }"
                   />
                 </v-col>
                 <v-col cols="12" md="6" class="pr-2">
                   <Autocomplete
                     v-model="searchData"
                     :data-a="pencarian === 'Mata Pelajaran' ? optionsMengajar : pencarian === 'Kelas' ? optionsKelas : questionOptions"
-                    :label-a="pencarian ? pencarian === 'Mata Pelajaran' ? 'Pilih Mata Pelajaran' : pencarian === 'Kelas' ? 'Pilih Kelas' : 'Pilih Jenis Soal' : '---'"
+                    :label-a="pencarian ? pencarian === 'Mata Pelajaran' ? 'Pilih Mata Pelajaran' : pencarian === 'Kelas' ? 'Pilih Kelas' : 'Pilih Tipe Soal' : 'Pilih Pencarian'"
                     item-title="label"
-                    :item-value="pencarian === 'Mata Pelajaran' ? 'kode' : 'link'"
+                    :item-value="pencarian === 'Mata Pelajaran' ? 'value' : (pencarian === 'Tipe Soal' || pencarian === 'Kelas') ? 'link' : null"
                     :disabled-a="!pencarian"
+                    :autofocus="false"
                     @ubah="(e) => { page = 1; getQuestionExam({page: 1, limit: limit, keyword: e}); }"
-                  />
-                </v-col>
-                <v-col cols="12" md="2" class="d-flex justify-end align-center">
-                  <Autocomplete
-                    v-model="page"
-                    :data-a="pageOptions"
-                    label-a="Page"
-                    :disabled-a="DataQuestionExam.length ? false : true"
                   />
                 </v-col>
               </v-row>
@@ -222,7 +215,17 @@
           <v-divider :thickness="2" class="border-opacity-100" color="white" />
           <v-row no-gutters>
             <v-col cols="12" lg="10" class="pa-2 d-flex justify-start align-center">
-              <span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
+              <!-- <span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span> -->
+              <span style="font-size: 10pt;">Halaman</span>
+              <div style="width: 100px; margin-left: 3px; margin-right: 3px;">
+                <Autocomplete
+                  v-model="page"
+                  :data-a="pageOptions"
+                  label-a="Page"
+                  :disabled-a="DataQuestionExam.length ? false : true"
+                />
+              </div>
+              <span style="font-size: 10pt;">dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
             </v-col>
             <v-col cols="12" lg="2" class="pa-2 text-right">
               <div class="d-flex justify-start align-center">
@@ -237,7 +240,7 @@
                   variant="plain"
                   size-button="large"
                   model-button="comfortable"
-                  color-button="#ffffff"
+                  color-button="success"
                   icon-button="mdi mdi-arrow-left-circle-outline"
                   :disabled-button="DataQuestionExam.length ? pageSummary.page != 1 ? false : true : true"
                   @proses="() => { page = pageSummary.page - 1 }"
@@ -246,7 +249,7 @@
                   variant="plain"
                   size-button="large"
                   model-button="comfortable"
-                  color-button="#ffffff"
+                  color-button="success"
                   icon-button="mdi mdi-arrow-right-circle-outline"
                   :disabled-button="DataQuestionExam.length ? pageSummary.page != pageSummary.totalPages ? false : true : true"
                   @proses="() => { page = pageSummary.page + 1 }"
@@ -266,7 +269,7 @@
     >
       <v-card color="background-dialog-card">
         <v-toolbar color="surface">
-          <v-toolbar-title>{{editedIndex == 0 ? 'Tambah' : 'Ubah'}} Data Question Exam</v-toolbar-title>
+          <v-toolbar-title>{{editedIndex == 'tambah' ? 'Tambah' : 'Ubah'}} Data Question Exam</v-toolbar-title>
           <v-spacer />
           <v-toolbar-items>
             <Button
@@ -298,7 +301,7 @@
                 :data-a="mengajarOptions"
                 label-a="Pilih Mata Pelajaran"
                 item-title="label"
-                item-value="kode"
+                item-value="value"
                 :clearable-a="true"
               />
             </v-col>
@@ -346,8 +349,7 @@
                 item-title="label"
                 item-value="link"
                 :clearable-a="true"
-                :disabled-a="editedIndex === 1"
-                @ubah="() => { jumlahPilihan = 0; }"
+                :disabled-a="editedIndex === 'ubah'"
               />
             </v-col>
           </v-row>
@@ -372,7 +374,7 @@
               />
               <Button
                 v-if="inputDataQuestionExam.jenis !== null"
-                color-button="#0bd369"
+                color-button="success"
                 icon-prepend-button="mdi mdi-upload"
                 nama-button="Upload Gambar Pertanyaan"
                 @proses="pilihFile('pertanyaan', null)"
@@ -481,7 +483,7 @@
             >
               <TextArea
                 v-if="JenisPilihan === 'text'"
-                v-model="TextPilihan[index]"
+                v-model="TextPilihan[x]"
                 :label-ta="`Pilihan ${k}`"
                 rows="4"
                 class="mt-2"
@@ -490,10 +492,10 @@
               />
               <Button 
                v-if="JenisPilihan === 'gambar'"
-                color-button="#0bd369"
+                color-button="success"
                 icon-prepend-button="mdi mdi-upload"
-                :nama-button="`Upload Gambar Pertanyaan ${k}`"
-                @proses="pilihFile('pilihan', index)"
+                :nama-button="`Upload Gambar Pilihan ${k}`"
+                @proses="pilihFile('pilihan', x)"
               />
               <input 
                 ref="inputPilihan"
@@ -501,7 +503,7 @@
                 type="file"
                 accept=".png,.jpg"
                 style="display: none"
-                @change="uploadDataFile($event, 'pilihan', index)"
+                @change="uploadDataFile($event, 'pilihan', x)"
               >
               <!-- <div v-if="JenisPilihan === 'gambar'">
                 {{ FilePilihan[index].kode }}
@@ -525,15 +527,15 @@
               cols="12"
             >
               <Button
-                v-if="editedIndex == 0" 
-                color-button="black"
+                v-if="editedIndex == 'tambah'" 
+                color-button="info"
                 nama-button="Simpan Data"
                 :disabled-button="kondisiTombol"
                 @proses="postRecord('ADD')"
               />
               <Button
-                v-if="editedIndex == 1" 
-                color-button="black"
+                v-if="editedIndex == 'ubah'" 
+                color-button="info"
                 nama-button="Ubah Data"
                 :disabled-button="kondisiTombol"
                 @proses="postRecord('EDIT')"
@@ -662,6 +664,8 @@ export default {
   data: () => ({
 		expanded: [],
 		DataQuestionExam: [],
+    pencarianOptions: ["Tipe Soal", "Mata Pelajaran", "Kelas"],
+    pencarian: null,
 		searchData: null,
     page: 1,
     pageCount: 0,
@@ -705,9 +709,14 @@ export default {
     ValuePilihan2: ["B", "S"],
     TextPilihan: [],
     FilePilihan: [],
-    questionOptions: ["pilihan ganda", "essay", "menjodohkan", "benar salah"],
+    questionOptions: [
+      { label: "pilihan ganda", link: "pilihan ganda" }, 
+      { label: "essay", link: "essay" }, 
+      { label: "menjodohkan", link: "menjodohkan" }, 
+      { label: "benar salah", link: "benar salah" }, 
+    ],
     jenisPilihanOptions: ["text", "gambar"],
-    editedIndex: 0,
+    editedIndex: 'tambah',
     kondisiTombol: true,
     DialogQuestionExam: false,
     dialogCrop: false,
@@ -720,8 +729,6 @@ export default {
     filePertanyaan: '',
     filename: '',
     jumlahPilihan: 0,
-    pencarianOptions: ["Jenis Soal", "Mata Pelajaran", "Kelas"],
-    pencarian: null,
     image: {
       src: null,
       type: null,
@@ -756,11 +763,10 @@ export default {
     }),
     mengajarOptions(){
 			if(this.roleID === '3'){
+        if(localStorage.getItem('mengajar_bidang') === '') return []
 				let mengajar_bidang = localStorage.getItem('mengajar_bidang').split(', ')
-				let result = []
-				mengajar_bidang.map(str => {
-					let hasil = this.mengajar.filter(val => { return val.kode == str })
-					result.push({ label: hasil.length ? hasil[0].label : '', kode: str })
+				let result = this.mengajar.filter(val => mengajar_bidang.includes(val.value)).map(x => {
+					return x
 				})
 				return result
 			}else if(this.roleID === '1' || this.roleID === '2'){
@@ -826,19 +832,19 @@ export default {
     inputDataQuestionExam: {
       deep: true,
       handler(value){
-        if(value.kelas != null || value.mapel != null){
+        if(value.kelas != null && value.mapel != null && value.jenis != null && value.pertanyaan != null){
           this.kondisiTombol = false
         }else{
           this.kondisiTombol = true
         }
 
-        if(value.jenis === 'menjodohkan' && this.editedIndex === 0){
+        if(value.jenis === 'menjodohkan' && this.editedIndex === 'tambah'){
           this.jumlahPilihan = 1
           this.TextPilihan = []
         }else if(value.jenis === 'benar salah'){
           this.jumlahPilihan = 2
           this.TextPilihan = ["Benar", "Salah"]
-        }else if(value.jenis === 'menjodohkan' && this.editedIndex === 1){
+        }else if(value.jenis === 'menjodohkan' && this.editedIndex === 'ubah'){
           this.jumlahPilihan = 1
         }
       }
@@ -858,20 +864,26 @@ export default {
 				this.getQuestionExam({page: 1, limit: value, keyword: this.searchData})
 			}
 		},
+    searchData: {
+			deep: true,
+			handler(value) {
+        // console.log(value);
+			}
+		},
   },
   mounted() {
     if(!localStorage.getItem('user_token')) return this.$router.push({name: 'LogIn'});
     this.roleID = localStorage.getItem('roleID')
     this.idLog = localStorage.getItem('idLogin')
 		this.getQuestionExam({page: this.page, limit: this.limit, keyword: this.searchData});
-    this.getMengajar()
+		this.getDataMaster({ kode: 'mengajar' })
     this.getKelas({ kondisi: 'All' })
 	},
 	methods: {
 		...mapActions({
 			uploadBerkas: 'upload/uploadBerkas',
       getQuestionExam: 'user/getQuestionExam',
-      getMengajar: "setting/getMengajar",
+			getDataMaster: 'setting/getDataMaster',
       getKelas: 'setting/getKelas',
     }),
     postRecord(jenis) {
@@ -928,7 +940,7 @@ export default {
     },
     openDialog(item, index){
       this.editedIndex = index
-      if(index == 0){
+      if(index == 'tambah'){
         this.clearData()
       }else{
         this.inputDataQuestionExam = {
@@ -1098,10 +1110,10 @@ export default {
       }
     },
     clickrow(event, data) {
-      const index = this.$data.expanded.find(i => i === data?.item?.raw?.kode);
+      const index = this.$data.expanded.find(i => i === data?.item?.kode);
       if(typeof index === 'undefined') return this.$data.expanded = [];
       this.$data.expanded.splice(0, 1)
-      this.$data.expanded.push(data?.item?.raw?.kode);
+      this.$data.expanded.push(data?.item?.kode);
     },
     notifikasi(kode, text, proses){
       this.dialogNotifikasi = true

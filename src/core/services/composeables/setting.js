@@ -5,7 +5,7 @@ const user = {
 	listexamGet: (kelas) => {
 		return useQuery({
 			queryKey: ["list-exam"],
-			queryFn: () => ApiService.get(`settings/listExam${kelas ? `?kelas=${kelas}` : ''}`, localStorage.getItem('user_token')),
+			queryFn: () => ApiService.get(`settings/list-exam${kelas ? `?kelas=${kelas}` : ''}`, localStorage.getItem('user_token')),
 			select: (response) => response.data.result
 		})
 	},

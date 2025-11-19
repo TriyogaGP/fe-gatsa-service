@@ -1,31 +1,38 @@
 <template>
   <div>
-    <h1 class="subheading grey--text text-decoration-underline">Data Broadcast</h1>
+    <h2 class="subheading grey--text text-decoration-underline">Data Broadcast</h2>
     <Button 
       v-if="roleID === '1' || roleID === '2' || roleID === '3'"
       color-button="light-blue darken-3"
       icon-prepend-button="mdi mdi-broadcast"
       nama-button="Broadcast"
+      size-button="x-small"
       @proses="() => {
-        this.getBerkas({kategori: 'tautan'})
-        this.DialogBroadcast = true
+        getBerkas({jenis: 'broadcast', kategori: 'tautan'})
+        DialogBroadcast = true
       }"
     />
     <v-card class="mt-2 mb-2 pa-1 rounded" variant="outlined" elevation="4">
       <v-tabs
         v-if="roleID === '1' || roleID === '2' || roleID === '3'"
         v-model="tab"
+        align-tabs="center"
+        color="#4CAF50"
+        bg-color="surface"
+        slider-color="#4CAF50"
+        density="compact"
+        show-arrows
+        stacked
         grow
-        bg-color="background-dialog-card"
-        density="comfortable"
       >
         <v-tab v-for="item in itemsTab" :key="item.code" :value="item.code">
           <v-icon :icon="item.icon" />
           {{ item.text }}
         </v-tab>
       </v-tabs>
-      <v-window v-model="tab">
-        <v-window-item value="1">
+      <v-divider :thickness="3" color="#4CAF50" class="border-opacity-100" />
+      <v-tabs-window v-model="tab">
+        <v-tabs-window-item value="1">
           <div v-if="dataNotifikasi.length" class="wadah-notif">
             <v-row>
               <v-col cols="12" md="12" class="text-right">
@@ -96,8 +103,8 @@
             />
           </div> -->
           <v-alert v-else-if="!dataNotifikasi.length && roleID !== '4'" type="warning">Tidak ada Broadcast</v-alert>
-        </v-window-item>
-        <v-window-item value="2">
+        </v-tabs-window-item>
+        <v-tabs-window-item value="2">
           <v-data-table
             v-model="selectRecord"
             loading-text="Sedang memuat... Harap tunggu"
@@ -109,7 +116,6 @@
             item-value="idNotifikasi"
             density="comfortable"
             hide-default-footer
-            hide-default-header
             class="elavation-3 rounded"
             :items-per-page="itemsPerPage"
             @page-count="pageCount = $event"
@@ -124,29 +130,29 @@
             <template #loader>
               <LoaderDataTables />
             </template>
-            <template #[`item.number`]="{ item }">
-              {{ page > 1 ? ((page - 1)*limit) + item.index + 1 : item.index + 1 }}
+            <template #[`item.number`]="{ index }">
+              {{ page > 1 ? ((page - 1)*limit) + index + 1 : index + 1 }}
             </template>
             <!-- <template #[`item.check`]="{ item }">
               <v-checkbox
                 v-model="selectRecord"
-                :value="item.raw.idNotifikasi"
+                :value="item.idNotifikasi"
                 hide-details
               />
             </template> -->
             <template #[`item.pesan`]="{ item }">
-              <span v-html="item.raw.pesan.message" />
+              <span v-html="item.pesan.message" />
             </template>
             <template #[`item.isRead`]="{ item }">
-              <v-icon size="small" v-if="item.raw.isRead == true" color="green" icon="mdi mdi-check" />
-              <v-icon size="small" v-else-if="item.raw.isRead == false" color="red" icon="mdi mdi-close" />
+              <v-icon size="small" :color="item.isRead ? 'green' : 'red'" :icon="item.isRead ? 'mdi mdi-check' : 'mdi mdi-close'" />
             </template>
             <template #[`item.opsi`]="{ item }">
               <Button 
-                color-button="#bd3a07"
+                color-button="error"
                 icon-prepend-button="mdi mdi-delete"
                 nama-button="Hapus"
-                @proses="hapusNotifikasi(item.raw, 'Single')"
+                size-button="x-small"
+                @proses="hapusNotifikasi(item, 'Single')"
               />
             </template>
             <template #bottom>
@@ -155,23 +161,26 @@
                 <v-col cols="12" class="pa-2 d-flex justify-start align-center">
                   <Button
                     v-if="dataNotifikasi.length && selectRecord.length < dataNotifikasi.length"
-                    color-button="#0bd369"
+                    color-button="success"
                     icon-prepend-button="mdi mdi-select-all"
                     :nama-button="`Choose All (${selectRecord.length})`"
+                    size-button="x-small"
                     @proses="allData(dataNotifikasi)"
                   />
                   <Button
                     v-if="selectRecord.length"
-                    color-button="#0bd369"
+                    color-button="success"
                     icon-prepend-button="mdi mdi-select-remove"
                     :nama-button="`Remove Select`"
+                    size-button="x-small"
                     @proses="() => { selectRecord = [] }"
                   />
                   <Button 
-                    color-button="#bd3a07"
+                    color-button="error"
                     icon-prepend-button="mdi mdi-delete"
                     nama-button="Hapus Record Selected"
                     :disabled-button="!dataNotifikasi.length"
+                    size-button="x-small"
                     @proses="hapusNotifikasi(selectRecord, 'Multiple')"
                   />
                 </v-col>
@@ -179,7 +188,7 @@
               <v-divider :thickness="2" class="border-opacity-100" color="white" />
               <v-row no-gutters>
                 <v-col cols="12" lg="10" class="pa-2 d-flex justify-start align-center">
-                  <span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
+                  <span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary?.totalPage }}</strong> (Records {{ pageSummary?.total }})</span>
                 </v-col>
                 <v-col cols="12" lg="2" class="pa-2 text-right">
                   <div class="d-flex justify-start align-center">
@@ -188,24 +197,24 @@
                       pilihan-a="select"
                       :data-a="limitPage"
                       label-a="Limit"
-                      :disabled-a="dataNotifikasi.length ? false : true"
+                      :disabled-a="!dataNotifikasi.length"
                     />
                     <Button
                       variant="plain"
                       size-button="large"
                       model-button="comfortable"
-                      color-button="#ffffff"
+                      color-button="success"
                       icon-button="mdi mdi-arrow-left-circle-outline"
-                      :disabled-button="dataNotifikasi.length ? pageSummary.page != 1 ? false : true : true"
+                      :disabled-button="!dataNotifikasi.length || !(pageSummary.page != 1)"
                       @proses="() => { page = pageSummary.page - 1 }"
                     />
                     <Button
                       variant="plain"
                       size-button="large"
                       model-button="comfortable"
-                      color-button="#ffffff"
+                      color-button="success"
                       icon-button="mdi mdi-arrow-right-circle-outline"
-                      :disabled-button="dataNotifikasi.length ? pageSummary.page != pageSummary.totalPages ? false : true : true"
+                      :disabled-button="!dataNotifikasi.length || !(pageSummary.page != pageSummary.totalPage)"
                       @proses="() => { page = pageSummary.page + 1 }"
                     />
                   </div>
@@ -213,8 +222,8 @@
               </v-row>
             </template>
           </v-data-table>
-        </v-window-item>
-      </v-window>
+        </v-tabs-window-item>
+      </v-tabs-window>
 
       <!-- untuk siswa -->
       <div v-if="dataNotifikasi.length && roleID === '4'" class="wadah-notif">
@@ -597,7 +606,7 @@
               cols="12"
             >
               <Button
-                color-button="black"
+                color-button="info"
                 nama-button="Share Broadcast"
                 :disabled-button="kondisiTombol"
                 @proses="postRecord(kategoriBroadcast)"
@@ -779,11 +788,7 @@ export default {
       deep: true,
       handler(value){
         this.idUserField = false
-        value.map(val => {
-          if(val.nama !== localStorage.getItem('nama')){
-            this.pilihanUser.push(val)
-          }
-        })
+        this.pilihanUser = value.filter(val => val.nama !== localStorage.getItem('nama'))
       }
     },
     notifikasiAll: {
@@ -792,23 +797,21 @@ export default {
         let data = value.records
         this.dataNotifikasi = []
         if(this.kodeKategori === 'penerima'){
-          data.map(val => {
-            this.dataNotifikasi.push(val)
-          })
+          this.dataNotifikasi = data
           this.pageSummary = {
-            limit: value.pageSummary.limit,
-            page: value.pageSummary.page,
-            hasNext: value.pageSummary.hasNext,
-            lastID: value.pageSummary.lastID,
-            totalPage: value.pageSummary.totalPage
+            limit: value?.pageSummary?.limit,
+            page: value?.pageSummary?.page,
+            hasNext: value?.pageSummary?.hasNext,
+            lastID: value?.pageSummary?.lastID,
+            totalPage: value?.pageSummary?.totalPage
           }
         }else{
           this.dataNotifikasi = data
           this.pageSummary = {
-            page: value.pageSummary.page,
-            limit: value.pageSummary.limit,
-            total: value.pageSummary.total,
-            totalPage: value.pageSummary.totalPage
+            page: value?.pageSummary?.page,
+            limit: value?.pageSummary?.limit,
+            total: value?.pageSummary?.total,
+            totalPage: value?.pageSummary?.totalPage
           }
         }
       }
@@ -825,6 +828,21 @@ export default {
 			  this.getNotifikasi({kategori: '4', untuk: this.kodeKategori, page: this.page, limit: this.limit})
       }
     },
+    page: {
+			deep: true,
+			handler(value) {
+        this.dataNotifikasi = []
+			  this.getNotifikasi({kategori: '4', untuk: this.kodeKategori, page: value, limit: this.limit})
+			}
+		},
+    limit: {
+			deep: true,
+			handler(value) {
+        this.dataNotifikasi = []
+        this.page = 1
+			  this.getNotifikasi({kategori: '4', untuk: this.kodeKategori, page: this.page, limit: value})
+			}
+		},
   },
   mounted() {
     if(!localStorage.getItem('user_token')) return this.$router.push({name: 'LogIn'});
@@ -854,21 +872,21 @@ export default {
     },
     openDialog(item){
       this.detailData = {
-        idNotifikasi: item.idNotifikasi,
-        idUser: item.idUser,
-        type: item.type,
-        judul: item.judul,
-        pesan: item.pesan,
-        params: item.params,
-        dikirim: item.dikirim,
-        tautan: item.tautan,
-        isRead: item.isRead,
-        createdAt: item.createdAt
+        idNotifikasi: item?.idNotifikasi,
+        idUser: item?.idUser,
+        type: item?.type,
+        judul: item?.judul,
+        pesan: item?.pesan,
+        params: item?.params,
+        dikirim: item?.dikirim,
+        tautan: item?.tautan,
+        isRead: item?.isRead,
+        createdAt: item?.createdAt
       }
       if(this.detailData.isRead) this.DialogNotifikasi = true
       let bodyData = {
         jenis: 'ISREAD',
-        idNotifikasi: item.idNotifikasi,
+        idNotifikasi: item?.idNotifikasi,
       }
       this.$store.dispatch('setting/postNotifikasi', bodyData)
       .then((res) => {
@@ -909,9 +927,9 @@ export default {
     },
     clearData(){
       this.pilihanUser = []
-      this.kategoriBroadcast = ''
+      this.kategoriBroadcast = null
       this.inputData = {
-        idUser: '',
+        idUser: null,
         judul: '',
         pesan: '',
       }
@@ -1002,6 +1020,7 @@ export default {
           nilai += dataindex
           const data = (nilai / this.dataBroadcast) * 100
           this.progress = Math.ceil(data)
+          console.log(nilai, data, this.dataBroadcast, this.progress)
         }, 1000)
       }, 2500)
     },

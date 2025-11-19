@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="subheading grey--text text-decoration-underline">{{ roleID === '1' || roleID === '2' ? 'Data Kelas Siswa' : `Kelas ${kelas}` }}</h1>
+    <h2 class="subheading grey--text text-decoration-underline">{{ roleID === '1' || roleID === '2' ? 'Data Kelas Siswa' : `Kelas ${kelas}` }}</h2>
     <v-card v-if="roleID === '1' || roleID === '2'" class="pa-1 rounded" variant="outlined" elevation="4">
       <Button 
         v-if="DataKelas.length"
@@ -45,7 +45,7 @@
       @proses="updatePeringkat(kelas)"
     />
     <v-card v-if="roleID === '3'" class="pa-1 rounded" variant="outlined" elevation="4">
-      <h1 class="subheading black--text text-center"><div class="pembungkus"><span class="title">Rapot Siswa Siswi</span></div></h1>
+      <h2 class="subheading black--text text-center"><div class="pembungkus"><span class="title">Rapot Siswa Siswi</span></div></h2>
       <v-row no-gutters>
         <v-col
           cols="12"
@@ -251,11 +251,7 @@
           </v-toolbar-items>
         </v-toolbar>
         <v-card-text class="pt-4 v-dialog--custom">
-          <v-row no-gutters class="pa-2">
-            <v-col cols="12" md="3" />
-            <v-col cols="12" md="9" />
-          </v-row>
-          <h1 class="subheading black--text text-center"><div class="pembungkus"><span class="title">Rapot Siswa Siswi</span></div></h1>
+          <h2 class="subheading black--text text-center"><div class="pembungkus"><span class="title">Rapot Siswa Siswi</span></div></h2>
           <v-row no-gutters>
             <v-col
               cols="12"
@@ -304,55 +300,7 @@
               : {{ dataSiswaSiswi.length ? uppercaseLetterFirst2(dataSiswaSiswi[0].waliKelas) : '-' }}
             </v-col>
           </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="6"
-              class="pt-2 text-left font-weight-bold"
-            >
-              <Button 
-                :loading="isLoadingbtnPDF"
-                color-button="light-blue darken-3"
-                icon-prepend-button="mdi mdi-export"
-                nama-button="Konversi -> PDF File"
-                @proses="PDFOpen(dataSiswaSiswi.length ? dataSiswaSiswi[0].idUser : '-')"
-              />
-            </v-col>
-            <v-col
-              cols="12"
-              md="6"
-              class="pt-2 text-right font-weight-bold"
-            >
-              <v-row>
-                <v-col cols="12" lg="2" class="text-right font-weight-bold">
-                  <Button
-                    variant="plain"
-                    size-button="large"
-                    model-button="comfortable"
-                    color-button="#000000"
-                    icon-button="mdi mdi-arrow-left-circle-outline"
-                    :disabled-button="dataSiswaSiswi.length ? pageSummary.page != 1 ? false : true : true"
-                    @proses="() => { page = pageSummary.page - 1 }"
-                  />
-                </v-col>  
-                <v-col cols="12" lg="8" class="d-flex align-center justify-center font-weight-bold">  
-                  <span>{{ dataSiswaSiswi.length ? uppercaseLetterFirst2(dataSiswaSiswi[0].nama) : '-' }}</span>
-                </v-col>
-                <v-col cols="12" lg="2" class="text-left font-weight-bold">
-                  <Button
-                    variant="plain"
-                    size-button="large"
-                    model-button="comfortable"
-                    color-button="#000000"
-                    icon-button="mdi mdi-arrow-right-circle-outline"
-                    :disabled-button="dataSiswaSiswi.length ? pageSummary.page != pageSummary.totalPages ? false : true : true"
-                    @proses="() => { page = pageSummary.page + 1 }"
-                  />
-                </v-col> 
-              </v-row>
-            </v-col>
-          </v-row>
-          <table dark class="mb-2">
+          <table dark class="mt-2 mb-2">
             <thead>
               <tr>
                 <th>MATA PELAJARAN</th>
@@ -369,8 +317,8 @@
                 <td style="text-align: center">{{ v.kkm }}</td>
                 <td style="text-align: center">{{ v.nilai }}</td>
                 <td style="text-align: center">{{ v.hurufNilai }}</td>
-                <td>{{ v.nilai === 0 ? 'Nol' : setPembilang.pembilang(v.nilai) }}</td>
-                <td :style="v.nilai > v.kkm ? 'color: green' : 'color: red'">{{ v.nilai > v.kkm ? 'KOMPETEN' : 'TIDAK KOMPETEN' }}</td>
+                <td style="text-align: center">{{ v.nilai === 0 ? 'Nol' : setPembilang.pembilang(v.nilai) }}</td>
+                <td :style="`text-align: center;${v.nilai > v.kkm ? 'color: green;' : 'color: red;'}`">{{ v.nilai > v.kkm ? 'KOMPETEN' : 'TIDAK KOMPETEN' }}</td>
               </tr>
               <tr style="font-weight: bold;">
                 <td colspan="2" class="text-right">RATA - RATA NILAI</td>
@@ -408,7 +356,55 @@
           </table>
         </v-card-text>
         <v-divider />
-        <v-card-actions />
+        <v-card-actions>
+          <v-row no-gutters>
+            <v-col
+              cols="12"
+              md="7"
+            >
+              <Button 
+                :loading="isLoadingbtnPDF"
+                color-button="light-blue darken-3"
+                icon-prepend-button="mdi mdi-export"
+                nama-button="Konversi -> PDF File"
+                @proses="PDFOpen(dataSiswaSiswi.length ? dataSiswaSiswi[0].idUser : '-')"
+              />
+            </v-col>
+            <v-col
+              cols="12"
+              md="5"
+              class="d-flex align-center text-right font-weight-bold"
+            >
+              <v-row>
+                <v-col cols="12" md="2" class="text-right font-weight-bold">
+                  <Button
+                    variant="plain"
+                    size-button="medium"
+                    model-button="comfortable"
+                    color-button="#000000"
+                    icon-button="mdi mdi-arrow-left-circle-outline"
+                    :disabled-button="dataSiswaSiswi.length ? pageSummary.page != 1 ? false : true : true"
+                    @proses="() => { page = pageSummary.page - 1 }"
+                  />
+                </v-col>  
+                <v-col cols="12" md="8" class="d-flex align-center justify-center font-weight-bold">  
+                  <span style="font-size: 9pt;">{{ dataSiswaSiswi.length ? uppercaseLetterFirst2(dataSiswaSiswi[0].nama) : '-' }}</span>
+                </v-col>
+                <v-col cols="12" md="2" class="text-left font-weight-bold">
+                  <Button
+                    variant="plain"
+                    size-button="medium"
+                    model-button="comfortable"
+                    color-button="#000000"
+                    icon-button="mdi mdi-arrow-right-circle-outline"
+                    :disabled-button="dataSiswaSiswi.length ? pageSummary.page != pageSummary.totalPages ? false : true : true"
+                    @proses="() => { page = pageSummary.page + 1 }"
+                  />
+                </v-col> 
+              </v-row>
+            </v-col>
+          </v-row>
+        </v-card-actions>
       </v-card>
     </v-dialog>
     <v-overlay v-model="isLoadingProses" persistent class="align-center justify-center">

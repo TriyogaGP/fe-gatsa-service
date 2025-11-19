@@ -1,20 +1,20 @@
 <template>
   <div>
-    <h1 class="subheading grey--text text-decoration-underline">Formulir Administrator</h1>
+    <h2 class="subheading grey--text text-decoration-underline">Formulir Administrator</h2>
     <div class="text-right wadah">
       <span class="link" @click="gotolist()">Data Administrator</span>
       <v-icon size="small" class="iconstyle" icon="mdi mdi-menu-right" />
       <span>Formulir Administrator</span>
     </div>
-    <v-stepper v-model="stepperVal">
-      <v-stepper-header>
+    <v-stepper alt-labels v-model="stepperVal">
+      <v-stepper-header style="color: #272727; font-size: 10pt; font-weight: bold;">
         <v-stepper-item
           :complete="stepperVal > 1"
           title="Data Log in"
           :value="1"
         ></v-stepper-item>
 
-        <v-divider></v-divider>
+        <v-divider style="border: solid 1px #272727;" />
 
         <v-stepper-item
           :complete="stepperVal > 2"
@@ -22,7 +22,7 @@
           :value="2"
         ></v-stepper-item>
 
-        <v-divider></v-divider>
+        <v-divider style="border: solid 1px #272727;" />
 
         <v-stepper-item
           title="Preview Formulir"
@@ -80,26 +80,26 @@ export default {
     steps: 3,
     lazyStep2: false,
     tampungStepOne: {
-      id_user: '',
+      id_user: null,
       level: null,
-      nama_lengkap: '',
-      username: '',
-      email: '',
-      password: '',
+      nama_lengkap: null,
+      username: null,
+      email: null,
+      password: null,
     },
     tampungStepTwo: {
-      id_user: '',
-      tempat: '',
-      tanggal_lahir: '',
+      id_user: null,
+      tempat: null,
+      tanggal_lahir: null,
       jenis_kelamin: null,
       agama: null,
-      telp: '',
-      alamat: '',
+      telp: null,
+      alamat: null,
       provinsi: null,
       kabkota: null,
       kecamatan: null,
       kelurahan: null,
-      kode_pos: '',
+      kode_pos: null,
     },
   }),
   setup() {
@@ -133,28 +133,28 @@ export default {
       handler(value) {
         if(this.stepperVal === 1){
           this.tampungStepOne = {
-            id_user: value.idUser ? value.idUser : '',
-            level: value.consumerType ? value.consumerType : null,
-            nama_lengkap: value.nama ? value.nama : '',
-            username: value.username ? value.username : '',
-            email: value.email ? value.email : '',
-            password: value.kataSandi ? value.kataSandi : '',
+            id_user: value?.idUser,
+            level: value?.consumerType,
+            nama_lengkap: value?.nama,
+            username: value?.username,
+            email: value?.email,
+            password: value?.kataSandi,
           }
         }
         if(this.stepperVal === 2){
           this.tampungStepTwo = {
-            id_user: value.idUser ? value.idUser : '',
-            tempat: value.tempat ? value.tempat : '',
-            tanggal_lahir: value.tanggalLahir ? value.tanggalLahir : '',
-            jenis_kelamin: value.jenisKelamin ? value.jenisKelamin : null,
-            agama: value.agama ? value.agama : null,
-            telp: value.telp ? value.telp : '',
-            alamat: value.alamat ? value.alamat : '',
-            provinsi: value.provinsi ? value.provinsi : null,
-            kabkota: value.kabKota ? value.kabKota : null,
-            kecamatan: value.kecamatan ? value.kecamatan : null,
-            kelurahan: value.kelurahan ? value.kelurahan : null,
-            kode_pos: value.kodePos ? value.kodePos : '',
+            id_user: value?.idUser,
+            tempat: value?.tempat,
+            tanggal_lahir: value?.tanggalLahir,
+            jenis_kelamin: value?.jenisKelamin,
+            agama: value?.agama?.value,
+            telp: value?.telp,
+            alamat: value?.alamat,
+            provinsi: value?.provinsi?.kode,
+            kabkota: value?.kabKota?.kode,
+            kecamatan: value?.kecamatan?.kode,
+            kelurahan: value?.kelurahan?.kode,
+            kode_pos: value?.kodePos,
           }
         }
       },

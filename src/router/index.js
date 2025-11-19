@@ -35,6 +35,7 @@ const routes = [
       {
         path: '/settings',
         name: 'Pengaturan',
+        props: true,
         component: () => import('@/views/Settings.vue')
       },
       {

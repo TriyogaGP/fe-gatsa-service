@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="subheading grey--text text-decoration-underline">Data Jadwal Mengajar</h1>
+    <h2 class="subheading grey--text text-decoration-underline">Data Jadwal Mengajar</h2>
     <v-card class="pa-1 rounded" variant="outlined" elevation="4">
       <v-data-table
         loading-text="Sedang memuat... Harap tunggu"
@@ -13,7 +13,6 @@
         item-value="idUser"
         density="comfortable"
         hide-default-footer
-        hide-default-header
         class="elavation-3 rounded"
         :items-per-page="itemsPerPage"
         @page-count="pageCount = $event"
@@ -29,71 +28,65 @@
         <template #loader>
           <LoaderDataTables />
         </template>
-        <template #[`item.number`]="{ item }">
-          {{ page > 1 ? ((page - 1)*limit) + item.index + 1 : item.index + 1 }}
+        <template #[`item.number`]="{ index }">
+          {{ page > 1 ? ((page - 1)*limit) + index + 1 : index + 1 }}
         </template>
         <template #[`item.nama`]="{ item }">
-          <span v-html="uppercaseLetterFirst2(item.raw.nama)" /> 
+          <span v-html="uppercaseLetterFirst2(item.nama)" /> 
         </template>
         <template #[`item.datamapel`]="{ item }">
-          <v-chip-group>
-            <v-chip v-for="(val, i) in item.raw.dataJadwalMengajar" :key="i" class="box fourcorners" @click="bukadialog(item.raw.dataJadwalMengajar[i], val.mapel.kodeMapel, item.raw)"><strong><span v-html="val.mapel.namaMapel" /></strong></v-chip>
-          </v-chip-group>
+          <!-- <v-chip-group> -->
+          <div class="d-flex justify-start align-start flex-wrap">
+            <v-chip v-for="(val, i) in item.dataJadwalMengajar" :key="i" :ripple="false" class="box fourcorners" @click="bukadialog(item.dataJadwalMengajar[i], val.mapel.value, item)"><strong><span v-html="val.mapel.label" /></strong></v-chip>
+          </div>
+          <!-- </v-chip-group> -->
         </template>
         <template #[`item.datakelas`]="{ item }">
-          <v-chip-group>
-            <v-chip v-for="(val, i) in item.raw.kelas" :key="i" class="box fourcorners"><strong><span v-html="val" /></strong></v-chip>
-          </v-chip-group>
+          <!-- <v-chip-group> -->
+            <div class="d-flex justify-start align-start flex-wrap">
+              <v-chip v-for="(val, i) in item.kelas" :key="i" :ripple="false" class="box fourcorners"><strong><span v-html="val" /></strong></v-chip>
+            </div>
+          <!-- </v-chip-group> -->
         </template>
         <template #expanded-row="{ columns, item }">
           <tr>
             <td :colspan="columns.length">
               <Button 
-                color-button="#0bd369"
+                color-button="success"
                 icon-prepend-button="mdi mdi-pencil"
                 nama-button="Ubah"
-                @proses="ubahData(item.raw)"
+                size-button="x-small"
+                @proses="ubahData(item)"
               />
             </td>
           </tr>
         </template>
         <template #top>
           <v-row no-gutters class="pa-2">
-            <v-col cols="12" md="6">
+            <v-col cols="12" md="6" class="d-flex align-center">
               <Button 
                 color-button="light-blue darken-3"
                 icon-prepend-button="mdi mdi-view-list"
                 nama-button="Jadwal Pelajaran"
+                size-button="x-small"
                 @proses="lookJadwal()"
               />
             </v-col>
             <v-col cols="12" md="6">
-              <v-row no-gutters>
-                <v-col cols="12" md="9" class="pr-2">
-                  <TextField
-                    v-model="searchData"
-                    icon-prepend-tf="mdi mdi-magnify"
-                    label-tf="Pencarian..."
-                    :clearable-tf="true"
-                    @click:clear="() => {
-                      page = 1
-                      getJadwalMengajar({page: 1, limit: limit, keyword: ''})
-                    }"
-                    @keyup.enter="() => {
-                      page = 1
-                      getJadwalMengajar({page: 1, limit: limit, keyword: searchData})
-                    }"
-                  />
-                </v-col>
-                <v-col cols="12" md="3" class="d-flex justify-end align-center">
-                  <Autocomplete
-                    v-model="page"
-                    :data-a="pageOptions"
-                    label-a="Page"
-                    :disabled-a="DataJadwalMengajar.length ? false : true"
-                  />
-                </v-col>
-              </v-row>
+              <TextField
+                v-model="searchData"
+                icon-prepend-tf="mdi mdi-magnify"
+                label-tf="Pencarian..."
+                :clearable-tf="true"
+                @click:clear="() => {
+                  page = 1
+                  getJadwalMengajar({page: 1, limit: limit, keyword: ''})
+                }"
+                @keyup.enter="() => {
+                  page = 1
+                  getJadwalMengajar({page: 1, limit: limit, keyword: searchData})
+                }"
+              />
             </v-col>
           </v-row>
           <v-divider :thickness="2" class="border-opacity-100" color="white" />
@@ -102,7 +95,17 @@
           <v-divider :thickness="2" class="border-opacity-100" color="white" />
           <v-row no-gutters>
             <v-col cols="12" lg="10" class="pa-2 d-flex justify-start align-center">
-              <span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
+              <!-- <span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span> -->
+              <span style="font-size: 10pt;">Halaman</span>
+              <div style="width: 100px; margin-left: 3px; margin-right: 3px;">
+                <Autocomplete
+                  v-model="page"
+                  :data-a="pageOptions"
+                  label-a="Page"
+                  :disabled-a="!DataJadwalMengajar.length"
+                />
+              </div>
+              <span style="font-size: 10pt;">dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
             </v-col>
             <v-col cols="12" lg="2" class="pa-2 text-right">
               <div class="d-flex justify-start align-center">
@@ -111,24 +114,24 @@
                   pilihan-a="select"
                   :data-a="limitPage"
                   label-a="Limit"
-                  :disabled-a="DataJadwalMengajar.length ? false : true"
+                  :disabled-a="!DataJadwalMengajar.length"
                 />
                 <Button
                   variant="plain"
                   size-button="large"
                   model-button="comfortable"
-                  color-button="#ffffff"
+                  color-button="success"
                   icon-button="mdi mdi-arrow-left-circle-outline"
-                  :disabled-button="DataJadwalMengajar.length ? pageSummary.page != 1 ? false : true : true"
+                  :disabled-button="!DataJadwalMengajar.length || !(pageSummary.page != 1)"
                   @proses="() => { page = pageSummary.page - 1 }"
                 />
                 <Button
                   variant="plain"
                   size-button="large"
                   model-button="comfortable"
-                  color-button="#ffffff"
+                  color-button="success"
                   icon-button="mdi mdi-arrow-right-circle-outline"
-                  :disabled-button="DataJadwalMengajar.length ? pageSummary.page != pageSummary.totalPages ? false : true : true"
+                  :disabled-button="!DataJadwalMengajar.length || !(pageSummary.page != pageSummary.totalPages)"
                   @proses="() => { page = pageSummary.page + 1 }"
                 />
               </div>
@@ -178,7 +181,7 @@
                 :data-a="mengajarOptions"
                 label-a="Pilih Mata Pelajaran"
                 item-title="label"
-                item-value="kode"
+                item-value="value"
                 multiple
                 chips
                 closable-chips
@@ -224,8 +227,9 @@
 							cols="12"
 						>
               <Button 
-                color-button="black"
+                color-button="info"
                 nama-button="Ubah Data"
+                icon-prepend-button="mdi mdi-pencil"
                 @proses="SimpanForm('JadwalMengajar')"
               />
 						</v-col>
@@ -257,7 +261,7 @@
         </v-toolbar>
         <v-card-text class="pt-4 v-dialog--custom">
           <div
-            style="background-color: #4CAF50; border-radius: 5px; border: 2px solid #000;"
+            style="background-color: #4CAF50; color: #FFF; border-radius: 5px; border: 2px solid #000;"
             class="pa-2 mb-2"
             v-for="(data, index) in dataKelasMapel"
             :key="data.idJadwalMengajar"
@@ -319,6 +323,7 @@
                 <vue-date-picker
                   v-model="inputData2.timeRange[index]"
                   placeholder="Range Waktu Jadwal"
+                  :teleport="true"
                   time-picker
                   range
                   hide-input-icon
@@ -347,6 +352,7 @@
                   item-value="idBerkas"
                   label-a="Modul Digital"
                   :clearable-a="true"
+                  :disabled-a="!berkasOptions.length"
                 />
               </v-col>
             </v-row>
@@ -363,8 +369,9 @@
 							cols="12"
 						>
               <Button 
-                color-button="black"
+                color-button="info"
                 nama-button="Ubah Data"
+                icon-prepend-button="mdi mdi-pencil"
                 @proses="SimpanForm('ModulAndTime')"
               />
 						</v-col>
@@ -398,10 +405,10 @@
           <v-row no-gutters>
             <v-col
               cols="12"
-              md="4"
+              md="5"
               class="pa-1"
             >
-            <table dark class="tableClass mb-2">
+              <table dark class="tableClass mb-2">
                 <thead>
                   <tr>
                     <th class="thSClass">Nama Guru</th>
@@ -435,7 +442,7 @@
             </v-col>
             <v-col
               cols="12"
-              md="8"
+              md="7"
               class="pa-1"
             >
               <table dark class="tableClass mb-10">
@@ -464,93 +471,87 @@
                     </tr>
                     <tr v-else>
                       <td class="tdClass">{{ data.dataJadwal[x].waktu }}</td>
-                      <td v-for="(datas, z) in dataKelas" :key="z" class="tdClass" :style="`background-color: ${data.dataJadwal[x].jadwal.filter(val => val.kelas === datas.kelas).length ? data.dataJadwal[x].jadwal.filter(val => val.kelas === datas.kelas)[0].color : '#e1e1f0'};`">
-                        {{ data.dataJadwal[x].jadwal.filter(val => val.kelas === datas.kelas).length ? data.dataJadwal[x].jadwal.filter(val => val.kelas === datas.kelas)[0].alias : '' }}
-                        <!-- <br>{{ data.dataJadwal[x].jadwal.filter(val => val.kelas === datas.kelas).length ? data.dataJadwal[x].jadwal.filter(val => val.kelas === datas.kelas)[0].namaGuru : '' }} -->
+                      <td v-for="(datas, z) in dataKelas" :key="z" class="tdClass cursor-pointer" :style="`background-color: ${data.dataJadwal[x].jadwal.filter(val => val.kelas === datas.kelas).length ? data.dataJadwal[x].jadwal.filter(val => val.kelas === datas.kelas)[0].color : '#e1e1f0'};`">
+                        <v-tooltip location="top" interactive>
+                          <template v-slot:activator="{ props }">
+                            <span v-bind="props" class="cursor-pointer">{{ data.dataJadwal[x].jadwal.filter(val => val.kelas === datas.kelas).length ? data.dataJadwal[x].jadwal.filter(val => val.kelas === datas.kelas)[0].alias : '' }}</span>
+                          </template>
+                          <span>{{ data.dataJadwal[x].jadwal.filter(val => val.kelas === datas.kelas).length ? data.dataJadwal[x].jadwal.filter(val => val.kelas === datas.kelas)[0].namaGuru : '' }}</span>
+                        </v-tooltip>
                       </td>
                     </tr>
                   </template>
                 </tbody>
               </table>
               <table border="0" width="100%" cellspacing="0" cellpadding="0" style="margin-top: 20px;">
-                <tr>
-                  <td style="width: 50%;">
-                    <table border="0" width="300px" cellspacing="0" cellpadding="0" style="float: left; margin-left: 80px;">
-                      <tr class="ttd">
-                        <td style="padding-bottom: 10px;">Mengetahui,</td>
-                      </tr>
-                      <tr class="ttd">
-                        <td>{{ `Kepala Sekolah ${dataTTD.ttd.namasekolah}` }}</td>
-                      </tr>
-                      <tr class="ttd">
-                        <td style="padding: 10px 0px;">
-                          <template v-if="dataTTD.kepalasekolah.signature !== null">
-                            <v-img
-                              :src="`${dataTTD.url}/image/${dataTTD.kepalasekolah.signature}`"
-                              width="80px"
-                              height="80px"
-                            />
-                          </template>
-                        </td>
-                      </tr>
-                      <tr class="ttd">
-                        <td style="text-decoration: underline;">{{ dataTTD.kepalasekolah.nama }}</td>
-                      </tr>
-                      <tr class="ttd">
-                        <td>{{ `NIP. ${dataTTD.kepalasekolah.nomorInduk}` }}</td>
-                      </tr>
-                    </table>
-                  </td>
-                  <td style="width: 50%;">
-                    <table border="0" width="300px" cellspacing="0" cellpadding="0" style="float: right;">
-                      <tr class="ttd">
-                        <td style="padding-bottom: 10px;">{{ `${dataTTD.ttd.tempat}, ${dataTTD.ttd.tanggal}` }}</td>
-                      </tr>
-                      <tr class="ttd">
-                        <td>{{ `WaKaBid. Kurikulum ${dataTTD.ttd.namasekolah}` }}</td>
-                      </tr>
-                      <tr class="ttd">
-                        <td style="padding: 10px 0px;">
-                          <template v-if="dataTTD.kurikulum.signature !== null">
-                            <v-img
-                              :src="`${dataTTD.url}/image/${dataTTD.kurikulum.signature}`"
-                              width="80px"
-                              height="80px"
-                            />
-                          </template>
-                        </td>
-                      </tr>
-                      <tr class="ttd">
-                        <td style="text-decoration: underline;">{{ dataTTD.kurikulum.nama }}</td>
-                      </tr>
-                      <tr class="ttd">
-                        <td>{{ `NIP. ${dataTTD.kurikulum.nomorInduk}` }}</td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
+                <tbody>
+                  <tr>
+                    <td style="width: 50%;">
+                      <table border="0" width="300px" cellspacing="0" cellpadding="0" style="float: left; margin-left: 80px;">
+                        <tbody>
+                          <tr class="ttd">
+                            <td style="padding-bottom: 10px;">Mengetahui,</td>
+                          </tr>
+                          <tr class="ttd">
+                            <td>{{ `Kepala Sekolah ${dataTTD.ttd.namasekolah}` }}</td>
+                          </tr>
+                          <tr class="ttd">
+                            <td style="padding: 10px 0px;">
+                              <template v-if="dataTTD.kepalasekolah.signature !== null">
+                                <v-img
+                                  :src="dataTTD.kepalasekolah.signature"
+                                  width="80px"
+                                  height="80px"
+                                />
+                              </template>
+                            </td>
+                          </tr>
+                          <tr class="ttd">
+                            <td style="text-decoration: underline;">{{ dataTTD.kepalasekolah.nama }}</td>
+                          </tr>
+                          <tr class="ttd">
+                            <td>{{ `NIP. ${dataTTD.kepalasekolah.nomorInduk}` }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                    <td style="width: 50%;">
+                      <table border="0" width="300px" cellspacing="0" cellpadding="0" style="float: right;">
+                        <tbody>
+                          <tr class="ttd">
+                            <td style="padding-bottom: 10px;">{{ `${dataTTD.ttd.tempat}, ${dataTTD.ttd.tanggal}` }}</td>
+                          </tr>
+                          <tr class="ttd">
+                            <td>{{ `WaKaBid. Kurikulum ${dataTTD.ttd.namasekolah}` }}</td>
+                          </tr>
+                          <tr class="ttd">
+                            <td style="padding: 10px 0px;">
+                              <template v-if="dataTTD.kurikulum.signature !== null">
+                                <v-img
+                                  :src="dataTTD.kurikulum.signature"
+                                  width="80px"
+                                  height="80px"
+                                />
+                              </template>
+                            </td>
+                          </tr>
+                          <tr class="ttd">
+                            <td style="text-decoration: underline;">{{ dataTTD.kurikulum.nama }}</td>
+                          </tr>
+                          <tr class="ttd">
+                            <td>{{ `NIP. ${dataTTD.kurikulum.nomorInduk}` }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                </tbody>
               </table>
             </v-col>
           </v-row>
         </v-card-text>
         <v-divider />
-        <v-card-actions>
-          <v-row 
-            no-gutters
-            class="mr-3"
-          >
-            <v-col
-              class="text-end"
-              cols="12"
-            >
-              <!-- <Button 
-                color-button="black"
-                nama-button="Lihat Point"
-                @proses="UpdatePoint()"
-              /> -->
-            </v-col>
-          </v-row>
-        </v-card-actions>
+        <v-card-actions />
       </v-card>
     </v-dialog>
     <v-dialog
@@ -603,7 +604,6 @@ export default {
         tempat: '',
         tanggal: '',
       },
-      url: '',
     },
 		searchData: '',
     page: 1,
@@ -681,28 +681,27 @@ export default {
     jadwalPelajaranAll: {
 			deep: true,
 			handler(value) {
-        this.DataJadwalPelajaran = value.result
+        this.DataJadwalPelajaran = value.jadwal
         this.dataKelas = value.dataKelas
-        this.dataGuru = value.dataGuru
+        this.dataGuru = value.struktural.dataGuru
         this.dataTTD = {
           kepalasekolah: {
-            idUser: value.kepalaSekolah.idUser,
-            nama: value.kepalaSekolah.nama,
-            nomorInduk: value.kepalaSekolah.nomorInduk,
-            signature: value.kepalaSekolah.signature,
+            idUser: value.struktural.kepalaSekolah.idUser,
+            nama: value.struktural.kepalaSekolah.nama,
+            nomorInduk: value.struktural.kepalaSekolah.nomorInduk,
+            signature: value.struktural.kepalaSekolah.signature,
           },
           kurikulum: {
-            idUser: value.kurikulum.idUser,
-            nama: value.kurikulum.nama,
-            nomorInduk: value.kurikulum.nomorInduk,
-            signature: value.kurikulum.signature,
+            idUser: value.struktural.kurikulum.idUser,
+            nama: value.struktural.kurikulum.nama,
+            nomorInduk: value.struktural.kurikulum.nomorInduk,
+            signature: value.struktural.kurikulum.signature,
           },
           ttd: {
             namasekolah: value.ttd.namasekolah,
             tempat: value.ttd.tempat,
             tanggal: value.ttd.tanggal,
           },
-          url: value.url,
         }
       }
     },
@@ -745,7 +744,7 @@ export default {
 		...mapActions({
       getJadwalMengajar: 'user/getJadwalMengajar', 
       getJadwalPelajaran: 'user/getJadwalPelajaran', 
-      getMengajar: 'setting/getMengajar', 
+			getDataMaster: 'setting/getDataMaster',
       getKelas: 'setting/getKelas',
 			getBerkas: "setting/getBerkas",
     }),
@@ -760,7 +759,6 @@ export default {
         timeJadwal: jenis === 'JadwalMengajar' ? null : this.inputData2.timeRange,
         tautan: jenis === 'JadwalMengajar' ? null : this.inputData2.tautan,
       }
-      // return console.log(bodyData);
       this.$store.dispatch('user/postJadwalMengajar', bodyData)
       .then((res) => {
         jenis === 'JadwalMengajar' ? this.DialogJadwalMengajar = false : this.DialogMataPelajaran = false
@@ -773,7 +771,7 @@ export default {
 			});
     },
     bukadialog(item, mapel, data){
-      this.getBerkas({kategori: 'tautan'})
+      this.getBerkas({jenis: 'modul', kategori: 'tautan'})
       this.dataKelasMapel = item.resdata
       this.inputData2.idUser = data.idUser
       this.inputData2.mapel = mapel
@@ -791,16 +789,15 @@ export default {
       this.DialogMataPelajaran = true
     },
     lookJadwal(){
-      // this.getJadwalPelajaran({ untuk: 'admin' })
       this.getJadwalPelajaran()
       this.DialogJadwalPelajaran = true
     },
     ubahData(item){
-		  this.getMengajar()
+		  this.getDataMaster({ kode: 'mengajar' })
       this.getKelas({ kondisi: 'All' })
       this.inputData = {
         idUser: item.idUser,
-        mapel: item.dataJadwalMengajar.map(str => str.mapel.kodeMapel),
+        mapel: item.dataJadwalMengajar.map(str => str.mapel.value),
         kelas: item.dataJadwalMengajar.map(str => {
           return str.resdata.map(val => val.kelas)
         })[0],
@@ -808,10 +805,10 @@ export default {
       this.DialogJadwalMengajar = true
     },
     clickrow(event, data) {
-      const index = this.$data.expanded.find(i => i === data?.item?.raw?.idUser);
+      const index = this.$data.expanded.find(i => i === data?.item?.idUser);
       if(typeof index === 'undefined') return this.$data.expanded = [];
       this.$data.expanded.splice(0, 1)
-      this.$data.expanded.push(data?.item?.raw?.idUser);
+      this.$data.expanded.push(data?.item?.idUser);
     },
     notifikasi(kode, text, proses){
       this.dialogNotifikasi = true
@@ -825,24 +822,26 @@ export default {
 
 <style scoped>
 .tableClass, .tdClass, .thClass {
-  border: 2px solid #FFF;
   padding: 5px;
   text-align: center;
 	font-size: 7.5pt;
   font-weight: bold;
 }
+.tdClass {
+  border: 2px solid #000;
+}
 .tableClass, .tdSClass, .thSClass {
-  border: 2px solid #FFF;
   padding: 5px;
   text-align: center;
 	font-size: 7.5pt;
   font-weight: bold;
 }
 .tdSClass {
+  border: 2px solid #000;
   text-align: left;
 }
 .thClass, .thSClass {
-  border: 2px solid #FFF;
+  border: 2px solid #be1111;
   background-color: #000;
   color: #FFF;
 }

@@ -40,7 +40,7 @@ const actions = {
   },
   [GET_PROFILE](context, uid) {
     return new Promise((resolve, reject) => {
-      ApiService.put(`auth/profile/${uid}`, localStorage.getItem('user_token'))
+      ApiService.put(`auth/profile`, localStorage.getItem('user_token'))
       .then((response) => {
           context.commit('SET_PROFILE', response.data.result)
           resolve(response);
@@ -74,7 +74,7 @@ const actions = {
   },
   [AUTH_LOGOUT](context, uid) {
     return new Promise((resolve, reject) => {
-      ApiService.get(`auth/logout/${uid}`, '12qwaszx@321123')
+      ApiService.get(`auth/logout`, localStorage.getItem('user_token'))
       .then((response) => {
           resolve(response);
         })

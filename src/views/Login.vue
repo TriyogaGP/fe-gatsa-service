@@ -49,6 +49,7 @@
                         :style="{
                           fontSize: getFontSize() + 'px',
                           fontWeight: 800,
+                          color: getColor(),
                           transform: 'rotate(' + getRotationAngle() + 'deg)',
                         }"
                         class="np-captcha-character"
@@ -80,6 +81,7 @@
           <h3 class="tombolLupaPass" @click="lupaSandi()">Lupa Kata Sandi ?</h3>
           <div class="text-center mt-3 mb-10">
             <Button 
+              :loading="isLoadingMasuk"
               color-button="light-black darken-3"
               nama-button="Masuk"
               @proses="AutentificationLogin()"
@@ -123,6 +125,7 @@ export default {
     captchaLength: 5,
     captchaArray: [],
     captcha: '',
+    isLoadingMasuk: false,
 
     //notifikasi
     dialogNotifikasi: false,
@@ -174,6 +177,7 @@ export default {
         this.captcha = '';
         return this.notifikasi("warning", "Captcha tidak cocok, coba lagi !", "1");
       }
+      this.isLoadingMasuk = true
       const payload = {
         username: this.username,
         password: this.katasandi,
@@ -181,6 +185,7 @@ export default {
       this.$store.dispatch('auth/AuthLogin', payload)
       .then((res) => {
         let data = res.data.result;
+        this.isLoadingMasuk = false
         localStorage.setItem('user_token', data.accessToken);
         localStorage.setItem('nama', data.nama);
         localStorage.setItem('nama_role', data.namaRole);
@@ -190,10 +195,10 @@ export default {
         if(data.consumerType === 3){
           let jabatan = data.jabatanGuru.split(', ')
           if(jabatan.includes('1') || jabatan.includes('2') || jabatan.includes('3') || jabatan.includes('4')){
-            localStorage.setItem('jabatan_guru', data.jabatanGuru);
-            localStorage.setItem('mengajar_bidang', data.mengajarBidang);
-            localStorage.setItem('mengajar_kelas', data.mengajarKelas);
-            localStorage.setItem('wali_kelas', data.waliKelas ? data.waliKelas : '');
+            localStorage.setItem('jabatan_guru', data?.jabatanGuru || '');
+            localStorage.setItem('mengajar_bidang', data?.mengajarBidang || '');
+            localStorage.setItem('mengajar_kelas', data?.mengajarKelas || '');
+            localStorage.setItem('wali_kelas', data?.waliKelas || '');
             const socket = io(this.API_URL);
             socket.emit("dataonline");
             return this.notifikasi("success", res.data.message, "2")
@@ -206,20 +211,19 @@ export default {
             localStorage.clear();
             return this.notifikasi("warning", "Anda tidak bisa akses panel ini, karena anda bukan Guru Pengajar!", "1")
           }
-          localStorage.setItem('jabatan_guru', data.jabatanGuru);
-          localStorage.setItem('mengajar_bidang', data.mengajarBidang);
-          localStorage.setItem('mengajar_kelas', data.mengajarKelas);
-          localStorage.setItem('wali_kelas', data.waliKelas ? data.waliKelas : '');
+          localStorage.setItem('jabatan_guru', data.jabatanGuru || '');
+          localStorage.setItem('mengajar_bidang', data.mengajarBidang || '');
+          localStorage.setItem('mengajar_kelas', data.mengajarKelas || '');
+          localStorage.setItem('wali_kelas', data?.waliKelas || '');
         }else if(data.consumerType === 4){
           localStorage.setItem('kelas', data.kelas);
         }
-
-
         const socket = io(this.API_URL);
         socket.emit("dataonline");
         this.notifikasi("success", res.data.message, "2")
 			})
 			.catch((err) => {
+        this.isLoadingMasuk = false
         this.createCaptcha();
         this.captcha = '';
         this.notifikasi("error", err.response.data.message, "1")
@@ -245,6 +249,14 @@ export default {
     getRotationAngle() {
       const rotationVariations = [5, 10, 20, 25, -5, -10, -20, -25];
       return rotationVariations[Math.floor(Math.random() * rotationVariations.length)];
+    },
+    getColor() {
+      const letters = '0123456789ABCDEF';
+      let color = '#';
+      for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
     },
     goToProses() {
       const socket = io(this.API_URL);
@@ -380,7 +392,7 @@ export default {
 .np-captcha-container {
   background: #e1e1f0;
   width: 185px;
-  height: 35px;
+  height: 45px;
   margin: 0 auto;
   border: 2px dotted;
   border-radius: 10px;
@@ -401,5 +413,6 @@ export default {
 .np-captcha-character {
   display: inline-block;
   letter-spacing: 14px;
+  font-family: 'Roboto', sans-serif;
 }
 </style>

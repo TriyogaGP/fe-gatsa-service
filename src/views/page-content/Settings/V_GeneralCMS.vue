@@ -1,6 +1,6 @@
 <template>
   <div>
-		<h1 class="subheading grey--text text-decoration-underline">Panel General CMS</h1>
+		<h2 class="subheading grey--text text-decoration-underline">Panel General CMS</h2>
     <v-row>
       <v-col cols="12" md="12" class="text-right">
 				<v-menu
@@ -13,8 +13,9 @@
 					<template v-slot:activator="{ props }">
 						<Button
 							v-bind="props"
-							color-button="#0bd369"
+							color-button="success"
 							nama-button="Upload Berkas"
+							size-button="x-small"
 							icon-append-button="mdi mdi-menu-down"
 						/>
 					</template>
@@ -76,18 +77,19 @@
 				<Button
 					color-button="light-blue darken-3"
 					nama-button="Simpan Data"
+					size-button="x-small"
 					@proses="SimpanGeneranCMS()"
 				/>
       </v-col>
     </v-row>
 		<v-card class="mt-2 mb-2 pa-2 ma-1">
-      <h2><u>Logo Sekolah</u></h2>
+      <h3><u>Logo Sekolah</u></h3>
 			<div class="mt-4 d-flex flex-column justify-space-between align-center">
 				<div class="avatar" @click="$refs.logoSekolah.click()">
 					<span class="tulisan">
 						<v-icon color="white" icon="mdi mdi-camera-account" />&nbsp;Ubah Logo Sekolah
 					</span>
-					<v-img :src="inputData.logo" />
+					<v-img :src="`${this.API_URL}bahan/${inputData.logo}`" />
 				</div>
 				<input 
 					ref="logoSekolah"
@@ -100,7 +102,7 @@
 			</div>
 		</v-card>
     <v-card class="mt-2 mb-2 pa-2 ma-1">
-      <h2><u>Default Settings</u></h2>
+      <h4><u>Default Settings</u></h4>
       <v-row no-gutters>
         <v-col cols="12" md="6" class="pa-4">
           <TextField
@@ -114,7 +116,7 @@
 						v-model="inputData.statussekolah"
 						:data-a="statusSekolahOptions"
 						item-title="label"
-						item-value="kode"
+						item-value="value"
 						label-a="Status Sekolah"
 						:clearable-a="true"
 					/>
@@ -176,7 +178,7 @@
       </v-row>
     </v-card>
     <v-card class="mt-2 mb-2 pa-2 ma-1">
-      <h2><u>Address Settings</u></h2>
+      <h4><u>Address Settings</u></h4>
       <v-row no-gutters>
         <v-col cols="12" md="6" class="pa-4">
           <TextField
@@ -277,6 +279,458 @@
         </v-col>
       </v-row>
     </v-card>
+		<v-card class="mt-2 mb-2 pa-2 ma-1">
+      <h4><u>Data Master Settings</u></h4>
+			<v-row no-gutters>
+        <v-col cols="12" md="4" class="pa-4">
+					<v-card color="background-dialog-card">
+						<v-toolbar color="success">
+							<v-toolbar-title>Options Agama</v-toolbar-title>
+							<v-spacer />
+							<v-toolbar-items>
+								<Button
+									variant="plain"
+									color-button="#ffffff"
+									icon-button="mdi mdi-plus"
+									model-button="comfortable"
+									size-button="large"
+									@proses="openDialogDataMaster('add', 'agama', null)"
+								/>
+							</v-toolbar-items>
+						</v-toolbar>
+						<VirtualScroll
+							:items="agamaOptions"
+							icon-vs="mdi mdi-format-list-bulleted"
+							height-vs="150"
+							item-height-vs="50"
+							@proses="(item) => { openDialogDataMaster('edit', 'agama', item); }"
+							@clear="(item) => { openDialogDataMaster('clear', 'agama', item); }"
+						/>
+					</v-card>
+        </v-col>
+        <v-col cols="12" md="4" class="pa-4">
+					<v-card color="background-dialog-card">
+						<v-toolbar color="success">
+							<v-toolbar-title>Options Hobi</v-toolbar-title>
+							<v-spacer />
+							<v-toolbar-items>
+								<Button
+									variant="plain"
+									color-button="#ffffff"
+									icon-button="mdi mdi-plus"
+									model-button="comfortable"
+									size-button="large"
+									@proses="openDialogDataMaster('add', 'hobi', null)"
+								/>
+							</v-toolbar-items>
+						</v-toolbar>
+						<VirtualScroll
+							:items="hobiOptions"
+							icon-vs="mdi mdi-format-list-bulleted"
+							height-vs="150"
+							item-height-vs="50"
+							@proses="(item) => { openDialogDataMaster('edit', 'hobi', item); }"
+							@clear="(item) => { openDialogDataMaster('clear', 'hobi', item); }"
+						/>
+					</v-card>
+        </v-col>
+        <v-col cols="12" md="4" class="pa-4">
+					<v-card color="background-dialog-card">
+						<v-toolbar color="success">
+							<v-toolbar-title>Options Cita-cita</v-toolbar-title>
+							<v-spacer />
+							<v-toolbar-items>
+								<Button
+									variant="plain"
+									color-button="#ffffff"
+									icon-button="mdi mdi-plus"
+									model-button="comfortable"
+									size-button="large"
+									@proses="openDialogDataMaster('add', 'citacita', null)"
+								/>
+							</v-toolbar-items>
+						</v-toolbar>
+						<VirtualScroll
+							:items="citacitaOptions"
+							icon-vs="mdi mdi-format-list-bulleted"
+							height-vs="150"
+							item-height-vs="50"
+							@proses="(item) => { openDialogDataMaster('edit', 'citacita', item); }"
+							@clear="(item) => { openDialogDataMaster('clear', 'citacita', item); }"
+						/>
+					</v-card>
+        </v-col>
+      </v-row>
+			<v-row no-gutters>
+        <v-col cols="12" md="4" class="pa-4">
+					<v-card color="background-dialog-card">
+						<v-toolbar color="success">
+							<v-toolbar-title>Options Jabatan</v-toolbar-title>
+							<v-spacer />
+							<v-toolbar-items>
+								<Button
+									variant="plain"
+									color-button="#ffffff"
+									icon-button="mdi mdi-plus"
+									model-button="comfortable"
+									size-button="large"
+									@proses="openDialogDataMaster('add', 'jabatan', null)"
+								/>
+							</v-toolbar-items>
+						</v-toolbar>
+						<VirtualScroll
+							:items="jabatanOptions"
+							icon-vs="mdi mdi-format-list-bulleted"
+							height-vs="150"
+							item-height-vs="50"
+							@proses="(item) => { openDialogDataMaster('edit', 'jabatan', item); }"
+							@clear="(item) => { openDialogDataMaster('clear', 'jabatan', item); }"
+						/>
+					</v-card>
+        </v-col>
+        <v-col cols="12" md="4" class="pa-4">
+					<v-card color="background-dialog-card">
+						<v-toolbar color="success">
+							<v-toolbar-title>Options Jenjang Sekolah</v-toolbar-title>
+							<v-spacer />
+							<v-toolbar-items>
+								<Button
+									variant="plain"
+									color-button="#ffffff"
+									icon-button="mdi mdi-plus"
+									model-button="comfortable"
+									size-button="large"
+									@proses="openDialogDataMaster('add', 'jenjangsekolah', null)"
+								/>
+							</v-toolbar-items>
+						</v-toolbar>
+						<VirtualScroll
+							:items="jenjangsekolahOptions"
+							icon-vs="mdi mdi-format-list-bulleted"
+							height-vs="150"
+							item-height-vs="50"
+							@proses="(item) => { openDialogDataMaster('edit', 'jenjangsekolah', item); }"
+							@clear="(item) => { openDialogDataMaster('clear', 'jenjangsekolah', item); }"
+						/>
+					</v-card>
+        </v-col>
+        <v-col cols="12" md="4" class="pa-4">
+					<v-card color="background-dialog-card">
+						<v-toolbar color="success">
+							<v-toolbar-title>Options Mengajar</v-toolbar-title>
+							<v-spacer />
+							<v-toolbar-items>
+								<Button
+									variant="plain"
+									color-button="#ffffff"
+									icon-button="mdi mdi-plus"
+									model-button="comfortable"
+									size-button="large"
+									@proses="openDialogDataMaster('add', 'mengajar', null)"
+								/>
+							</v-toolbar-items>
+						</v-toolbar>
+						<VirtualScroll
+							:items="mengajarOptions"
+							icon-vs="mdi mdi-format-list-bulleted"
+							height-vs="150"
+							item-height-vs="50"
+							@proses="(item) => { openDialogDataMaster('edit', 'mengajar', item); }"
+							@clear="(item) => { openDialogDataMaster('clear', 'mengajar', item); }"
+						/>
+					</v-card>
+        </v-col>
+      </v-row>
+			<v-row no-gutters>
+        <v-col cols="12" md="4" class="pa-4">
+					<v-card color="background-dialog-card">
+						<v-toolbar color="success">
+							<v-toolbar-title>Options Pekerjaan</v-toolbar-title>
+							<v-spacer />
+							<v-toolbar-items>
+								<Button
+									variant="plain"
+									color-button="#ffffff"
+									icon-button="mdi mdi-plus"
+									model-button="comfortable"
+									size-button="large"
+									@proses="openDialogDataMaster('add', 'pekerjaan', null)"
+								/>
+							</v-toolbar-items>
+						</v-toolbar>
+						<VirtualScroll
+							:items="pekerjaanOptions"
+							icon-vs="mdi mdi-format-list-bulleted"
+							height-vs="150"
+							item-height-vs="50"
+							@proses="(item) => { openDialogDataMaster('edit', 'pekerjaan', item); }"
+							@clear="(item) => { openDialogDataMaster('clear', 'pekerjaan', item); }"
+						/>
+					</v-card>
+        </v-col>
+        <v-col cols="12" md="4" class="pa-4">
+					<v-card color="background-dialog-card">
+						<v-toolbar color="success">
+							<v-toolbar-title>Options Pendidikan</v-toolbar-title>
+							<v-spacer />
+							<v-toolbar-items>
+								<Button
+									variant="plain"
+									color-button="#ffffff"
+									icon-button="mdi mdi-plus"
+									model-button="comfortable"
+									size-button="large"
+									@proses="openDialogDataMaster('add', 'pendidikan', null)"
+								/>
+							</v-toolbar-items>
+						</v-toolbar>
+						<VirtualScroll
+							:items="pendidikanOptions"
+							icon-vs="mdi mdi-format-list-bulleted"
+							height-vs="150"
+							item-height-vs="50"
+							@proses="(item) => { openDialogDataMaster('edit', 'pendidikan', item); }"
+							@clear="(item) => { openDialogDataMaster('clear', 'pendidikan', item); }"
+						/>
+					</v-card>
+        </v-col>
+        <v-col cols="12" md="4" class="pa-4">
+					<v-card color="background-dialog-card">
+						<v-toolbar color="success">
+							<v-toolbar-title>Options Penghasilan</v-toolbar-title>
+							<v-spacer />
+							<v-toolbar-items>
+								<Button
+									variant="plain"
+									color-button="#ffffff"
+									icon-button="mdi mdi-plus"
+									model-button="comfortable"
+									size-button="large"
+									@proses="openDialogDataMaster('add', 'penghasilan', null)"
+								/>
+							</v-toolbar-items>
+						</v-toolbar>
+						<VirtualScroll
+							:items="penghasilanOptions"
+							icon-vs="mdi mdi-format-list-bulleted"
+							height-vs="150"
+							item-height-vs="50"
+							@proses="(item) => { openDialogDataMaster('edit', 'penghasilan', item); }"
+							@clear="(item) => { openDialogDataMaster('clear', 'penghasilan', item); }"
+						/>
+					</v-card>
+        </v-col>
+      </v-row>
+			<v-row no-gutters>
+        <v-col cols="12" md="4" class="pa-4">
+					<v-card color="background-dialog-card">
+						<v-toolbar color="success">
+							<v-toolbar-title>Options Status Orang Tua</v-toolbar-title>
+							<v-spacer />
+							<v-toolbar-items>
+								<Button
+									variant="plain"
+									color-button="#ffffff"
+									icon-button="mdi mdi-plus"
+									model-button="comfortable"
+									size-button="large"
+									@proses="openDialogDataMaster('add', 'statusorangtua', null)"
+								/>
+							</v-toolbar-items>
+						</v-toolbar>
+						<VirtualScroll
+							:items="statusorangtuaOptions"
+							icon-vs="mdi mdi-format-list-bulleted"
+							height-vs="150"
+							item-height-vs="50"
+							@proses="(item) => { openDialogDataMaster('edit', 'statusorangtua', item); }"
+							@clear="(item) => { openDialogDataMaster('clear', 'statusorangtua', item); }"
+						/>
+					</v-card>
+        </v-col>
+        <v-col cols="12" md="4" class="pa-4">
+					<v-card color="background-dialog-card">
+						<v-toolbar color="success">
+							<v-toolbar-title>Options Status Tempat Tinggal</v-toolbar-title>
+							<v-spacer />
+							<v-toolbar-items>
+								<Button
+									variant="plain"
+									color-button="#ffffff"
+									icon-button="mdi mdi-plus"
+									model-button="comfortable"
+									size-button="large"
+									@proses="openDialogDataMaster('add', 'statustempattinggal', null)"
+								/>
+							</v-toolbar-items>
+						</v-toolbar>
+						<VirtualScroll
+							:items="statustempattinggalOptions"
+							icon-vs="mdi mdi-format-list-bulleted"
+							height-vs="150"
+							item-height-vs="50"
+							@proses="(item) => { openDialogDataMaster('edit', 'statustempattinggal', item); }"
+							@clear="(item) => { openDialogDataMaster('clear', 'statustempattinggal', item); }"
+						/>
+					</v-card>
+        </v-col>
+        <v-col cols="12" md="4" class="pa-4">
+					<v-card color="background-dialog-card">
+						<v-toolbar color="success">
+							<v-toolbar-title>Options Transportasi</v-toolbar-title>
+							<v-spacer />
+							<v-toolbar-items>
+								<Button
+									variant="plain"
+									color-button="#ffffff"
+									icon-button="mdi mdi-plus"
+									model-button="comfortable"
+									size-button="large"
+									@proses="openDialogDataMaster('add', 'transportasi', null)"
+								/>
+							</v-toolbar-items>
+						</v-toolbar>
+						<VirtualScroll
+							:items="transportasiOptions"
+							icon-vs="mdi mdi-format-list-bulleted"
+							height-vs="150"
+							item-height-vs="50"
+							@proses="(item) => { openDialogDataMaster('edit', 'transportasi', item); }"
+							@clear="(item) => { openDialogDataMaster('clear', 'transportasi', item); }"
+						/>
+					</v-card>
+        </v-col>
+      </v-row>
+			<v-row no-gutters>
+        <v-col cols="12" md="4" class="pa-4">
+					<v-card color="background-dialog-card">
+						<v-toolbar color="success">
+							<v-toolbar-title>Options Jarak Rumah</v-toolbar-title>
+							<v-spacer />
+							<v-toolbar-items>
+								<Button
+									variant="plain"
+									color-button="#ffffff"
+									icon-button="mdi mdi-plus"
+									model-button="comfortable"
+									size-button="large"
+									@proses="openDialogDataMaster('add', 'jarakrumah', null)"
+								/>
+							</v-toolbar-items>
+						</v-toolbar>
+						<VirtualScroll
+							:items="jarakrumahOptions"
+							icon-vs="mdi mdi-format-list-bulleted"
+							height-vs="150"
+							item-height-vs="50"
+							@proses="(item) => { openDialogDataMaster('edit', 'jarakrumah', item); }"
+							@clear="(item) => { openDialogDataMaster('clear', 'jarakrumah', item); }"
+						/>
+					</v-card>
+        </v-col>
+        <v-col cols="12" md="4" class="pa-4" />
+        <v-col cols="12" md="4" class="pa-4" />
+      </v-row>
+		</v-card>
+		<v-dialog
+      v-model="dialogDataMaster"
+      max-width="400"
+      persistent
+    >
+      <v-card color="background-dialog-card">
+				<v-toolbar color="surface">
+					<v-toolbar-title>{{ `${edited == 'add' ? "Tambah" : "Ubah"} Field Data Master ${jenisDataMaster}` }}</v-toolbar-title>
+				</v-toolbar>
+				<v-card-text class="pt-4 ScrollFullscreen">
+					<v-row no-gutters>
+						<v-col
+							cols="12"
+							class="mb-2 d-flex align-center"
+						>
+							<TextField
+								v-model="inputDataMaster.value"
+								label-tf="Kode"
+								:disabled-tf="true"
+							/>
+						</v-col>
+					</v-row>
+					<v-row no-gutters>
+						<v-col
+							cols="12"
+							class="mb-2 d-flex align-center"
+						>
+							<TextField
+								v-model="inputDataMaster.label"
+								label-tf="Label"
+								:clearable-tf="true"
+							/>
+						</v-col>
+					</v-row>
+					<v-row no-gutters v-if="jenisDataMaster == 'Mengajar'">
+						<v-col
+							cols="12"
+							class="mb-2 d-flex align-center"
+						>
+							<TextField
+								v-model="inputDataMaster.alias"
+								label-tf="Alias"
+								:clearable-tf="true"
+							/>
+						</v-col>
+					</v-row>
+					<v-row no-gutters v-if="jenisDataMaster == 'Mengajar'">
+						<v-col
+							cols="12"
+							class="d-flex align-center flex-wrap"
+						>
+							<div style="width: 100%; margin-bottom: 8px;">
+								<TextField
+									v-model="inputDataMaster.color"
+									label-tf="Color"
+									:disabled-tf="true"
+								/>
+							</div>
+							<div>
+								<v-color-picker
+									v-model="inputDataMaster.color"
+									canvas-height="100"
+									:modes="['hexa']"
+								/>
+							</div>
+						</v-col>
+					</v-row>
+				</v-card-text>
+				<v-divider />
+        <v-card-actions>
+					<v-row 
+						no-gutters
+						class="mt-1 mr-3"
+					>
+						<v-col class="text-start" cols="6" />
+						<v-col class="text-end" cols="6" >
+							<Button
+								color-button="black"
+								nama-button="Batal"
+								@proses="() => {
+									dialogDataMaster = false;
+									inputDataMaster = {
+										value: null,
+										label: null,
+										alias: null,
+										color: null,
+									};
+								}"
+							/>
+							<Button
+								color-button="black"
+								nama-button="Simpan"
+								@proses="simpanDataMaster(jenisDataMaster.toLowerCase(), inputDataMaster)"
+							/>
+						</v-col>
+					</v-row>
+				</v-card-actions>
+			</v-card>
+    </v-dialog>
 		<v-dialog
       v-model="DialogUploadBerkas"
       fullscreen
@@ -296,9 +750,9 @@
 							model-button="comfortable"
 							size-button="large"
 							@proses="() => {
-								this.DialogUploadBerkas = false
-								this.MultipleBerkas = []
-								this.jenisUpload = ''
+								DialogUploadBerkas = false;
+								MultipleBerkas = [];
+								jenisUpload = '';
 							}"
 						/>
 					</v-toolbar-items>
@@ -363,6 +817,15 @@
 								class="ma-1"
 								:clearable-tf="true"
 							/>
+							<Autocomplete
+								v-model="MultipleBerkas[f].jenis"
+								pilihan-a="autocomplete"
+								:data-a="jenisOptions"
+								item-title="label"
+								item-value="value"
+								label-a="Jenis Tujuan"
+								:clearable-a="true"
+							/>
 						</div>
 					</div>
         </v-card-text>
@@ -388,13 +851,13 @@
 							cols="6"
 						>
 							<Button
-								color-button="black"
+								color-button="info"
 								nama-button="Batal"
 								:disabled-button="MultipleBerkas.length ? false : true"
-								@proses="() => { this.MultipleBerkas = []; }"
+								@proses="() => { MultipleBerkas = []; }"
 							/>
 							<Button
-								color-button="black"
+								color-button="info"
 								nama-button="Upload Berkas"
 								:disabled-button="MultipleBerkas.length ? false : true"
 								@proses="SimpanMultiple()"
@@ -437,7 +900,6 @@
 						item-value="idBerkas"
 						density="comfortable"
 						hide-default-footer
-						hide-default-header
 						class="elavation-3 rounded"
 						:items-per-page="itemsPerPage"
 						@page-count="pageCount = $event"
@@ -451,64 +913,53 @@
 						<template #loader>
 							<LoaderDataTables />
 						</template>
-						<template #[`item.number`]="{ item }">
-							{{ page > 1 ? ((page - 1)*limit) + item.index + 1 : item.index + 1 }}
+						<template #[`item.number`]="{ index }">
+							{{ page > 1 ? ((page - 1)*limit) + index + 1 : index + 1 }}
 						</template>
 						<template #[`item.title`]="{ item }">
 							<div class="kotakFile">
-								<img v-if="item.raw.type === 'Gambar'" :ref="'file'" :src="item.raw.file" :title="item.raw.title" class="iconFile"/>
-								<v-icon v-if="item.raw.type === 'File' && item.raw.ext === 'docx'" class="iconFile" size="large" icon="mdi mdi-file-word-box" />
-								<v-icon v-if="item.raw.type === 'File' && item.raw.ext === 'xlsx'" class="iconFile" size="large" icon="mdi mdi-file-excel-box" />
-								<v-icon v-if="item.raw.type === 'File' && item.raw.ext === 'pdf'" class="iconFile" size="large" icon="mdi mdi-file-pdf-box" />
-								<v-icon v-if="item.raw.type === 'File' && item.raw.ext === 'txt'" class="iconFile" size="large" icon="mdi mdi-file-document" />
-								<span class="textFile">{{ `${item.raw.title}.${item.raw.ext}` }}</span>
+								<img v-if="item.type === 'Gambar'" :ref="'file'" :src="item.file" :title="item.title" class="iconFile"/>
+								<v-icon v-if="item.type === 'File' && item.ext === 'docx'" class="iconFile" size="large" icon="mdi mdi-file-word-box" />
+								<v-icon v-if="item.type === 'File' && item.ext === 'xlsx'" class="iconFile" size="large" icon="mdi mdi-file-excel-box" />
+								<v-icon v-if="item.type === 'File' && item.ext === 'pdf'" class="iconFile" size="large" icon="mdi mdi-file-pdf-box" />
+								<v-icon v-if="item.type === 'File' && item.ext === 'txt'" class="iconFile" size="large" icon="mdi mdi-file-document" />
+								<span class="textFile">{{ `${item.title}.${item.ext}` }}</span>
 							</div>
 						</template>
 						<template #[`item.opsi`]="{ item }">
-							<v-switch color="white" v-model="item.raw.statusAktif" hide-details @click="postRecord(item.raw.idBerkas, 'STATUSRECORD', !item.raw.statusAktif)" />
+							<v-switch color="success" v-model="item.statusAktif" :false-value="0" :true-value="1" hide-details @click="postRecord(item.idBerkas, 'STATUSRECORD', !item.statusAktif)" />
 						</template>
 						<template #[`item.aksi`]="{ item }">
 							<Button 
-								color-button="#bd3a07"
+								color-button="error"
 								icon-prepend-button="mdi mdi-delete"
 								nama-button="Hapus"
-								@proses="postRecord(item.raw.idBerkas, 'DELETE', null)"
+								size-button="x-small"
+								@proses="postRecord(item.idBerkas, 'DELETE', null)"
 							/>
 						</template>
 						<template #[`item.statusAktif`]="{ item }">
-							<v-icon size="small" v-if="item.raw.statusAktif == true" color="green" icon="mdi mdi-check" />
-							<v-icon size="small" v-else-if="item.raw.statusAktif == false" color="red" icon="mdi mdi-close" />
+							<v-icon size="small" v-if="item.statusAktif == true" color="green" icon="mdi mdi-check" />
+							<v-icon size="small" v-else-if="item.statusAktif == false" color="red" icon="mdi mdi-close" />
 						</template>
 						<template #top>
 							<v-row no-gutters class="pa-2">
 								<v-col cols="12" md="6" />
 								<v-col cols="12" md="6">
-									<v-row no-gutters>
-										<v-col cols="12" md="9">
-											<TextField
-												v-model="searchData"
-												icon-prepend-tf="mdi mdi-magnify"
-												label-tf="Pencarian..."
-												:clearable-tf="true"
-												@click:clear="() => {
-													page = 1
-													getDataBerkas({page: 1, limit: limit, keyword: ''})
-												}"
-												@keyup.enter="() => {
-													page = 1
-													getDataBerkas({page: 1, limit: limit, keyword: searchData})
-												}"
-											/>
-										</v-col>
-										<v-col cols="12" md="3" class="pl-2 d-flex justify-end align-center">
-											<Autocomplete
-												v-model="page"
-												:data-a="pageOptions"
-												label-a="Page"
-												:disabled-a="dataBerkas.length ? false : true"
-											/>
-										</v-col>
-									</v-row>
+									<TextField
+										v-model="searchData"
+										icon-prepend-tf="mdi mdi-magnify"
+										label-tf="Pencarian..."
+										:clearable-tf="true"
+										@click:clear="() => {
+											page = 1
+											getDataBerkas({page: 1, limit: limit, keyword: ''})
+										}"
+										@keyup.enter="() => {
+											page = 1
+											getDataBerkas({page: 1, limit: limit, keyword: searchData})
+										}"
+									/>
 								</v-col>
 							</v-row>
 							<v-divider :thickness="2" class="border-opacity-100" color="white" />
@@ -521,7 +972,17 @@
         <v-card-actions>
 					<v-row no-gutters>
 						<v-col cols="12" lg="9" class="d-flex justify-start align-center">
-							<span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
+							<!-- <span>Halaman <strong>{{ pageSummary.page ? pageSummary.page : 0 }}</strong> dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span> -->
+							<span style="font-size: 10pt;">Halaman</span>
+              <div style="width: 100px; margin-left: 3px; margin-right: 3px;">
+                <Autocomplete
+                  v-model="page"
+                  :data-a="pageOptions"
+                  label-a="Page"
+                  :disabled-a="dataBerkas.length ? false : true"
+                />
+              </div>
+              <span style="font-size: 10pt;">dari Total Halaman <strong>{{ pageSummary.totalPages ? pageSummary.totalPages : 0 }}</strong> (Records {{ pageSummary.total ? pageSummary.total : 0 }})</span>
 						</v-col>
 						<v-col cols="12" lg="3" class="pa-2 text-right">
 							<div class="d-flex justify-start align-center">
@@ -536,7 +997,7 @@
 									variant="plain"
 									size-button="large"
 									model-button="comfortable"
-									color-button="#000000"
+									color-button="success"
 									icon-button="mdi mdi-arrow-left-circle-outline"
 									:disabled-button="dataBerkas.length ? pageSummary.page != 1 ? false : true : true"
 									@proses="() => { page = pageSummary.page - 1 }"
@@ -545,7 +1006,7 @@
 									variant="plain"
 									size-button="large"
 									model-button="comfortable"
-									color-button="#000000"
+									color-button="success"
 									icon-button="mdi mdi-arrow-right-circle-outline"
 									:disabled-button="dataBerkas.length ? pageSummary.page != pageSummary.totalPages ? false : true : true"
 									@proses="() => { page = pageSummary.page + 1 }"
@@ -583,12 +1044,12 @@
               cols="12"
             >
               <Button
-                color-button="black"
+                color-button="info"
                 nama-button="Tutup"
                 @proses="tutupDialogCrop()"
               />
               <Button
-                color-button="black"
+                color-button="info"
                 nama-button="Crop Lampiran"
                 @proses="crop()"
               />
@@ -644,10 +1105,6 @@ export default {
   name: 'GeneralCMS',
 	components: { PopUpNotifikasi, RectangleStencil },
   data: () => ({
-    statusSekolahOptions: [
-			{ label: 'Negeri', kode: 1 },
-			{ label: 'Swasta', kode: 2 },
-		],
     raportOptions: [
 			{ label: 'False', value: 0 },
 			{ label: 'True', value: 1 },
@@ -661,32 +1118,45 @@ export default {
 			{ label: 'PENILAIAN AKHIR SEMESTER (PAS)', value: 'PAS' },
 			{ label: 'PENILAIAN TENGAH SEMESTER (PTS)', value: 'PTS' },
 		],
+		jenisOptions: [
+			{ label: 'Modul', value: 'modul' },
+			{ label: 'Broadcast', value: 'broadcast' },
+		],
     inputData: {
-      namasekolah: '',
+      namasekolah: null,
       statussekolah: null,
-      telepon: '',
-      alamat: '',
+      telepon: null,
+      alamat: null,
       provinsi: null,
       kabupatenkota: null,
       kecamatan: null,
       kelurahan: null,
-      kodepos: '',
-      latitude: '',
-      longitude: '',
+      kodepos: null,
+      latitude: null,
+      longitude: null,
       tahunpelajaran: null,
       pdfraport: null,
       jenisraport: null,
       semester: null,
-      kkm: '',
-      logo: '',
+      kkm: null,
+      logo: null,
     },
-    tahunOptions: [],
+		inputDataMaster: {
+			value: null,
+			label: null,
+			alias: null,
+			color: null,
+		},
+    // tahunOptions: [],
     DialogUploadBerkas: false,
     DialogBerkas: false,
     dialogCrop: false,
+    dialogDataMaster: false,
 		dataBerkas: [],
 		MultipleBerkas: [],
 		componentKey: 0,
+		edited: 'add',
+		jenisDataMaster: '',
 		jenisUpload: '',
 		dataNotifikasi: [],
 		searchData: '',
@@ -742,6 +1212,7 @@ export default {
     }),
 		...mapState({
 			loadingtable: store => store.setting.loadingtable,
+			dataCMSSetting: store => store.setting.dataCMSSetting,
 			ProvinsiOptions: store => store.setting.ProvinsiOptions,
 			KabKotaOptions: store => store.setting.KabKotaOptions,
 			KecamatanOptions: store => store.setting.KecamatanOptions,
@@ -765,6 +1236,29 @@ export default {
       })
       return kel
     },
+		tahunOptions(){
+      const d = new Date();
+			let tampung = []
+			for (let tahun = 2020; tahun <= d.getFullYear(); tahun++) {
+				let tulisan = `${tahun}/${tahun+1}`
+				tampung.push(tulisan.toString())
+			}
+      return tampung
+    },
+		statusSekolahOptions(){ return this.dataCMSSetting?.status_sekolah || [] },
+		agamaOptions(){ return this.dataCMSSetting?.agama || [] },
+		hobiOptions(){ return this.dataCMSSetting?.hobi || [] },
+		citacitaOptions(){ return this.dataCMSSetting?.citacita || [] },
+		jabatanOptions(){ return this.dataCMSSetting?.jabatan || [] },
+		jenjangsekolahOptions(){ return this.dataCMSSetting?.jenjangsekolah || [] },
+		mengajarOptions(){ return this.dataCMSSetting?.mengajar || [] },
+		pekerjaanOptions(){ return this.dataCMSSetting?.pekerjaan || [] },
+		pendidikanOptions(){ return this.dataCMSSetting?.pendidikan || [] },
+		penghasilanOptions(){ return this.dataCMSSetting?.penghasilan || [] },
+		statusorangtuaOptions(){ return this.dataCMSSetting?.statusorangtua || [] },
+		statustempattinggalOptions(){ return this.dataCMSSetting?.statustempattinggal || [] },
+		transportasiOptions(){ return this.dataCMSSetting?.transportasi || [] },
+		jarakrumahOptions(){ return this.dataCMSSetting?.jarakrumah || [] },
   },
 	watch: {
 		berkasAll: {
@@ -786,29 +1280,24 @@ export default {
     cmssettings:{
 			deep: true,
 			handler(value) {
-				const d = new Date();
-        for (let tahun = 2020; tahun <= d.getFullYear(); tahun++) {
-          let tulisan = `${tahun}/${tahun+1}`
-          this.tahunOptions.push(tulisan.toString())
-        }
 				this.inputData = {
-					namasekolah: value.namasekolah ? value.namasekolah : null,
-					statussekolah: value.statussekolah ? value.statussekolah.value : null,
-					telepon: value.telepon ? value.telepon : null,
-					alamat: value.alamat ? value.alamat : null,
-					provinsi: value.provinsi ? value.provinsi.value : null,
-					kabupatenkota: value.kabupatenkota ? value.kabupatenkota.value : null,
-					kecamatan: value.kecamatan ? value.kecamatan.value : null,
-					kelurahan: value.kelurahan ? value.kelurahan.value : null,
-					kodepos: value.kodepos ? value.kodepos : null,
-					latitude: value.latitude ? value.latitude : null,
-					longitude: value.longitude ? value.longitude : null,
-					tahunpelajaran: value.tahunpelajaran ? value.tahunpelajaran : null,
-					pdfraport: value.pdfraport ? value.pdfraport.value : null,
-					jenisraport: value.jenisraport ? value.jenisraport.value : null,
-					semester: value.semester ? value.semester.value : null,
-					kkm: value.kkm ? value.kkm : null,
-					logo: value.logo ? `${this.API_URL}bahan/${value.logo}` : null,
+					namasekolah: value?.namasekolah,
+					statussekolah: value?.statussekolah?.value,
+					telepon: value?.telepon,
+					alamat: value?.alamat,
+					provinsi: value?.provinsi?.value,
+					kabupatenkota: value?.kabupatenkota?.value,
+					kecamatan: value?.kecamatan?.value,
+					kelurahan: value?.kelurahan?.value,
+					kodepos: value?.kodepos,
+					latitude: value?.latitude,
+					longitude: value?.longitude,
+					tahunpelajaran: value?.tahunpelajaran,
+					pdfraport: value?.pdfraport?.value,
+					jenisraport: value?.jenisraport?.value,
+					semester: value?.semester?.value,
+					kkm: value?.kkm,
+					logo: value?.logo,
 				}
 				this.getWilayah2023({ bagian: 'kabkota', KodeWilayah: this.inputData.provinsi })
 				this.getWilayah2023({ bagian: 'kecamatan', KodeWilayah: this.inputData.kabupatenkota })
@@ -895,11 +1384,6 @@ export default {
 			}
 		},
     SimpanGeneranCMS(){
-      const d = new Date();
-      for (let tahun = 2020; tahun <= d.getFullYear(); tahun++) {
-        let tulisan = `${tahun}/${tahun+1}`
-        this.tahunOptions.push(tulisan.toString())
-      }
 			this.getWilayah2023({ bagian: 'provinsi', KodeWilayah: null })
 			this.getWilayah2023({ bagian: 'kabkota', KodeWilayah: this.inputData.provinsi })
 			this.getWilayah2023({ bagian: 'kecamatan', KodeWilayah: this.inputData.kabupatenkota })
@@ -907,12 +1391,14 @@ export default {
       let semester = this.semesterOptions.filter(str => str.value === this.inputData.semester)[0]
       let jenisraport = this.jenisRaportOptions.filter(str => str.value === this.inputData.jenisraport)[0]
       let raport = this.raportOptions.filter(str => str.value === this.inputData.pdfraport)[0]
-      let status = this.statusSekolahOptions.filter(str => str.kode === this.inputData.statussekolah)[0]
+      let status = this.statusSekolahOptions.filter(str => str.value === this.inputData.statussekolah)[0]
       let provinsi = this.ProvinsiOptions.filter(str => str.kode === this.inputData.provinsi)[0]
       let kabkota = this.KabKotaOptions.filter(str => str.kode === this.inputData.kabupatenkota)[0]
       let kec = this.KecamatanOptions.filter(str => str.kode === this.inputData.kecamatan)[0]
       let kel = this.KelurahanOptions.filter(str => str.kode === this.inputData.kelurahan)[0]
+			
       let bodyData = {
+				jenis: 'nonDataMaster',
         alamat: this.inputData.alamat,
 				provinsi: {
           label: `Provinsi ${provinsi.nama}`,
@@ -936,7 +1422,7 @@ export default {
         namasekolah: this.inputData.namasekolah,
         statussekolah: {
             label: status.label,
-            value: status.kode
+            value: status.value
         },
         tahunpelajaran: this.inputData.tahunpelajaran,
         pdfraport: {
@@ -954,7 +1440,6 @@ export default {
         telepon: this.inputData.telepon,
         kkm: this.inputData.kkm,
       }
-			// return console.log(bodyData);
 			this.$store.dispatch('setting/postCMSSettings', bodyData)
       .then((res) => {
         this.getCMSSettings()
@@ -972,6 +1457,7 @@ export default {
 					let file = e.target.files[i]
 					this.MultipleBerkas.push({ 
 						title: '',
+						jenis: 'broadcast',
 						ext: file.type === 'image/jpeg' || file.type === 'image/jpg' ? 'jpg' : 'png',
 						kategori: this.jenisUpload,
 						url: URL.createObjectURL(file),
@@ -984,6 +1470,7 @@ export default {
 					let file = e.target.files[i]
 					this.MultipleBerkas.push({ 
 						title: '',
+						jenis: null,
 						ext: file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || file.type === 'application/msword'
 							? 'docx' : file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || file.type === 'application/vnd.ms-excel'
 							? 'xlsx' : file.type === 'application/pdf'
@@ -1005,12 +1492,13 @@ export default {
 			}
     },
 		async SimpanMultiple(){
-			let dataFile = this.jenisUpload === 'Gambar' ? this.MultipleBerkas : this.MultipleBerkas
+			let dataFile = this.MultipleBerkas
 			let kirim = await Promise.all(dataFile.map(async (value) => {
         let status = []
         const bodyData = {
 					title: value.title,
 					type: value.kategori,
+					jenis: value.jenis,
 					ext: value.ext,
 					nama_file: `${this.convertDate(new Date().toISOString().slice(0,10))}${this.makeRandom(8)}`,
 					table: "Berkas",
@@ -1122,6 +1610,52 @@ export default {
 			this.$refs.cropper.value = null
       this.dialogCrop = false
     },
+		openDialogDataMaster(index, jenis, item){
+			this.edited = index
+			this.jenisDataMaster = this.uppercaseLetterFirst(jenis)
+			if(index == 'add'){
+				this.inputDataMaster = {
+					value: null,
+					label: null,
+					alias: null,
+					color: null,
+				}
+			}else{
+				this.inputDataMaster = {
+					value: jenis == 'mengajar' || jenis == 'jabatan' ? String(item?.value) : Number(item?.value),
+					label: item?.label,
+					alias: jenis == 'mengajar' ? item?.alias : null,
+					color: jenis == 'mengajar' ? item?.color : null,
+				}
+			}
+			if(index != 'clear') return this.dialogDataMaster = true
+			if(index == 'clear') return this.simpanDataMaster(jenis, this.inputDataMaster)
+		},
+		simpanDataMaster(kode, setting){
+			let bodyData = {
+				jenis: this.edited,
+				kode: kode.replace('-', ''),
+				setting
+			}
+			// return console.log(bodyData);
+			this.$store.dispatch('setting/postCMSSettings', bodyData)
+      .then((res) => {
+				this.dialogDataMaster = false
+				this.inputDataMaster = {
+					value: null,
+					label: null,
+					alias: null,
+					color: null,
+				}
+        this.getCMSSettings()
+        this.getWilayah2023({ bagian: 'provinsi', KodeWilayah: null })
+        this.notifikasi("success", res.data.message, "1")
+			})
+			.catch((err) => {
+				this.dialogDataMaster = false
+        this.notifikasi("error", err.response.data.message, "1")
+			});
+		},
 		goToProses() {
       window.location.reload();
     },
